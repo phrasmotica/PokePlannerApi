@@ -14,13 +14,13 @@ node {
             powershell "dotnet build"
         }
     }
-    
-    dir("PokePlannerWeb") {
-        stage("Checkout PokePlannerWeb") {
+
+    dir("PokePlannerApi") {
+        stage("Checkout PokePlannerApi") {
             checkout scm
         }
 
-        stage("Build PokePlannerWeb") {
+        stage("Build PokePlannerApi") {
             powershell "dotnet build"
         }
     }
