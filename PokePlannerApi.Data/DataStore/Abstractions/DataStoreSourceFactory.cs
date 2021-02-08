@@ -30,6 +30,11 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         /// </summary>
         public IDataStoreSource<TEntry> Create<TEntry>(string collectionName) where TEntry : EntryBase
         {
+            if (string.IsNullOrWhiteSpace(ConnectionString))
+            {
+                return new NullDataStoreSource<TEntry>();
+            }
+
             var isCosmosDb = Regex.IsMatch(ConnectionString, @"https:\/\/[\w-]+\.documents\.azure\.com");
             if (isCosmosDb)
             {
