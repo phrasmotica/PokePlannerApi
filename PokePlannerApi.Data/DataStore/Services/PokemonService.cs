@@ -16,45 +16,14 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonService : NamedApiResourceServiceBase<Pokemon, PokemonEntry>
     {
-        /// <summary>
-        /// The ability service.
-        /// </summary>
-        private readonly AbilityService AbilityService;
-
-        /// <summary>
-        /// The item service.
-        /// </summary>
-        private readonly ItemService ItemService;
-
-        /// <summary>
-        /// The machine service.
-        /// </summary>
-        private readonly MachineService MachineService;
-
-        /// <summary>
-        /// The move learn method service.
-        /// </summary>
-        private readonly MoveLearnMethodService MoveLearnMethodService;
-
-        /// <summary>
-        /// The move service.
-        /// </summary>
-        private readonly MoveService MoveService;
-
-        /// <summary>
-        /// The Pokemon form service.
-        /// </summary>
-        private readonly PokemonFormService PokemonFormService;
-
-        /// <summary>
-        /// The version group service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupService;
-
-        /// <summary>
-        /// The version service.
-        /// </summary>
-        private readonly VersionService VersionService;
+        private readonly AbilityService _abilityService;
+        private readonly ItemService _itemService;
+        private readonly MachineService _machineService;
+        private readonly MoveLearnMethodService _moveLearnMethodService;
+        private readonly MoveService _moveService;
+        private readonly PokemonFormService _pokemonFormService;
+        private readonly VersionGroupService _versionGroupService;
+        private readonly VersionService _versionService;
 
         /// <summary>
         /// Constructor.
@@ -72,14 +41,14 @@ namespace PokePlannerApi.Data.DataStore.Services
             VersionService versionService,
             ILogger<PokemonService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            AbilityService = abilityService;
-            ItemService = itemService;
-            MachineService = machineService;
-            MoveLearnMethodService = moveLearnMethodService;
-            MoveService = moveService;
-            PokemonFormService = pokemonFormService;
-            VersionGroupService = versionGroupService;
-            VersionService = versionService;
+            _abilityService = abilityService;
+            _itemService = itemService;
+            _machineService = machineService;
+            _moveLearnMethodService = moveLearnMethodService;
+            _moveService = moveService;
+            _pokemonFormService = pokemonFormService;
+            _versionGroupService = versionGroupService;
+            _versionService = versionService;
         }
 
         #region Entry conversion methods
@@ -132,7 +101,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public async Task<PokemonFormEntry[]> GetPokemonForms(int pokemonId, int versionGroupId)
         {
             var entry = await Upsert(pokemonId);
-            var formEntries = await PokemonFormService.UpsertMany(entry.Forms.Select(f => f.Id));
+            var formEntries = await _pokemonFormService.UpsertMany(entry.Forms.Select(f => f.Id));
             return formEntries.OrderBy(f => f.FormId).ToArray();
         }
 
@@ -143,7 +112,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public async Task<PokemonMoveContext[]> GetPokemonMoves(int pokemonId, int versionGroupId)
         {
             var resource = await _pokeApi.Get<Pokemon>(pokemonId);
-            var versionGroup = await VersionGroupService.Upsert(versionGroupId);
+            var versionGroup = await _versionGroupService.Upsert(versionGroupId);
 
             var relevantMoves = resource.Moves.Where(m =>
             {
@@ -151,7 +120,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 return versionGroupNames.Contains(versionGroup.Name);
             }).ToArray();
 
-            var moveEntries = await MoveService.UpsertMany(relevantMoves.Select(m => m.Move));
+            var moveEntries = await _moveService.UpsertMany(relevantMoves.Select(m => m.Move));
             var entryList = moveEntries.ToList();
 
             var moveContexts = new List<PokemonMoveContext>();
@@ -167,7 +136,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 var methodList = new List<MoveLearnMethodEntry>();
                 foreach (var detail in relevantDetails)
                 {
-                    var method = await MoveLearnMethodService.Upsert(detail.MoveLearnMethod);
+                    var method = await _moveLearnMethodService.Upsert(detail.MoveLearnMethod);
                     if (method.Name == "level-up")
                     {
                         context.Level = detail.LevelLearnedAt;
@@ -182,8 +151,8 @@ namespace PokePlannerApi.Data.DataStore.Services
 
                             foreach (var m in machineRefs)
                             {
-                                var machineEntry = await MachineService.Upsert(m.Id);
-                                var machineItem = await ItemService.Upsert(machineEntry.Item.Id);
+                                var machineEntry = await _machineService.Upsert(m.Id);
+                                var machineItem = await _itemService.Upsert(machineEntry.Item.Id);
                                 machineItems.Add(machineItem);
                             }
 
@@ -209,7 +178,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var resource = await _pokeApi.Get<Pokemon>(pokemonId);
             var orderedAbilities = resource.Abilities.OrderBy(a => a.Slot).ToArray();
-            var abilityEntries = await AbilityService.UpsertMany(orderedAbilities.Select(a => a.Ability));
+            var abilityEntries = await _abilityService.UpsertMany(orderedAbilities.Select(a => a.Ability));
 
             var abilityContexts = abilityEntries.Select((e, i) =>
             {
@@ -231,7 +200,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         private async Task<IEnumerable<LocalString>> GetDisplayNames(Pokemon pokemon)
         {
             // take display names from primary form, if any
-            var primaryForm = await PokemonFormService.Upsert(pokemon.Forms[0]);
+            var primaryForm = await _pokemonFormService.Upsert(pokemon.Forms[0]);
             return primaryForm.DisplayNames;
         }
 
@@ -272,7 +241,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             foreach (var form in pokemon.Forms)
             {
-                var source = await PokemonFormService.Upsert(form);
+                var source = await _pokemonFormService.Upsert(form);
                 formsList.Add(new PokemonForm
                 {
                     Id = source.FormId,
@@ -290,28 +259,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var typesList = new List<WithId<Type[]>>();
 
-            if (pokemon.PastTypes.Any())
-            {
-                // determine which version groups need entries
-                var versionGroups = await VersionGroupService.GetAll();
-                var generationNames = pokemon.PastTypes.Select(pt => pt.Generation.Name);
-                var relevantVersionGroups = versionGroups.Where(vg => generationNames.Contains(vg.Generation.Name));
-
-                // ensure we create an entry for only the last version group in the generation
-                var necessaryVersionGroups = relevantVersionGroups.OrderBy(vg => vg.Id)
-                                                                  .GroupBy(vg => vg.Generation.Name)
-                                                                  .Select(gr => gr.Last());
-
-                foreach (var vg in necessaryVersionGroups)
-                {
-                    var types = pokemon.PastTypes.Single(t => t.Generation.Name == vg.Generation.Name);
-                    var typeEntries = await MinimiseTypes(types.Types);
-                    typesList.Add(new WithId<Type[]>(vg.VersionGroupId, typeEntries.ToArray()));
-                }
-            }
-
-            // always include the newest types
-            var newestId = await VersionGroupService.GetNewestVersionGroupId();
+            var newestId = await _versionGroupService.GetNewestVersionGroupId();
             var newestTypeEntries = await MinimiseTypes(pokemon.Types);
             typesList.Add(new WithId<Type[]>(newestId, newestTypeEntries.ToArray()));
 
@@ -350,10 +298,10 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             // FUTURE: anticipating a generation-based base stats changelog
             // in which case this method will need to look like GetTypes()
-            var newestId = await VersionGroupService.GetNewestVersionGroupId();
+            var newestId = await _versionGroupService.GetNewestVersionGroupId();
             var currentBaseStats = pokemon.GetBaseStats(newestId);
 
-            var versionGroups = await VersionGroupService.GetAll();
+            var versionGroups = await _versionGroupService.GetAll();
             var statsList = versionGroups.Select(
                 vg => new WithId<int[]>(vg.VersionGroupId, currentBaseStats)
             );
@@ -368,7 +316,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var movesList = new List<WithId<Move[]>>();
 
-            var versionGroups = await VersionGroupService.GetAll();
+            var versionGroups = await _versionGroupService.GetAll();
             foreach (var vg in versionGroups)
             {
                 var moves = await GetMoves(pokemon, vg);
@@ -391,7 +339,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 return versionGroupNames.Contains(versionGroup.Name);
             });
 
-            var moveEntries = await MoveService.UpsertMany(relevantMoves.Select(m => m.Move));
+            var moveEntries = await _moveService.UpsertMany(relevantMoves.Select(m => m.Move));
             return moveEntries.Select(m => new Move
             {
                 Id = m.MoveId,
@@ -406,7 +354,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var itemsList = new List<WithId<VersionHeldItemContext[]>>();
 
-            var versions = await VersionService.GetAll();
+            var versions = await _versionService.GetAll();
             foreach (var v in versions)
             {
                 var items = await GetHeldItems(pokemon, v);
@@ -432,7 +380,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 return versionGroupNames.Contains(version.Name);
             }).ToArray();
 
-            var itemEntries = await ItemService.UpsertMany(relevantHeldItems.Select(m => m.Item));
+            var itemEntries = await _itemService.UpsertMany(relevantHeldItems.Select(m => m.Item));
             return itemEntries.Select((item, index) =>
             {
                 var context = VersionHeldItemContext.From(item);

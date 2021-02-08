@@ -14,10 +14,8 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonFormService : NamedApiResourceServiceBase<PokemonForm, PokemonFormEntry>
     {
-        /// <summary>
-        /// The version group service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupService;
+        private readonly PokemonService _pokemonService;
+        private readonly VersionGroupService _versionGroupService;
 
         /// <summary>
         /// Constructor.
@@ -25,10 +23,12 @@ namespace PokePlannerApi.Data.DataStore.Services
         public PokemonFormService(
             IDataStoreSource<PokemonFormEntry> dataStoreSource,
             IPokeAPI pokeApi,
+            PokemonService pokemonService,
             VersionGroupService versionGroupService,
             ILogger<PokemonFormService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            VersionGroupService = versionGroupService;
+            _pokemonService = pokemonService;
+            _versionGroupService = versionGroupService;
         }
 
         #region Entry conversion methods
@@ -38,7 +38,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         protected override async Task<PokemonFormEntry> ConvertToEntry(PokemonForm pokemonForm)
         {
-            var versionGroup = await VersionGroupService.Upsert(pokemonForm.VersionGroup);
+            var versionGroup = await _versionGroupService.Upsert(pokemonForm.VersionGroup);
             var types = await GetTypes(pokemonForm);
             var validity = await GetValidity(pokemonForm);
 
@@ -106,27 +106,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <summary>
-        /// Returns the given Pokemon form's types.
+        /// Returns the given Pokemon form's types, which are equal to the types of the base Pokemon.
         /// </summary>
         private async Task<IEnumerable<WithId<Type[]>>> GetTypes(PokemonForm form)
         {
-            var typesList = new List<WithId<Type[]>>();
-
-            // always include the newest types
-            var newestId = await VersionGroupService.GetNewestVersionGroupId();
-            var newestTypeEntries = await MinimiseTypes(form.Types);
-            typesList.Add(new WithId<Type[]>(newestId, newestTypeEntries.ToArray()));
-
-            return typesList;
-        }
-
-        /// <summary>
-        /// Minimises a set of Pokemon types.
-        /// </summary>
-        private async Task<IEnumerable<Type>> MinimiseTypes(IEnumerable<PokemonType> types)
-        {
-            var newestTypeObjs = await _pokeApi.Get(types.Select(t => t.Type));
-            return newestTypeObjs.Select(t => t.Minimise());
+            // TODO: circular dependency with PokemonService. Sort it out
+            var pokemon = await _pokemonService.Upsert(form.Pokemon);
+            return pokemon.Types;
         }
 
         /// <summary>
@@ -136,7 +122,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var validityList = new List<int>();
 
-            foreach (var vg in await VersionGroupService.GetAll())
+            foreach (var vg in await _versionGroupService.GetAll())
             {
                 var isValid = await IsValid(pokemonForm, vg);
                 if (isValid)
@@ -157,7 +143,7 @@ namespace PokePlannerApi.Data.DataStore.Services
             if (pokemonForm.IsMega)
             {
                 // decide based on version group in which it was introduced
-                var formVersionGroup = await VersionGroupService.Upsert(pokemonForm.VersionGroup);
+                var formVersionGroup = await _versionGroupService.Upsert(pokemonForm.VersionGroup);
                 return formVersionGroup.Order <= versionGroup.Order;
             }
 

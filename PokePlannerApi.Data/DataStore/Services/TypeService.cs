@@ -14,15 +14,8 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class TypeService : NamedApiResourceServiceBase<Type, TypeEntry>
     {
-        /// <summary>
-        /// The generations service.
-        /// </summary>
-        private readonly GenerationService GenerationsService;
-
-        /// <summary>
-        /// The version groups service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupsService;
+        private readonly GenerationService _generationService;
+        private readonly VersionGroupService _versionGroupService;
 
         /// <summary>
         /// Constructor.
@@ -30,12 +23,12 @@ namespace PokePlannerApi.Data.DataStore.Services
         public TypeService(
             IDataStoreSource<TypeEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            GenerationService generationsService,
-            VersionGroupService versionGroupsService,
+            GenerationService generationService,
+            VersionGroupService versionGroupService,
             ILogger<TypeService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            GenerationsService = generationsService;
-            VersionGroupsService = versionGroupsService;
+            _generationService = generationService;
+            _versionGroupService = versionGroupService;
         }
 
         #region Entry conversion methods
@@ -47,7 +40,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var displayNames = type.Names.Localise();
             var efficacyMap = await GetEfficacyMap(type);
-            var generation = await GenerationsService.Upsert(type.Generation);
+            var generation = await _generationService.Upsert(type.Generation);
 
             return new TypeEntry
             {
@@ -102,27 +95,19 @@ namespace PokePlannerApi.Data.DataStore.Services
         #region Helpers
 
         /// <summary>
-        /// Returns true if the given generation uses the type with the given ID.
-        /// </summary>
-        private bool HasType(Generation generation, TypeEntry typeId)
-        {
-            return typeId.Generation.Id <= generation.Id;
-        }
-
-        /// <summary>
         /// Returns the efficacy of the given type in all version groups.
         /// </summary>
         private async Task<EfficacyMap> GetEfficacyMap(Type type)
         {
             var efficacy = new EfficacyMap();
 
-            var versionGroups = await VersionGroupsService.GetAll();
+            var versionGroups = await _versionGroupService.GetAll();
             foreach (var vg in versionGroups)
             {
                 var efficacySet = new EfficacySet();
 
                 // populate damage relations - we can do this with the 'from' relations alone
-                var damageRelations = await GetDamageRelations(type, vg.Key);
+                var damageRelations = type.DamageRelations;
 
                 foreach (var typeFrom in damageRelations.DoubleDamageFrom)
                 {
@@ -146,44 +131,6 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return efficacy;
-        }
-
-        /// <summary>
-        /// Returns this type's damage relations in the version group with the given ID.
-        /// </summary>
-        private async Task<TypeRelations> GetDamageRelations(Type type, int versionGroupId)
-        {
-            if (versionGroupId == await VersionGroupsService.GetNewestVersionGroupId())
-            {
-                return type.DamageRelations;
-            }
-
-            var versionGroup = await VersionGroupsService.Upsert(versionGroupId);
-            var pastDamageRelations = await GetPastDamageRelations(type, versionGroup.Generation);
-            return pastDamageRelations ?? type.DamageRelations;
-        }
-
-        /// <summary>
-        /// Returns this type's damage relations data for the given generation, if any.
-        /// </summary>
-        private async Task<TypeRelations> GetPastDamageRelations(Type type, Generation generation)
-        {
-            var pastDamageRelations = type.PastDamageRelations;
-            if (pastDamageRelations.Any())
-            {
-                // use the earliest generation after the given one with past damage relation data,
-                // if it exists
-                var pastGenerations = await GenerationsService.UpsertMany(pastDamageRelations.Select(t => t.Generation));
-                var laterGens = pastGenerations.Where(g => g.GenerationId >= generation.Id).ToList();
-                if (laterGens.Any())
-                {
-                    var genToUse = laterGens.Aggregate((g, h) => g.GenerationId < h.GenerationId ? g : h);
-                    return pastDamageRelations.Single(p => p.Generation.Name == genToUse.Name)
-                                              .DamageRelations;
-                }
-            }
-
-            return null;
         }
 
         #endregion

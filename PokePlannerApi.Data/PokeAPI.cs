@@ -27,7 +27,7 @@ namespace PokePlannerApi.Data
         /// <summary>
         /// The base URI for PokeAPI.
         /// </summary>
-        private readonly Uri BaseUri = new Uri("http://localhost:8000/api/v2/");
+        private readonly Uri BaseUri = new Uri("https://pokeapi.co/api/v2/");
 
         /// <summary>
         /// Constructor.
