@@ -3,11 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
 using PokePlannerApi.Data.Util;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -36,6 +35,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private readonly LocationAreaService LocationAreasService;
 
+        private readonly PokemonService _pokemonService;
+
         /// <summary>
         /// The versions service.
         /// </summary>
@@ -52,19 +53,20 @@ namespace PokePlannerApi.Data.DataStore.Services
         public EncountersService(
             IDataStoreSource<EncountersEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            PokemonCacheService pokemonCacheService,
+            PokemonService pokemonService,
             EncounterConditionValueService encounterConditionValueService,
             EncounterMethodService encounterMethodService,
             LocationService locationsService,
             LocationAreaService locationAreasService,
             VersionService versionsService,
             VersionGroupService versionGroupsService,
-            ILogger<EncountersService> logger) : base(dataStoreSource, pokeApi, pokemonCacheService, logger)
+            ILogger<EncountersService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             EncounterConditionValueService = encounterConditionValueService;
             EncounterMethodService = encounterMethodService;
             LocationsService = locationsService;
             LocationAreasService = locationAreasService;
+            _pokemonService = pokemonService;
             VersionService = versionsService;
             VersionGroupsService = versionGroupsService;
         }
@@ -77,7 +79,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         protected override async Task<Pokemon> FetchSource(int pokemonId)
         {
             Logger.LogInformation($"Fetching Pokemon source object with ID {pokemonId}...");
-            return await CacheService.Upsert(pokemonId);
+            return await _pokeApi.Get<Pokemon>(pokemonId);
         }
 
         /// <summary>
@@ -119,7 +121,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             // enumerate version groups spanned by this Pokemon's encounters
             // TODO: create encounters cache service
-            var encounters = await PokeApi.GetEncounters(pokemon);
+            var encounters = await _pokeApi.GetEncounters(pokemon);
             var versions = await VersionService.UpsertMany(encounters.GetDistinctVersions());
             var versionGroups = await VersionGroupsService.UpsertManyByVersionIds(versions.Select(v => v.VersionId));
 

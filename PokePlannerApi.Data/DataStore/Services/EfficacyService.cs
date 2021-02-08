@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -11,11 +11,10 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class EfficacyService
     {
-        // TODO: create cache service
         /// <summary>
         /// The PokeAPI data fetcher.
         /// </summary>
-        protected IPokeAPI PokeApi;
+        protected IPokeAPI _pokeApi;
 
         /// <summary>
         /// The Pokemon service.
@@ -41,7 +40,7 @@ namespace PokePlannerApi.Data.DataStore.Services
             TypeService typesService,
             ILogger<EfficacyService> logger)
         {
-            PokeApi = pokeApi;
+            _pokeApi = pokeApi;
             PokemonService = pokemonService;
             TypesService = typesService;
             Logger = logger;

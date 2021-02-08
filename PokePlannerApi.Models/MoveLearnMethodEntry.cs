@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a move learn method in the data store.

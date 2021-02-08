@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -20,8 +19,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public MoveCategoryService(
             IDataStoreSource<MoveCategoryEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            MoveCategoryCacheService moveTargetCacheService,
-            ILogger<MoveCategoryService> logger) : base(dataStoreSource, pokeApi, moveTargetCacheService, logger)
+            ILogger<MoveCategoryService> logger) : base(dataStoreSource, pokeApi, logger)
         {
         }
 

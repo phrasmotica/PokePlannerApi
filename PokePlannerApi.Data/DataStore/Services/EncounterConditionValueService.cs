@@ -2,10 +2,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -20,8 +19,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public EncounterConditionValueService(
             IDataStoreSource<EncounterConditionValueEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            EncounterConditionValueCacheService encounterConditionValueCacheService,
-            ILogger<EncounterConditionValueService> logger) : base(dataStoreSource, pokeApi, encounterConditionValueCacheService, logger)
+            ILogger<EncounterConditionValueService> logger) : base(dataStoreSource, pokeApi, logger)
         {
         }
 

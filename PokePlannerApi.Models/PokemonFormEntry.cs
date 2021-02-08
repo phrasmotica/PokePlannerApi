@@ -2,7 +2,7 @@
 using System.Linq;
 using PokeApiNet;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a Pokemon form in the data store.

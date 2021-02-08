@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -26,9 +25,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         public AbilityService(
             IDataStoreSource<AbilityEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            AbilityCacheService abilityCacheService,
             VersionGroupService versionGroupService,
-            ILogger<AbilityService> logger) : base(dataStoreSource, pokeApi, abilityCacheService, logger)
+            ILogger<AbilityService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             VersionGroupService = versionGroupService;
         }

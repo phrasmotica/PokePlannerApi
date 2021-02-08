@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -13,21 +12,13 @@ namespace PokePlannerApi.Data.DataStore.Services
     public class MachineService : ServiceBase<Machine, MachineEntry>
     {
         /// <summary>
-        /// The item cache service.
-        /// </summary>
-        private readonly ItemCacheService ItemCacheService;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public MachineService(
             IDataStoreSource<MachineEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            MachineCacheService machineCacheService,
-            ItemCacheService itemCacheService,
-            ILogger<MachineService> logger) : base(dataStoreSource, pokeApi, machineCacheService, logger)
+            ILogger<MachineService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            ItemCacheService = itemCacheService;
         }
 
         #region Entry conversion methods
@@ -37,7 +28,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         protected override async Task<MachineEntry> ConvertToEntry(Machine machine)
         {
-            var item = await ItemCacheService.GetMinimal(machine.Item);
+            var item = await _pokeApi.Get(machine.Item);
 
             return new MachineEntry
             {
@@ -52,7 +43,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         protected override async Task<Machine> FetchSource(int key)
         {
             Logger.LogInformation($"Fetching machine source object with ID {key}...");
-            return await CacheService.Upsert(key);
+            return await _pokeApi.Get<Machine>(key);
         }
 
         #endregion

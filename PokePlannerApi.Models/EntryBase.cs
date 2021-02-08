@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Base class for data store entries.

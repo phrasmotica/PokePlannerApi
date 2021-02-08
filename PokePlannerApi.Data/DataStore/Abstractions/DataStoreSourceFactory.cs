@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using MongoDB.Bson.Serialization.Conventions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Util;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Abstractions
 {

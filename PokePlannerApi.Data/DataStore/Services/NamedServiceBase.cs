@@ -4,9 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -25,12 +24,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <summary>
         /// The PokeAPI data fetcher.
         /// </summary>
-        protected IPokeAPI PokeApi;
-
-        /// <summary>
-        /// The cache service for the resource type.
-        /// </summary>
-        protected CacheServiceBase<TSource> CacheService;
+        protected IPokeAPI _pokeApi;
 
         /// <summary>
         /// The logger.
@@ -43,12 +37,10 @@ namespace PokePlannerApi.Data.DataStore.Services
         public NamedServiceBase(
             IDataStoreSource<TEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            CacheServiceBase<TSource> cacheService,
             ILogger<NamedServiceBase<TSource, TEntry>> logger)
         {
             DataStoreSource = dataStoreSource;
-            PokeApi = pokeApi;
-            CacheService = cacheService;
+            _pokeApi = pokeApi;
             Logger = logger;
         }
 
@@ -143,7 +135,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public virtual async Task<TEntry> Upsert(NamedApiResource<TSource> res)
         {
-            var source = await PokeApi.Get(res);
+            var source = await _pokeApi.Get(res);
             return await Upsert(source);
         }
 
@@ -168,7 +160,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public virtual async Task<IEnumerable<TEntry>> UpsertMany(IEnumerable<NamedApiResource<TSource>> resources)
         {
-            var sources = await PokeApi.Get(resources);
+            var sources = await _pokeApi.Get(resources);
             return await UpsertMany(sources);
         }
 
@@ -206,7 +198,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<IEnumerable<TEntry>> UpsertAll()
         {
-            var resourcesPage = await PokeApi.GetNamedPage<TSource>();
+            var resourcesPage = await _pokeApi.GetNamedPage<TSource>();
 
             var allEntries = await GetAllEntries();
             if (!allEntries.Any() || allEntries.ToList().Count != resourcesPage.Count)
@@ -219,7 +211,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 NamedApiResourceList<TSource> page;
                 do
                 {
-                    page = await PokeApi.GetNamedPage<TSource>(pageSize, pageSize * pagesUsed++);
+                    page = await _pokeApi.GetNamedPage<TSource>(pageSize, pageSize * pagesUsed++);
                     var entries = await UpsertMany(page);
                     entryList.AddRange(entries);
                 } while (!string.IsNullOrEmpty(page.Next));

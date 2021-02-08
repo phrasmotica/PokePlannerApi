@@ -1,6 +1,6 @@
 ﻿using PokeApiNet;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a machine in the data store.

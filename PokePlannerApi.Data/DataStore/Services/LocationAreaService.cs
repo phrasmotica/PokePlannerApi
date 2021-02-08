@@ -1,11 +1,10 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -25,9 +24,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         public LocationAreaService(
             IDataStoreSource<LocationAreaEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            LocationAreaCacheService locationAreaCacheService,
             LocationService locationsService,
-            ILogger<LocationAreaService> logger) : base(dataStoreSource, pokeApi, locationAreaCacheService, logger)
+            ILogger<LocationAreaService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             LocationsService = locationsService;
         }

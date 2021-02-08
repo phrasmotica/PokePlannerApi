@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PokeApiNet;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a Pokemon species in the data store.

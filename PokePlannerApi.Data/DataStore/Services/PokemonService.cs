@@ -3,12 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 using Pokemon = PokeApiNet.Pokemon;
-using PokemonEntry = PokePlannerApi.Data.DataStore.Models.PokemonEntry;
+using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -17,16 +16,6 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonService : NamedApiResourceServiceBase<Pokemon, PokemonEntry>
     {
-        /// <summary>
-        /// The ability cache service.
-        /// </summary>
-        private readonly AbilityCacheService AbilityCacheService;
-
-        /// <summary>
-        /// The type cache service.
-        /// </summary>
-        private readonly TypeCacheService TypeCacheService;
-
         /// <summary>
         /// The ability service.
         /// </summary>
@@ -73,9 +62,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         public PokemonService(
             IDataStoreSource<PokemonEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            PokemonCacheService pokemonCacheService,
-            AbilityCacheService abilityCacheService,
-            TypeCacheService typeCacheService,
             AbilityService abilityService,
             ItemService itemService,
             MachineService machineService,
@@ -84,10 +70,8 @@ namespace PokePlannerApi.Data.DataStore.Services
             PokemonFormService pokemonFormService,
             VersionGroupService versionGroupService,
             VersionService versionService,
-            ILogger<PokemonService> logger) : base(dataStoreSource, pokeApi, pokemonCacheService, logger)
+            ILogger<PokemonService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            AbilityCacheService = abilityCacheService;
-            TypeCacheService = typeCacheService;
             AbilityService = abilityService;
             ItemService = itemService;
             MachineService = machineService;
@@ -158,7 +142,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<PokemonMoveContext[]> GetPokemonMoves(int pokemonId, int versionGroupId)
         {
-            var resource = await CacheService.Upsert(pokemonId);
+            var resource = await _pokeApi.Get<Pokemon>(pokemonId);
             var versionGroup = await VersionGroupService.Upsert(versionGroupId);
 
             var relevantMoves = resource.Moves.Where(m =>
@@ -223,7 +207,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<PokemonAbilityContext[]> GetPokemonAbilities(int pokemonId)
         {
-            var resource = await CacheService.Upsert(pokemonId);
+            var resource = await _pokeApi.Get<Pokemon>(pokemonId);
             var orderedAbilities = resource.Abilities.OrderBy(a => a.Slot).ToArray();
             var abilityEntries = await AbilityService.UpsertMany(orderedAbilities.Select(a => a.Ability));
 
@@ -339,7 +323,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private async Task<IEnumerable<Type>> MinimiseTypes(IEnumerable<PokemonType> types)
         {
-            var newestTypeObjs = await TypeCacheService.UpsertMany(types.Select(t => t.Type));
+            var newestTypeObjs = await _pokeApi.Get(types.Select(t => t.Type));
             return newestTypeObjs.Select(t => t.Minimise());
         }
 
@@ -352,7 +336,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             foreach (var ability in pokemon.Abilities.Select(a => a.Ability))
             {
-                var abilityRef = await AbilityCacheService.GetMinimal(ability);
+                var abilityRef = await _pokeApi.Get(ability);
                 abilities.Add(abilityRef);
             }
 

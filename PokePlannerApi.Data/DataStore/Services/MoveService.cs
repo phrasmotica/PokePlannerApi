@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -15,11 +14,6 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class MoveService : NamedApiResourceServiceBase<Move, MoveEntry>
     {
-        /// <summary>
-        /// The machine cache service.
-        /// </summary>
-        private readonly MachineCacheService MachineCacheService;
-
         /// <summary>
         /// The move category service.
         /// </summary>
@@ -51,16 +45,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         public MoveService(
             IDataStoreSource<MoveEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            MoveCacheService moveCacheService,
-            MachineCacheService machineCacheService,
             MoveCategoryService moveCategoryService,
             MoveDamageClassService moveDamageClassService,
             MoveTargetService moveTargetService,
             TypeService typeService,
             VersionGroupService versionGroupService,
-            ILogger<MoveService> logger) : base(dataStoreSource, pokeApi, moveCacheService, logger)
+            ILogger<MoveService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            MachineCacheService = machineCacheService;
             MoveCategoryService = moveCategoryService;
             MoveDamageClassService = moveDamageClassService;
             MoveTargetService = moveTargetService;
@@ -166,7 +157,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                         var machines = new List<Machine>();
                         foreach (var m in relevantMachines)
                         {
-                            var machine = await MachineCacheService.GetMinimal(m.Machine);
+                            var machine = await _pokeApi.Get(m.Machine);
                             machines.Add(machine);
                         }
 

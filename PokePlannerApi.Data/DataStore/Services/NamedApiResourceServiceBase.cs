@@ -3,9 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -22,10 +21,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         public NamedApiResourceServiceBase(
             IDataStoreSource<TEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            NamedCacheServiceBase<TSource> cacheService,
-            ILogger<NamedApiResourceServiceBase<TSource, TEntry>> logger) : base(dataStoreSource, pokeApi, cacheService, logger)
+            ILogger<NamedApiResourceServiceBase<TSource, TEntry>> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            CacheService = cacheService;
         }
 
         #region CRUD methods
@@ -76,7 +73,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 return existingEntry;
             }
 
-            var resource = await CacheService.Upsert(res);
+            var resource = await _pokeApi.Get(res);
             return await CreateEntry(resource);
         }
 
@@ -131,7 +128,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var typeName = typeof(TSource).Name;
             Logger.LogInformation($"Fetching {typeName} source object with ID {key}...");
-            return await CacheService.Upsert(key);
+            return await _pokeApi.Get<TSource>(key);
         }
 
         /// <summary>

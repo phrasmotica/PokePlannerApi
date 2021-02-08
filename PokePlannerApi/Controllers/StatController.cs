@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.DataStore.Services;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Controllers
 {

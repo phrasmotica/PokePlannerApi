@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents an ability in the data store.

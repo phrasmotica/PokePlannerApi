@@ -1,4 +1,4 @@
-﻿namespace PokePlannerApi.Data.DataStore
+﻿namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a localised string.

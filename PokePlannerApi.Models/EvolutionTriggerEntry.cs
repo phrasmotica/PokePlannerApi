@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PokePlannerApi.Data.DataStore.Models
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a evolution trigger in the data store.

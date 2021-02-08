@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -35,10 +34,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private readonly MoveService MoveService;
 
-        /// <summary>
-        /// The Pokemon species cache service.
-        /// </summary>
-        private readonly PokemonSpeciesCacheService PokemonSpeciesCacheService;
+        private readonly PokemonSpeciesService _pokemonSpeciesService;
 
         /// <summary>
         /// The type service.
@@ -46,33 +42,25 @@ namespace PokePlannerApi.Data.DataStore.Services
         private readonly TypeService TypeService;
 
         /// <summary>
-        /// The Pokemon species service.
-        /// </summary>
-        private readonly PokemonSpeciesService PokemonSpeciesService;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public EvolutionChainService(
             IDataStoreSource<EvolutionChainEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            EvolutionChainCacheService cacheService,
             EvolutionTriggerService evolutionTriggerService,
             ItemService itemService,
             LocationService locationService,
             MoveService moveService,
-            PokemonSpeciesCacheService pokemonSpeciesCacheService,
-            TypeService typeCacheService,
             PokemonSpeciesService pokemonSpeciesService,
-            ILogger<EvolutionChainService> logger) : base(dataStoreSource, pokeApi, cacheService, logger)
+            TypeService typeCacheService,
+            ILogger<EvolutionChainService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             EvolutionTriggerService = evolutionTriggerService;
             ItemService = itemService;
             LocationService = locationService;
             MoveService = moveService;
-            PokemonSpeciesCacheService = pokemonSpeciesCacheService;
             TypeService = typeCacheService;
-            PokemonSpeciesService = pokemonSpeciesService;
+            _pokemonSpeciesService = pokemonSpeciesService;
         }
 
         #region Entry conversion methods
@@ -97,7 +85,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         protected override async Task<EvolutionChain> FetchSource(int key)
         {
             Logger.LogInformation($"Fetching evolution chain source object with ID {key}...");
-            return await CacheService.Upsert(key);
+            return await _pokeApi.Get<EvolutionChain>(key);
         }
 
         #endregion
@@ -118,7 +106,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<EvolutionChainEntry> GetBySpeciesId(int speciesId)
         {
-            var species = await PokemonSpeciesCacheService.Upsert(speciesId);
+            var species = await _pokeApi.Get<PokemonSpecies>(speciesId);
             return await Upsert(species.EvolutionChain);
         }
 
@@ -127,7 +115,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public override async Task<EvolutionChainEntry> Upsert(UrlNavigation<EvolutionChain> evolutionChain)
         {
-            var chainRes = await CacheService.Upsert(evolutionChain);
+            var chainRes = await _pokeApi.Get(evolutionChain);
             if (chainRes.IsEmpty())
             {
                 // don't bother converting if the chain is empty
@@ -146,7 +134,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private async Task<ChainLinkEntry> CreateChainLinkEntry(ChainLink chainLink)
         {
-            var species = await PokemonSpeciesService.Upsert(chainLink.Species);
+            var species = await _pokemonSpeciesService.Upsert(chainLink.Species);
             var evolutionDetailEntries = await CreateEvolutionDetailEntries(chainLink.EvolutionDetails);
 
             var evolvesTo = new List<ChainLinkEntry>();
@@ -194,9 +182,9 @@ namespace PokePlannerApi.Data.DataStore.Services
             var knownMove = await MoveService.Upsert(evolutionDetail.KnownMove);
             var knownMoveType = await TypeService.Upsert(evolutionDetail.KnownMoveType);
             var location = await LocationService.Upsert(evolutionDetail.Location);
-            var partySpecies = await PokemonSpeciesService.Upsert(evolutionDetail.PartySpecies);
+            var partySpecies = await _pokemonSpeciesService.Upsert(evolutionDetail.PartySpecies);
             var partyType = await TypeService.Upsert(evolutionDetail.PartyType);
-            var tradeSpecies = await PokemonSpeciesService.Upsert(evolutionDetail.TradeSpecies);
+            var tradeSpecies = await _pokemonSpeciesService.Upsert(evolutionDetail.TradeSpecies);
 
             return new EvolutionDetailEntry
             {

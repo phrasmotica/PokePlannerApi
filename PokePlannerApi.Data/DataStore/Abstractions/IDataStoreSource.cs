@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Abstractions
 {

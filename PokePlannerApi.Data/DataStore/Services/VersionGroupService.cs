@@ -3,9 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -35,11 +34,10 @@ namespace PokePlannerApi.Data.DataStore.Services
         public VersionGroupService(
             IDataStoreSource<VersionGroupEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            VersionGroupCacheService versionGroupCacheService,
             GenerationService generationsService,
             PokedexService pokedexesService,
             VersionService versionsService,
-            ILogger<VersionGroupService> logger) : base(dataStoreSource, pokeApi, versionGroupCacheService, logger)
+            ILogger<VersionGroupService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             GenerationsService = generationsService;
             PokedexesService = pokedexesService;

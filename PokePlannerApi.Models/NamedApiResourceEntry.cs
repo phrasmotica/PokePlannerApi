@@ -1,4 +1,4 @@
-﻿namespace PokePlannerApi.Data.DataStore.Models
+﻿namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Base class for named API resource data store entries.

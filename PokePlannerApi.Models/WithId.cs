@@ -1,4 +1,4 @@
-﻿namespace PokePlannerApi.Data.DataStore.Models
+﻿namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents some data associated with a numeric ID.

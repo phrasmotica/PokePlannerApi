@@ -15,4 +15,10 @@
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PokeApiNet">
+      <HintPath>..\..\PokeApiNet\PokeApiNet\bin\Debug\netstandard2.1\PokeApiNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

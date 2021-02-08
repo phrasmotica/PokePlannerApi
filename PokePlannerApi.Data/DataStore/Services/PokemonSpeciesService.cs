@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -15,21 +14,6 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonSpeciesService : NamedApiResourceServiceBase<PokemonSpecies, PokemonSpeciesEntry>
     {
-        /// <summary>
-        /// The evolution chain cache service.
-        /// </summary>
-        private readonly EvolutionChainCacheService EvolutionChainCacheService;
-
-        /// <summary>
-        /// The generation service.
-        /// </summary>
-        private readonly GenerationCacheService GenerationCacheService;
-
-        /// <summary>
-        /// The Pokemon cache service.
-        /// </summary>
-        private readonly PokemonCacheService PokemonCacheService;
-
         /// <summary>
         /// The Pokemon service.
         /// </summary>
@@ -51,18 +35,11 @@ namespace PokePlannerApi.Data.DataStore.Services
         public PokemonSpeciesService(
             IDataStoreSource<PokemonSpeciesEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            PokemonSpeciesCacheService pokemonSpeciesCacheService,
-            EvolutionChainCacheService evolutionChainCacheService,
-            GenerationCacheService generationCacheService,
-            PokemonCacheService pokemonCacheService,
             PokemonService pokemonService,
             VersionGroupService versionGroupService,
             VersionService versionService,
-            ILogger<PokemonSpeciesService> logger) : base(dataStoreSource, pokeApi, pokemonSpeciesCacheService, logger)
+            ILogger<PokemonSpeciesService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            EvolutionChainCacheService = evolutionChainCacheService;
-            GenerationCacheService = generationCacheService;
-            PokemonCacheService = pokemonCacheService;
             PokemonService = pokemonService;
             VersionGroupService = versionGroupService;
             VersionService = versionService;
@@ -121,7 +98,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<PokemonSpeciesEntry[]> GetPokemonSpecies(int limit, int offset)
         {
-            var resources = await PokeApi.GetNamedPage<PokemonSpecies>(limit, offset);
+            var resources = await _pokeApi.GetNamedPage<PokemonSpecies>(limit, offset);
             var species = await UpsertMany(resources);
             return species.OrderBy(s => s.SpeciesId).ToArray();
         }
@@ -198,7 +175,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             foreach (var res in species.Varieties)
             {
-                var pokemon = await PokemonCacheService.GetMinimal(res.Pokemon);
+                var pokemon = await _pokeApi.Get(res.Pokemon);
                 varietiesList.Add(pokemon);
             }
 
@@ -210,7 +187,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private async Task<Generation> GetGeneration(PokemonSpecies species)
         {
-            return await GenerationCacheService.GetMinimal(species.Generation);
+            return await _pokeApi.Get(species.Generation);
         }
 
         /// <summary>
@@ -218,7 +195,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private async Task<EvolutionChain> GetEvolutionChain(PokemonSpecies species)
         {
-            return await EvolutionChainCacheService.GetMinimal(species.EvolutionChain);
+            return await _pokeApi.Get(species.EvolutionChain);
         }
 
         /// <summary>

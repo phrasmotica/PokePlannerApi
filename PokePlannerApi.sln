@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi", "PokePlann
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Data", "PokePlannerApi.Data\PokePlannerApi.Data.csproj", "{A07B301D-698D-41C3-8006-025401913622}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokePlannerApi.Tests", "PokePlannerApi.Tests\PokePlannerApi.Tests.csproj", "{B14E20C2-0E8B-4A3F-A8F5-578AD17B9E2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Tests", "PokePlannerApi.Tests\PokePlannerApi.Tests.csproj", "{B14E20C2-0E8B-4A3F-A8F5-578AD17B9E2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Models", "PokePlannerApi.Models\PokePlannerApi.Models.csproj", "{86E2357F-A64D-448F-A520-BB448C37F272}"
 EndProject

@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -15,11 +14,6 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonFormService : NamedApiResourceServiceBase<PokemonForm, PokemonFormEntry>
     {
-        /// <summary>
-        /// The type cache service.
-        /// </summary>
-        private readonly TypeCacheService TypeCacheService;
-
         /// <summary>
         /// The version group service.
         /// </summary>
@@ -31,13 +25,10 @@ namespace PokePlannerApi.Data.DataStore.Services
         public PokemonFormService(
             IDataStoreSource<PokemonFormEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            PokemonFormCacheService pokemonFormCacheService,
-            TypeCacheService typeCacheService,
             VersionGroupService versionGroupService,
-            ILogger<PokemonFormService> logger) : base(dataStoreSource, pokeApi, pokemonFormCacheService, logger)
+            ILogger<PokemonFormService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             VersionGroupService = versionGroupService;
-            TypeCacheService = typeCacheService;
         }
 
         #region Entry conversion methods
@@ -134,7 +125,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         private async Task<IEnumerable<Type>> MinimiseTypes(IEnumerable<PokemonType> types)
         {
-            var newestTypeObjs = await TypeCacheService.UpsertMany(types.Select(t => t.Type));
+            var newestTypeObjs = await _pokeApi.Get(types.Select(t => t.Type));
             return newestTypeObjs.Select(t => t.Minimise());
         }
 

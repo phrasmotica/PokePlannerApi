@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.Cache.Services;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.DataStore.Models;
 using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
@@ -31,10 +30,9 @@ namespace PokePlannerApi.Data.DataStore.Services
         public TypeService(
             IDataStoreSource<TypeEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            TypeCacheService typeCacheService,
             GenerationService generationsService,
             VersionGroupService versionGroupsService,
-            ILogger<TypeService> logger) : base(dataStoreSource, pokeApi, typeCacheService, logger)
+            ILogger<TypeService> logger) : base(dataStoreSource, pokeApi, logger)
         {
             GenerationsService = generationsService;
             VersionGroupsService = versionGroupsService;
@@ -128,19 +126,19 @@ namespace PokePlannerApi.Data.DataStore.Services
 
                 foreach (var typeFrom in damageRelations.DoubleDamageFrom)
                 {
-                    var o = await CacheService.Upsert(typeFrom);
+                    var o = await _pokeApi.Get(typeFrom);
                     efficacySet.Add(o.Id, 2);
                 }
 
                 foreach (var typeFrom in damageRelations.HalfDamageFrom)
                 {
-                    var o = await CacheService.Upsert(typeFrom);
+                    var o = await _pokeApi.Get(typeFrom);
                     efficacySet.Add(o.Id, 0.5);
                 }
 
                 foreach (var typeFrom in damageRelations.NoDamageFrom)
                 {
-                    var o = await CacheService.Upsert(typeFrom);
+                    var o = await _pokeApi.Get(typeFrom);
                     efficacySet.Add(o.Id, 0);
                 }
 

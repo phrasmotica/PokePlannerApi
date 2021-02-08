@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using PokeApiNet;
-using PokePlannerApi.Data.DataStore.Models;
+using PokePlannerApi.Models;
 using PokePlannerApi.Data.DataStore.Services;
 
 namespace PokePlannerApi.Tests.DataStore.Services
