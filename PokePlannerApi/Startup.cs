@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +29,7 @@ namespace PokePlannerApi
         public void ConfigureServices(IServiceCollection services)
         {
             // configure PokeAPI services
-            services.AddSingleton<PokeApiClient>();
+            services.AddSingleton(sp => new PokeApiClient(new Uri("https://pokeapi.co/api/v2/")));
             services.AddSingleton<IPokeAPI, PokeAPI>();
 
             ConfigureDataStore(services);
