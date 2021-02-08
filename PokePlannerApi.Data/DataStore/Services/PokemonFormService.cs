@@ -14,7 +14,6 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class PokemonFormService : NamedApiResourceServiceBase<PokemonForm, PokemonFormEntry>
     {
-        private readonly PokemonService _pokemonService;
         private readonly VersionGroupService _versionGroupService;
 
         /// <summary>
@@ -23,11 +22,9 @@ namespace PokePlannerApi.Data.DataStore.Services
         public PokemonFormService(
             IDataStoreSource<PokemonFormEntry> dataStoreSource,
             IPokeAPI pokeApi,
-            PokemonService pokemonService,
             VersionGroupService versionGroupService,
             ILogger<PokemonFormService> logger) : base(dataStoreSource, pokeApi, logger)
         {
-            _pokemonService = pokemonService;
             _versionGroupService = versionGroupService;
         }
 
@@ -39,7 +36,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         protected override async Task<PokemonFormEntry> ConvertToEntry(PokemonForm pokemonForm)
         {
             var versionGroup = await _versionGroupService.Upsert(pokemonForm.VersionGroup);
-            var types = await GetTypes(pokemonForm);
             var validity = await GetValidity(pokemonForm);
 
             return new PokemonFormEntry
@@ -56,7 +52,6 @@ namespace PokePlannerApi.Data.DataStore.Services
                 DisplayNames = pokemonForm.Names.Localise().ToList(),
                 SpriteUrl = GetSpriteUrl(pokemonForm),
                 ShinySpriteUrl = GetShinySpriteUrl(pokemonForm),
-                Types = types.ToList(),
                 Validity = validity.ToList()
             };
         }
@@ -103,16 +98,6 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return frontShinyUrl;
-        }
-
-        /// <summary>
-        /// Returns the given Pokemon form's types, which are equal to the types of the base Pokemon.
-        /// </summary>
-        private async Task<IEnumerable<WithId<Type[]>>> GetTypes(PokemonForm form)
-        {
-            // TODO: circular dependency with PokemonService. Sort it out
-            var pokemon = await _pokemonService.Upsert(form.Pokemon);
-            return pokemon.Types;
         }
 
         /// <summary>
