@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PokeApiNet;
 using PokePlannerApi.Data;
@@ -55,16 +54,6 @@ namespace PokePlannerApi
         /// </summary>
         private void ConfigureDataStore(IServiceCollection services)
         {
-            // bind data store settings
-            services.Configure<DataStoreSettings>(
-                Configuration.GetSection(nameof(DataStoreSettings))
-            );
-
-            // create singleton for data store settings
-            services.AddSingleton<IDataStoreSettings>(sp =>
-                sp.GetRequiredService<IOptions<DataStoreSettings>>().Value
-            );
-
             // create data store services
             var dataStoreSourceFactory = new DataStoreSourceFactory();
             var dataStoreSettings = Configuration.GetSection(nameof(DataStoreSettings)).Get<DataStoreSettings>();
