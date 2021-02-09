@@ -1,4 +1,4 @@
-﻿namespace PokePlannerApi
+﻿namespace PokePlannerApi.Settings
 {
     /// <summary>
     /// Class for PokeAPI settings.

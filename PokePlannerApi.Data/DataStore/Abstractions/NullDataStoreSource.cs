@@ -8,7 +8,7 @@ using PokePlannerApi.Models;
 namespace PokePlannerApi.Data.DataStore.Abstractions
 {
     /// <summary>
-    /// Data store source for Cosmos DB.
+    /// Data store source that does nothing.
     /// </summary>
     public class NullDataStoreSource<TEntry> : IDataStoreSource<TEntry> where TEntry : EntryBase
     {

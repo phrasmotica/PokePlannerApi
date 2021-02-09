@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using MongoDB.Bson.Serialization.Conventions;
-using PokePlannerApi.Data.Util;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Abstractions
@@ -11,38 +10,28 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
     public class DataStoreSourceFactory
     {
         /// <summary>
-        /// The connection string to the database instance.
-        /// </summary>
-        private readonly string ConnectionString = EnvHelper.GetVariable("PokePlannerApiConnectionString");
-
-        /// <summary>
-        /// The private key of the database.
-        /// </summary>
-        private readonly string PrivateKey = EnvHelper.GetVariable("PokePlannerApiPrivateKey");
-
-        /// <summary>
-        /// The name of the database.
-        /// </summary>
-        private readonly string DatabaseName = "PokePlannerApiDataStore";
-
-        /// <summary>
         /// Creates an entry source for the given entry type.
         /// </summary>
-        public IDataStoreSource<TEntry> Create<TEntry>(string collectionName) where TEntry : EntryBase
+        public IDataStoreSource<TEntry> Create<TEntry>(
+            string collectionName,
+            string databaseName,
+            string privateKey,
+            string connectionString) where TEntry : EntryBase
         {
-            if (string.IsNullOrWhiteSpace(ConnectionString))
-            {
-                return new NullDataStoreSource<TEntry>();
-            }
-
-            var isCosmosDb = Regex.IsMatch(ConnectionString, @"https:\/\/[\w-]+\.documents\.azure\.com");
+            var isCosmosDb = Regex.IsMatch(connectionString, @"https:\/\/[\w-]+\.documents\.azure\.com");
             if (isCosmosDb)
             {
-                return new CosmosDbDataStoreSource<TEntry>(ConnectionString, PrivateKey, DatabaseName, collectionName);
+                return new CosmosDbDataStoreSource<TEntry>(connectionString, privateKey, databaseName, collectionName);
             }
 
-            ConfigureMongoDb();
-            return new MongoDbDataStoreSource<TEntry>(ConnectionString, DatabaseName, collectionName);
+            var isMongoDb = Regex.IsMatch(connectionString, @"mongodb://");
+            if (isMongoDb)
+            {
+                ConfigureMongoDb();
+                return new MongoDbDataStoreSource<TEntry>(connectionString, databaseName, collectionName);
+            }
+
+            return new NullDataStoreSource<TEntry>();
         }
 
         /// <summary>
