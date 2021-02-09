@@ -120,7 +120,6 @@ namespace PokePlannerApi.Data.DataStore.Services
             var encounterEntriesList = new List<WithId<EncounterEntry[]>>();
 
             // enumerate version groups spanned by this Pokemon's encounters
-            // TODO: create encounters cache service
             var encounters = await _pokeApi.GetEncounters(pokemon);
             var versions = await VersionService.UpsertMany(encounters.GetDistinctVersions());
             var versionGroups = await VersionGroupsService.UpsertManyByVersionIds(versions.Select(v => v.VersionId));
