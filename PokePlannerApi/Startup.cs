@@ -28,10 +28,7 @@ namespace PokePlannerApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // configure PokeAPI services
-            services.AddSingleton(sp => new PokeApiClient(new Uri("https://pokeapi.co/api/v2/")));
-            services.AddSingleton<IPokeAPI, PokeAPI>();
-
+            ConfigurePokeApiClient(services);
             ConfigureDataStore(services);
 
             services.AddControllers();
@@ -39,6 +36,17 @@ namespace PokePlannerApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PokePlannerApi", Version = "v1" });
             });
+        }
+
+        /// <summary>
+        /// Configures the PokeAPI client.
+        /// </summary>
+        private void ConfigurePokeApiClient(IServiceCollection services)
+        {
+            var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
+
+            services.AddSingleton(sp => new PokeApiClient(new Uri(pokeApiSettings.BaseUri)));
+            services.AddSingleton<IPokeAPI, PokeAPI>();
         }
 
         /// <summary>
