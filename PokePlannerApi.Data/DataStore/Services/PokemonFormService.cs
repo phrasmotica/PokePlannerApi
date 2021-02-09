@@ -52,6 +52,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 DisplayNames = pokemonForm.Names.Localise().ToList(),
                 SpriteUrl = GetSpriteUrl(pokemonForm),
                 ShinySpriteUrl = GetShinySpriteUrl(pokemonForm),
+                Types = new List<WithId<Type[]>>(),
                 Validity = validity.ToList()
             };
         }
