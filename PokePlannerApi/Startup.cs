@@ -36,6 +36,14 @@ namespace PokePlannerApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PokePlannerApi", Version = "v1" });
             });
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000");
+                });
+            });
         }
 
         /// <summary>
@@ -300,6 +308,7 @@ namespace PokePlannerApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthorization();
 
