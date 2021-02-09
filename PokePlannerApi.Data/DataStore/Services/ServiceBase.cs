@@ -12,6 +12,7 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// <summary>
     /// Service for managing a collection of entries in the data store.
     /// </summary>
+    // TODO: get rid of inheritance from ServiceBase and whatnot. Instead inject them as dependencies
     public abstract class ServiceBase<TSource, TEntry>
         where TSource : ApiResource, new()
         where TEntry : EntryBase
