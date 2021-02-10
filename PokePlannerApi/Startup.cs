@@ -74,6 +74,7 @@ namespace PokePlannerApi
                     dataStoreSettings.PrivateKey,
                     dataStoreSettings.ConnectionString)
             );
+            services.AddSingleton<NamedApiResourceServiceBase<Ability, AbilityEntry>>();
             services.AddSingleton<AbilityService>();
 
             services.AddSingleton<EfficacyService>();

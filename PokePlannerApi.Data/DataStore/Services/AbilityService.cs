@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
-using PokePlannerApi.Data.DataStore.Abstractions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Data.Extensions;
 using PokePlannerApi.Models;
 
@@ -12,31 +12,29 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// <summary>
     /// Service for managing the ability entries in the data store.
     /// </summary>
-    public class AbilityService : NamedApiResourceServiceBase<Ability, AbilityEntry>
+    public class AbilityService : IResourceConverter<Ability, AbilityEntry>
     {
-        /// <summary>
-        /// The version group service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupService;
+        private readonly NamedApiResourceServiceBase<Ability, AbilityEntry> _sourceService;
+        private readonly VersionGroupService _versionGroupService;
+        private readonly ILogger<AbilityService> _logger;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public AbilityService(
-            IDataStoreSource<AbilityEntry> dataStoreSource,
-            IPokeAPI pokeApi,
+            NamedApiResourceServiceBase<Ability, AbilityEntry> sourceService,
             VersionGroupService versionGroupService,
-            ILogger<AbilityService> logger) : base(dataStoreSource, pokeApi, logger)
+            ILogger<AbilityService> logger)
         {
-            VersionGroupService = versionGroupService;
+            _sourceService = sourceService;
+            _versionGroupService = versionGroupService;
+            _logger = logger;
         }
 
         #region Entry conversion methods
 
-        /// <summary>
-        /// Returns an ability entry for the given ability.
-        /// </summary>
-        protected async override Task<AbilityEntry> ConvertToEntry(Ability ability)
+        /// <inheritdoc />
+        public async Task<AbilityEntry> ConvertToEntry(Ability ability)
         {
             var displayNames = ability.Names.Localise();
             var flavourTextEntries = await GetFlavourTextEntries(ability);
@@ -59,7 +57,16 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<AbilityEntry[]> GetAll()
         {
-            var allAbilities = await UpsertAll();
+            var allAbilities = await _sourceService.UpsertAll();
+            return allAbilities.OrderBy(g => g.Id).ToArray();
+        }
+
+        /// <summary>
+        /// Returns the abilities references by the given resource pointers.
+        /// </summary>
+        public async Task<AbilityEntry[]> Get(IEnumerable<NamedApiResource<Ability>> resources)
+        {
+            var allAbilities = await _sourceService.UpsertMany(resources);
             return allAbilities.OrderBy(g => g.Id).ToArray();
         }
 
@@ -76,7 +83,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             if (ability.FlavorTextEntries.Any())
             {
-                foreach (var vg in await VersionGroupService.GetAll())
+                foreach (var vg in await _versionGroupService.GetAll())
                 {
                     var relevantDescriptions = ability.FlavorTextEntries.Where(f => f.VersionGroup.Name == vg.Name);
                     if (relevantDescriptions.Any())

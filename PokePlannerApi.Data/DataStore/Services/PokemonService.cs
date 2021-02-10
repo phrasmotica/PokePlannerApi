@@ -178,7 +178,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var resource = await _pokeApi.Get<Pokemon>(pokemonId);
             var orderedAbilities = resource.Abilities.OrderBy(a => a.Slot).ToArray();
-            var abilityEntries = await _abilityService.UpsertMany(orderedAbilities.Select(a => a.Ability));
+            var abilityEntries = await _abilityService.Get(orderedAbilities.Select(a => a.Ability));
 
             var abilityContexts = abilityEntries.Select((e, i) =>
             {

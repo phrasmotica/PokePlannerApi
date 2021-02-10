@@ -11,6 +11,7 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// <summary>
     /// Service for managing a collection of named API resource entries in the data store.
     /// </summary>
+    /// TODO: make this non-abstract
     public abstract class NamedApiResourceServiceBase<TSource, TEntry> : NamedServiceBase<TSource, TEntry>
         where TSource : NamedApiResource, new()
         where TEntry : NamedApiResourceEntry
