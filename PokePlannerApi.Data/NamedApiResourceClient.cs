@@ -36,16 +36,6 @@ namespace PokePlannerApi.Data
         }
 
         /// <summary>
-        /// Returns the resource of the given type with the given name.
-        /// </summary>
-        protected async Task<TResource> GetByName<TResource>(string name) where TResource : NamedApiResource
-        {
-            var typeName = typeof(TResource).Name;
-            _logger.LogInformation($"Fetching {typeName} resource with name {name}...");
-            return await _pokeApi.Get<TResource>(name);
-        }
-
-        /// <summary>
         /// Returns the resources of the given type with the given IDs.
         /// </summary>
         protected async Task<IEnumerable<TResource>> GetMany<TResource>(IEnumerable<int> ids) where TResource : NamedApiResource
@@ -55,21 +45,6 @@ namespace PokePlannerApi.Data
             foreach (var id in ids)
             {
                 resources.Add(await Get<TResource>(id));
-            }
-
-            return resources;
-        }
-
-        /// <summary>
-        /// Returns the resources of the given type with the given names.
-        /// </summary>
-        protected async Task<IEnumerable<TResource>> GetManyByName<TResource>(IEnumerable<string> names) where TResource : NamedApiResource
-        {
-            var resources = new List<TResource>();
-
-            foreach (var name in names)
-            {
-                resources.Add(await GetByName<TResource>(name));
             }
 
             return resources;

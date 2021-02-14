@@ -57,29 +57,5 @@ namespace PokePlannerApi.Clients
         Task<T> GetLast<T>() where T : ApiResource;
 
         #endregion
-
-        #region Named API resources
-
-        /// <summary>
-        /// Returns the named API resource of the given type with the given name.
-        /// </summary>
-        Task<T> Get<T>(string name) where T : NamedApiResource;
-
-        /// <summary>
-        /// Returns a page with all resources of the given named type.
-        /// </summary>
-        Task<NamedApiResourceList<T>> GetNamedFullPage<T>() where T : NamedApiResource;
-
-        /// <summary>
-        /// Returns a page with resources of the given named type.
-        /// </summary>
-        Task<NamedApiResourceList<T>> GetNamedPage<T>() where T : NamedApiResource;
-
-        /// <summary>
-        /// Returns a page of the given size and offset with resources of the given named type.
-        /// </summary>
-        Task<NamedApiResourceList<T>> GetNamedPage<T>(int limit = 20, int offset = 0) where T : NamedApiResource;
-
-        #endregion
     }
 }

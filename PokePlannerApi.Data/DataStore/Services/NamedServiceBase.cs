@@ -199,7 +199,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<IEnumerable<TEntry>> UpsertAll()
         {
-            var resourcesPage = await _pokeApi.GetNamedPage<TSource>();
+            var resourcesPage = await _pokeApi.GetPage<TSource>();
 
             var allEntries = await GetAllEntries();
             if (!allEntries.Any() || allEntries.ToList().Count != resourcesPage.Count)
@@ -212,7 +212,7 @@ namespace PokePlannerApi.Data.DataStore.Services
                 NamedApiResourceList<TSource> page;
                 do
                 {
-                    page = await _pokeApi.GetNamedPage<TSource>(pageSize, pageSize * pagesUsed++);
+                    page = await _pokeApi.GetPage<TSource>(pageSize, pageSize * pagesUsed++);
                     var entries = await UpsertMany(page);
                     entryList.AddRange(entries);
                 } while (!string.IsNullOrEmpty(page.Next));
