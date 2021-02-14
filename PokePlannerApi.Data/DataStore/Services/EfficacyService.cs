@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using PokePlannerApi.Clients;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services

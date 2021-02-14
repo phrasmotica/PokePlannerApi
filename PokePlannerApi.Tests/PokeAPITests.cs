@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using PokeApiNet;
-using PokePlannerApi.Data;
+using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Services;
 
 namespace PokePlannerApi.Tests

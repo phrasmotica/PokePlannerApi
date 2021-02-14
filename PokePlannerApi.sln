@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Tests", "Pok
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Models", "PokePlannerApi.Models\PokePlannerApi.Models.csproj", "{86E2357F-A64D-448F-A520-BB448C37F272}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokePlannerApi.Clients", "PokePlannerApi.Clients\PokePlannerApi.Clients.csproj", "{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{86E2357F-A64D-448F-A520-BB448C37F272}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86E2357F-A64D-448F-A520-BB448C37F272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86E2357F-A64D-448F-A520-BB448C37F272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

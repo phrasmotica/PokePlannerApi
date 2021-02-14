@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PokeApiNet;
-using PokePlannerApi.Data;
+using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Services;
 
 namespace PokePlannerApi.Tests

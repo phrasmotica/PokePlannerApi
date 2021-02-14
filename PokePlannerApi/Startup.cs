@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using PokeApiNet;
-using PokePlannerApi.Data;
+using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Data.DataStore.Settings;

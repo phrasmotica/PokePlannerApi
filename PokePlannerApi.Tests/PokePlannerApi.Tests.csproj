@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PokePlannerApi.Clients\PokePlannerApi.Clients.csproj" />
     <ProjectReference Include="..\PokePlannerApi.Data\PokePlannerApi.Data.csproj" />
   </ItemGroup>
 

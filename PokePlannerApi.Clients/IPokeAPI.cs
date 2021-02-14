@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using PokeApiNet;
 
-namespace PokePlannerApi.Data
+namespace PokePlannerApi.Clients
 {
     /// <summary>
     /// Interface for classes that fetch data from PokeAPI.

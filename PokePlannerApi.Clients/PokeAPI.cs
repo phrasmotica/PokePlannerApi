@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PokeApiNet;
 
-namespace PokePlannerApi.Data
+namespace PokePlannerApi.Clients
 {
     /// <summary>
     /// Class for fetching PokeAPI resources.

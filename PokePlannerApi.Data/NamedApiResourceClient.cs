@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PokeApiNet;
+using PokePlannerApi.Clients;
 
 namespace PokePlannerApi.Data
 {
