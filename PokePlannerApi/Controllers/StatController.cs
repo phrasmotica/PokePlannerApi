@@ -12,17 +12,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class StatController : ResourceControllerBase
     {
-        /// <summary>
-        /// The stats service.
-        /// </summary>
-        private readonly StatService StatsService;
+        private readonly StatService _statService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public StatController(StatService statsService, ILogger<StatController> logger) : base(logger)
+        public StatController(
+            StatService statsService,
+            ILogger<StatController> logger) : base(logger)
         {
-            StatsService = statsService;
+            _statService = statsService;
         }
 
         /// <summary>
@@ -31,8 +27,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{versionGroupId:int}")]
         public async Task<StatEntry[]> GetBaseStatsInVersionGroup(int versionGroupId)
         {
-            Logger.LogInformation($"Getting base stats in version group {versionGroupId}...");
-            var allStats = await StatsService.GetBaseStats(versionGroupId);
+            _logger.LogInformation($"Getting base stats in version group {versionGroupId}...");
+            var allStats = await _statService.GetBaseStats(versionGroupId);
             return allStats.ToArray();
         }
     }

@@ -1,74 +1,76 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the type entries in the data store.
+    /// Service for accessing type entries.
     /// </summary>
-    public class TypeService : NamedApiResourceServiceBase<Type, TypeEntry>
+    public class TypeService : INamedEntryService<Type, TypeEntry>
     {
-        private readonly GenerationService _generationService;
-        private readonly VersionGroupService _versionGroupService;
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Type, TypeEntry> _converter;
+        private readonly IDataStoreSource<TypeEntry> _dataSource;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public TypeService(
-            IDataStoreSource<TypeEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            GenerationService generationService,
-            VersionGroupService versionGroupService,
-            ILogger<TypeService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Type, TypeEntry> converter,
+            IDataStoreSource<TypeEntry> dataSource)
         {
-            _generationService = generationService;
-            _versionGroupService = versionGroupService;
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a type entry for the given type.
-        /// </summary>
-        protected override async Task<TypeEntry> ConvertToEntry(Type type)
+        /// <inheritdoc />
+        public async Task<TypeEntry> Get(NamedApiResource<Type> resource)
         {
-            var displayNames = type.Names.Localise();
-            var efficacyMap = await GetEfficacyMap(type);
-            var generation = await _generationService.Upsert(type.Generation);
+            var type = await _pokeApi.Get(resource);
 
-            return new TypeEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.TypeId == type.Id);
+            if (hasEntry)
             {
-                Key = type.Id,
-                Name = type.Name,
-                DisplayNames = displayNames.ToList(),
-                IsConcrete = type.Pokemon.Any(), // would like to use presence of move damage class but Fairy doesn't have it...
-                EfficacyMap = efficacyMap,
-                Generation = new Generation
-                {
-                    Id = generation.GenerationId,
-                    Name = generation.Name
-                }
-            };
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(type);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<TypeEntry> Get(NamedEntryRef<TypeEntry> entryRef)
+        {
+            return await Get(entryRef.Key);
+        }
 
-        #region Public methods
+        /// <inheritdoc />
+        public async Task<TypeEntry[]> Get(IEnumerable<NamedApiResource<Type>> resources)
+        {
+            var entries = new List<TypeEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
         /// Returns all types.
         /// </summary>
         public async Task<TypeEntry[]> GetAll()
         {
-            var allTypes = await UpsertAll();
-            return allTypes.OrderBy(t => t.TypeId).ToArray();
+            var resources = await _pokeApi.GetNamedFullPage<Type>();
+            return await Get(resources.Results);
         }
 
         /// <summary>
@@ -81,59 +83,49 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <summary>
+        /// Returns the type with the given ID.
+        /// </summary>
+        /// <param name="typeId">The type ID.</param>
+        public async Task<TypeEntry> Get(int typeId)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.TypeId == typeId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var type = await _pokeApi.Get<Type>(typeId);
+            var newEntry = await _converter.Convert(type);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <summary>
         /// Returns the efficacy of the type with the given ID in the version group with the given
         /// ID from the data store.
         /// </summary>
         public async Task<EfficacySet> GetTypesEfficacySet(IEnumerable<int> typeIds, int versionGroupId)
         {
-            var entries = await UpsertMany(typeIds);
+            var entries = await Get(typeIds);
             var efficacySets = entries.Select(e => e.GetEfficacySet(versionGroupId));
             return efficacySets.Aggregate((e1, e2) => e1.Product(e2));
         }
 
-        #endregion
-
-        #region Helpers
-
         /// <summary>
-        /// Returns the efficacy of the given type in all version groups.
+        /// Returns the types with the given IDs.
         /// </summary>
-        private async Task<EfficacyMap> GetEfficacyMap(Type type)
+        /// <param name="typeIds">The type IDs.</param>
+        private async Task<TypeEntry[]> Get(IEnumerable<int> typeIds)
         {
-            var efficacy = new EfficacyMap();
+            var entries = new List<TypeEntry>();
 
-            var versionGroups = await _versionGroupService.GetAll();
-            foreach (var vg in versionGroups)
+            foreach (var id in typeIds)
             {
-                var efficacySet = new EfficacySet();
-
-                // populate damage relations - we can do this with the 'from' relations alone
-                var damageRelations = type.DamageRelations;
-
-                foreach (var typeFrom in damageRelations.DoubleDamageFrom)
-                {
-                    var o = await _pokeApi.Get(typeFrom);
-                    efficacySet.Add(o.Id, 2);
-                }
-
-                foreach (var typeFrom in damageRelations.HalfDamageFrom)
-                {
-                    var o = await _pokeApi.Get(typeFrom);
-                    efficacySet.Add(o.Id, 0.5);
-                }
-
-                foreach (var typeFrom in damageRelations.NoDamageFrom)
-                {
-                    var o = await _pokeApi.Get(typeFrom);
-                    efficacySet.Add(o.Id, 0);
-                }
-
-                efficacy.SetEfficacySet(vg.Key, efficacySet);
+                entries.Add(await Get(id));
             }
 
-            return efficacy;
+            return entries.ToArray();
         }
-
-        #endregion
     }
 }

@@ -1,67 +1,85 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the generation entries in the data store.
+    /// Service for accessing generation entries.
     /// </summary>
-    public class GenerationService : NamedApiResourceServiceBase<Generation, GenerationEntry>
+    public class GenerationService : INamedEntryService<Generation, GenerationEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Generation, GenerationEntry> _converter;
+        private readonly IDataStoreSource<GenerationEntry> _dataSource;
+
         public GenerationService(
-            IDataStoreSource<GenerationEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<GenerationService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Generation, GenerationEntry> converter,
+            IDataStoreSource<GenerationEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a generation entry for the given generation.
-        /// </summary>
-        protected override Task<GenerationEntry> ConvertToEntry(Generation generation)
+        /// <inheritdoc />
+        public async Task<GenerationEntry> Get(NamedApiResource<Generation> resource)
         {
-            var displayNames = generation.Names.Localise();
+            var generation = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new GenerationEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.GenerationId == generation.Id);
+            if (hasEntry)
             {
-                Key = generation.Id,
-                Name = generation.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(generation);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<GenerationEntry> Get(NamedEntryRef<GenerationEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.GenerationId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
 
-        #region Public methods
+            var generation = await _pokeApi.Get<Generation>(entryRef.Key);
+            var newEntry = await _converter.Convert(generation);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<GenerationEntry[]> Get(IEnumerable<NamedApiResource<Generation>> resources)
+        {
+            var entries = new List<GenerationEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
         /// Returns all generations.
         /// </summary>
         public async Task<GenerationEntry[]> GetAll()
         {
-            var allGenerations = await UpsertAll();
-            return allGenerations.OrderBy(g => g.Id).ToArray();
+            var resources = await _pokeApi.GetNamedFullPage<Generation>();
+            return await Get(resources.Results);
         }
-
-        /// <summary>
-        /// Returns the generation of the given version group.
-        /// </summary>
-        public async Task<GenerationEntry> GetByVersionGroup(VersionGroup versionGroup)
-        {
-            return await Upsert(versionGroup.Generation);
-        }
-
-        #endregion
     }
 }

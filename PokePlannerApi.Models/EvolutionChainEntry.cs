@@ -10,12 +10,27 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the evolution chain.
         /// </summary>
-        public int EvolutionChainId => Key;
+        public int EvolutionChainId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the evolution chain link.
         /// </summary>
         public ChainLinkEntry Chain { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the evolution chain entry.
+        /// </summary>
+        public EntryRef<EvolutionChainEntry> ToRef()
+        {
+            return new EntryRef<EvolutionChainEntry>
+            {
+                Key = EvolutionChainId,
+            };
+        }
     }
 
     /// <summary>

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using PokePlannerApi.Clients;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
@@ -12,39 +11,21 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// </summary>
     public class EfficacyService
     {
-        /// <summary>
-        /// The PokeAPI data fetcher.
-        /// </summary>
-        protected IPokeAPI _pokeApi;
-
-        /// <summary>
-        /// The Pokemon service.
-        /// </summary>
-        private readonly PokemonService PokemonService;
-
-        /// <summary>
-        /// The types service.
-        /// </summary>
-        private readonly TypeService TypesService;
-
-        /// <summary>
-        /// The logger.
-        /// </summary>
-        protected readonly ILogger<EfficacyService> Logger;
+        private readonly PokemonService _pokemonService;
+        private readonly TypeService _typeService;
+        private readonly ILogger<EfficacyService> _logger;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public EfficacyService(
-            IPokeAPI pokeApi,
             PokemonService pokemonService,
             TypeService typesService,
             ILogger<EfficacyService> logger)
         {
-            _pokeApi = pokeApi;
-            PokemonService = pokemonService;
-            TypesService = typesService;
-            Logger = logger;
+            _pokemonService = pokemonService;
+            _typeService = typesService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -53,8 +34,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<EfficacySet> GetTypeEfficacyByTypeId(int typeId, int versionGroupId)
         {
-            var entry = await TypesService.Upsert(typeId);
-            return await TypesService.GetTypesEfficacySet(new[] { entry.TypeId }, versionGroupId);
+            var entry = await _typeService.Get(typeId);
+            return await _typeService.GetTypesEfficacySet(new[] { entry.TypeId }, versionGroupId);
         }
 
         /// <summary>
@@ -68,10 +49,10 @@ namespace PokePlannerApi.Data.DataStore.Services
             {
                 var invalidTypes = typeIds.Except(validTypeIds).ToArray();
                 var invalidTypesStr = string.Join(", ", invalidTypes);
-                Logger.LogWarning($"Attempted to get type efficacy for {invalidTypes.Length} invalid type(s): {invalidTypesStr}");
+                _logger.LogWarning($"Attempted to get type efficacy for {invalidTypes.Length} invalid type(s): {invalidTypesStr}");
             }
 
-            return await TypesService.GetTypesEfficacySet(validTypeIds, versionGroupId);
+            return await _typeService.GetTypesEfficacySet(validTypeIds, versionGroupId);
         }
 
         /// <summary>
@@ -80,14 +61,14 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<EfficacySet> GetTypeEfficacyByPokemonId(int pokemonId, int versionGroupId)
         {
-            var pokemon = await PokemonService.Upsert(pokemonId);
-            return await TypesService.GetTypesEfficacySet(pokemon.Types.Select(t => t.Id), versionGroupId);
+            var pokemon = await _pokemonService.Get(pokemonId);
+            return await _typeService.GetTypesEfficacySet(pokemon.Types.Select(t => t.Id), versionGroupId);
         }
 
         /// <summary>
         /// Returns all valid type IDs from the given list.
         /// </summary>
-        private IEnumerable<int> ValidateTypeIds(IEnumerable<int> typeIds)
+        private static IEnumerable<int> ValidateTypeIds(IEnumerable<int> typeIds)
         {
             return typeIds.Where(id => id != 0);
         }

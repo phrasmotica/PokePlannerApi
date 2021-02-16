@@ -34,8 +34,8 @@ namespace PokePlannerApi.Tests
         public async Task TypesLoadingTest()
         {
             // load type data
-            var typesService = serviceProvider.GetService<TypeService>();
-            var entries = await typesService.UpsertAll();
+            var typeService = serviceProvider.GetService<TypeService>();
+            var entries = await typeService.GetAll();
 
             // verify it's all loaded
             Assert.AreEqual(20, entries.ToArray().Length);

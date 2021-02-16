@@ -1,71 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the location area entries in the data store.
+    /// Service for accessing location area entries.
     /// </summary>
-    public class LocationAreaService : NamedApiResourceServiceBase<LocationArea, LocationAreaEntry>
+    public class LocationAreaService : INamedEntryService<LocationArea, LocationAreaEntry>
     {
-        /// <summary>
-        /// The locations service.
-        /// </summary>
-        private readonly LocationService LocationsService;
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<LocationArea, LocationAreaEntry> _converter;
+        private readonly IDataStoreSource<LocationAreaEntry> _dataSource;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public LocationAreaService(
-            IDataStoreSource<LocationAreaEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            LocationService locationsService,
-            ILogger<LocationAreaService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<LocationArea, LocationAreaEntry> converter,
+            IDataStoreSource<LocationAreaEntry> dataSource)
         {
-            LocationsService = locationsService;
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a location area entry for the given location area.
-        /// </summary>
-        protected override async Task<LocationAreaEntry> ConvertToEntry(LocationArea locationArea)
+        /// <inheritdoc />
+        public async Task<LocationAreaEntry> Get(NamedApiResource<LocationArea> resource)
         {
-            var displayNames = locationArea.Names.Localise();
-            var location = await GetLocation(locationArea);
+            var locationArea = await _pokeApi.Get(resource);
 
-            return new LocationAreaEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.LocationAreaId == locationArea.Id);
+            if (hasEntry)
             {
-                Key = locationArea.Id,
-                Name = locationArea.Name,
-                DisplayNames = displayNames.ToList(),
-                Location = new Location
-                {
-                    Id = location.LocationId,
-                    Name = location.Name
-                }
-            };
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(locationArea);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
-
-        #region Helpers
-
-        /// <summary>
-        /// Returns the location of the location area.
-        /// </summary>
-        private async Task<LocationEntry> GetLocation(LocationArea locationArea)
+        /// <inheritdoc />
+        public async Task<LocationAreaEntry> Get(NamedEntryRef<LocationAreaEntry> entryRef)
         {
-            return await LocationsService.Upsert(locationArea.Location);
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.LocationAreaId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var locationArea = await _pokeApi.Get<LocationArea>(entryRef.Key);
+            var newEntry = await _converter.Convert(locationArea);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<LocationAreaEntry[]> Get(IEnumerable<NamedApiResource<LocationArea>> resources)
+        {
+            var entries = new List<LocationAreaEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

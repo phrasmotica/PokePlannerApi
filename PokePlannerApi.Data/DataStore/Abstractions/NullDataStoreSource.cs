@@ -12,36 +12,34 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
     /// </summary>
     public class NullDataStoreSource<TEntry> : IDataStoreSource<TEntry> where TEntry : EntryBase
     {
-        /// <summary>
-        /// Returns all entries.
-        /// </summary>
+        /// <inheritdoc />
         public Task<IEnumerable<TEntry>> GetAll()
         {
             return Task.FromResult(Enumerable.Empty<TEntry>());
         }
 
-        /// <summary>
-        /// Returns the first entry that matches the given predicate.
-        /// </summary>
+        /// <inheritdoc />
         public Task<TEntry> GetOne(Expression<Func<TEntry, bool>> predicate)
         {
             return Task.FromResult<TEntry>(default);
         }
 
-        /// <summary>
-        /// Creates the given entry and returns it.
-        /// </summary>
+        /// <inheritdoc />
         public Task<TEntry> Create(TEntry entry)
         {
             return Task.FromResult<TEntry>(entry);
         }
 
-        /// <summary>
-        /// Deletes the first entry that matches the given predicate.
-        /// </summary>
+        /// <inheritdoc />
         public Task DeleteOne(Expression<Func<TEntry, bool>> predicate)
         {
             return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate)
+        {
+            return Task.FromResult((false, (TEntry) default));
         }
     }
 }

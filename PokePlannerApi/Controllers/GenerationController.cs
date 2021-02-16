@@ -10,17 +10,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class GenerationController : ResourceControllerBase
     {
-        /// <summary>
-        /// The generation service.
-        /// </summary>
-        private readonly GenerationService GenerationService;
+        private readonly GenerationService _generationService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public GenerationController(GenerationService versionGroupsService, ILogger<GenerationController> logger) : base(logger)
+        public GenerationController(
+            GenerationService generationService,
+            ILogger<GenerationController> logger) : base(logger)
         {
-            GenerationService = versionGroupsService;
+            _generationService = generationService;
         }
 
         /// <summary>
@@ -28,8 +24,8 @@ namespace PokePlannerApi.Controllers
         /// </summary>
         public async Task<GenerationEntry[]> GetGenerations()
         {
-            Logger.LogInformation("Getting generations...");
-            return await GenerationService.GetAll();
+            _logger.LogInformation("Getting generations...");
+            return await _generationService.GetAll();
         }
     }
 }

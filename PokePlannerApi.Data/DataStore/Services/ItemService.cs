@@ -1,59 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the item entries in the data store.
+    /// Service for accessing item entries.
     /// </summary>
-    public class ItemService : NamedApiResourceServiceBase<Item, ItemEntry>
+    public class ItemService : INamedEntryService<Item, ItemEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Item, ItemEntry> _converter;
+        private readonly IDataStoreSource<ItemEntry> _dataSource;
+
         public ItemService(
-            IDataStoreSource<ItemEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<ItemService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Item, ItemEntry> converter,
+            IDataStoreSource<ItemEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a item entry for the given item.
-        /// </summary>
-        protected override Task<ItemEntry> ConvertToEntry(Item item)
+        /// <inheritdoc />
+        public async Task<ItemEntry> Get(NamedApiResource<Item> resource)
         {
-            var displayNames = item.Names.Localise();
+            var item = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new ItemEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.ItemId == item.Id);
+            if (hasEntry)
             {
-                Key = item.Id,
-                Name = item.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(item);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Returns all items.
-        /// </summary>
-        public async Task<ItemEntry[]> GetAll()
+        /// <inheritdoc />
+        public async Task<ItemEntry> Get(NamedEntryRef<ItemEntry> entryRef)
         {
-            var allItems = await UpsertAll();
-            return allItems.OrderBy(g => g.Id).ToArray();
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.ItemId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var item = await _pokeApi.Get<Item>(entryRef.Key);
+            var newEntry = await _converter.Convert(item);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<ItemEntry[]> Get(IEnumerable<NamedApiResource<Item>> resources)
+        {
+            var entries = new List<ItemEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

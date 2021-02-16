@@ -10,17 +10,11 @@ namespace PokePlannerApi.Controllers
     [Route("[controller]")]
     public class ResourceControllerBase : ControllerBase
     {
-        /// <summary>
-        /// The logger.
-        /// </summary>
-        protected readonly ILogger<ResourceControllerBase> Logger;
+        protected readonly ILogger<ResourceControllerBase> _logger;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public ResourceControllerBase(ILogger<ResourceControllerBase> logger)
         {
-            Logger = logger;
+            _logger = logger;
         }
     }
 }

@@ -10,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the stat.
         /// </summary>
-        public int StatId => Key;
+        public int StatId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets this stat's display names.
@@ -21,5 +25,17 @@ namespace PokePlannerApi.Models
         /// Gets or sets whether this stat is a battle-only stat.
         /// </summary>
         public bool IsBattleOnly { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the stat entry.
+        /// </summary>
+        public NamedEntryRef<StatEntry> ToRef()
+        {
+            return new NamedEntryRef<StatEntry>
+            {
+                Key = StatId,
+                Name = Name,
+            };
+        }
     }
 }

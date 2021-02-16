@@ -30,5 +30,11 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         /// Deletes the first entry that matches the given predicate.
         /// </summary>
         Task DeleteOne(Expression<Func<TEntry, bool>> predicate);
+
+        /// <summary>
+        /// Returns whether there is a single entry that matches the given
+        /// predicate.
+        /// </summary>
+        Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate);
     }
 }

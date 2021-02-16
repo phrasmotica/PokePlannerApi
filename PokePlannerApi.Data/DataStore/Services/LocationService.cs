@@ -1,46 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the location entries in the data store.
+    /// Service for accessing location entries.
     /// </summary>
-    public class LocationService : NamedApiResourceServiceBase<Location, LocationEntry>
+    public class LocationService : INamedEntryService<Location, LocationEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Location, LocationEntry> _converter;
+        private readonly IDataStoreSource<LocationEntry> _dataSource;
+
         public LocationService(
-            IDataStoreSource<LocationEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<LocationService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Location, LocationEntry> converter,
+            IDataStoreSource<LocationEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a location entry for the given location.
-        /// </summary>
-        protected override Task<LocationEntry> ConvertToEntry(Location location)
+        /// <inheritdoc />
+        public async Task<LocationEntry> Get(NamedApiResource<Location> resource)
         {
-            var displayNames = location.Names.Localise();
+            var location = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new LocationEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.LocationId == location.Id);
+            if (hasEntry)
             {
-                Key = location.Id,
-                Name = location.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(location);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<LocationEntry> Get(NamedEntryRef<LocationEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.LocationId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var location = await _pokeApi.Get<Location>(entryRef.Key);
+            var newEntry = await _converter.Convert(location);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<LocationEntry[]> Get(IEnumerable<NamedApiResource<Location>> resources)
+        {
+            var entries = new List<LocationEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

@@ -10,12 +10,28 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the evolution trigger.
         /// </summary>
-        public int EvolutionTriggerId => Key;
+        public int EvolutionTriggerId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the evolution trigger.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the evolution trigger entry.
+        /// </summary>
+        public NamedEntryRef<EvolutionTriggerEntry> ToRef()
+        {
+            return new NamedEntryRef<EvolutionTriggerEntry>
+            {
+                Key = EvolutionTriggerId,
+                Name = Name,
+            };
+        }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.

@@ -8,11 +8,14 @@ using Microsoft.OpenApi.Models;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Data.DataStore.Settings;
 using PokePlannerApi.Models;
 using PokePlannerApi.Settings;
 using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
+using Type = PokeApiNet.Type;
+using Version = PokeApiNet.Version;
 
 namespace PokePlannerApi
 {
@@ -54,7 +57,7 @@ namespace PokePlannerApi
             var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
 
             services.AddSingleton(sp => new PokeApiClient(new Uri(pokeApiSettings.BaseUri)));
-            services.AddSingleton<IPokeAPI, PokeAPI>();
+            services.AddSingleton<IPokeApi, PokeAPI>();
         }
 
         /// <summary>
@@ -67,44 +70,31 @@ namespace PokePlannerApi
             var dataStoreSettings = Configuration.GetSection(nameof(DataStoreSettings)).Get<DataStoreSettings>();
             var collectionSettings = dataStoreSettings.CollectionSettings;
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<AbilityEntry>(
-                    collectionSettings.AbilityCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<NamedApiResourceServiceBase<Ability, AbilityEntry>>();
-            services.AddSingleton<AbilityService>();
+            AddNamedService<Ability, AbilityEntry, AbilityConverter, AbilityService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.AbilityCollectionName);
 
             services.AddSingleton<EfficacyService>();
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<EncounterConditionEntry>(
-                    collectionSettings.EncounterConditionCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<EncounterConditionService>();
+            //AddNamedService<EncounterCondition, EncounterConditionEntry, EncounterConditionConverter, EncounterConditionService>(
+            //    services,
+            //    dataStoreSourceFactory,
+            //    dataStoreSettings,
+            //    collectionSettings.EncounterConditionCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<EncounterConditionValueEntry>(
-                    collectionSettings.EncounterConditionValueCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<EncounterConditionValueService>();
+            AddNamedService<EncounterConditionValue, EncounterConditionValueEntry, EncounterConditionValueConverter, EncounterConditionValueService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.EncounterConditionValueCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<EncounterMethodEntry>(
-                    collectionSettings.EncounterMethodCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<EncounterMethodService>();
+            AddNamedService<EncounterMethod, EncounterMethodEntry, EncounterMethodConverter, EncounterMethodService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.EncounterMethodCollectionName);
 
             services.AddSingleton(sp =>
                 dataStoreSourceFactory.Create<EncountersEntry>(
@@ -113,187 +103,172 @@ namespace PokePlannerApi
                     dataStoreSettings.PrivateKey,
                     dataStoreSettings.ConnectionString)
             );
+            services.AddSingleton<IResourceConverter<Pokemon, EncountersEntry>, EncountersConverter>();
             services.AddSingleton<EncountersService>();
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<EvolutionChainEntry>(
-                    collectionSettings.EvolutionChainCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<EvolutionChainService>();
+            AddService<EvolutionChain, EvolutionChainEntry, EvolutionChainConverter, EvolutionChainService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.EvolutionChainCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<EvolutionTriggerEntry>(
-                    collectionSettings.EvolutionTriggerCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<EvolutionTriggerService>();
+            AddNamedService<EvolutionTrigger, EvolutionTriggerEntry, EvolutionTriggerConverter, EvolutionTriggerService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.EvolutionTriggerCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<ItemEntry>(
-                    collectionSettings.ItemCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<ItemService>();
+            AddNamedService<Generation, GenerationEntry, GenerationConverter, GenerationService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.GenerationCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<GenerationEntry>(
-                    collectionSettings.GenerationCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<GenerationService>();
+            AddNamedService<Item, ItemEntry, ItemConverter, ItemService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.ItemCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<LocationEntry>(
-                    collectionSettings.LocationCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<LocationService>();
+            AddNamedService<Location, LocationEntry, LocationConverter, LocationService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.LocationCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<LocationAreaEntry>(
-                    collectionSettings.LocationAreaCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<LocationAreaService>();
+            AddNamedService<LocationArea, LocationAreaEntry, LocationAreaConverter, LocationAreaService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.LocationAreaCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MachineEntry>(
-                    collectionSettings.MachineCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MachineService>();
+            AddService<Machine, MachineEntry, MachineConverter, MachineService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MachineCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MoveCategoryEntry>(
-                    collectionSettings.MoveCategoryCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MoveCategoryService>();
+            AddNamedService<MoveCategory, MoveCategoryEntry, MoveCategoryConverter, MoveCategoryService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveCategoryCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MoveDamageClassEntry>(
-                    collectionSettings.MoveDamageClassCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MoveDamageClassService>();
+            AddNamedService<MoveDamageClass, MoveDamageClassEntry, MoveDamageClassConverter, MoveDamageClassService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveDamageClassCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MoveLearnMethodEntry>(
-                    collectionSettings.MoveLearnMethodCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MoveLearnMethodService>();
+            AddNamedService<MoveLearnMethod, MoveLearnMethodEntry, MoveLearnMethodConverter, MoveLearnMethodService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveLearnMethodCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MoveEntry>(
-                    collectionSettings.MoveCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MoveService>();
+            AddNamedService<Move, MoveEntry, MoveConverter, MoveService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<MoveTargetEntry>(
-                    collectionSettings.MoveTargetCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<MoveTargetService>();
+            AddNamedService<MoveTarget, MoveTargetEntry, MoveTargetConverter, MoveTargetService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveTargetCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<PokedexEntry>(
-                    collectionSettings.PokedexCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<PokedexService>();
+            AddNamedService<Pokedex, PokedexEntry, PokedexConverter, PokedexService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.PokedexCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<PokemonEntry>(
-                    collectionSettings.PokemonCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<PokemonService>();
+            AddNamedService<Pokemon, PokemonEntry, PokemonConverter, PokemonService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.PokemonCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<PokemonFormEntry>(
-                    collectionSettings.PokemonFormCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<PokemonFormService>();
+            AddNamedService<PokemonForm, PokemonFormEntry, PokemonFormConverter, PokemonFormService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.PokemonFormCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<PokemonSpeciesEntry>(
-                    collectionSettings.PokemonSpeciesCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<PokemonSpeciesService>();
+            AddNamedService<PokemonSpecies, PokemonSpeciesEntry, PokemonSpeciesConverter, PokemonSpeciesService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.MoveCategoryCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<StatEntry>(
-                    collectionSettings.StatCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<StatService>();
+            AddNamedService<Stat, StatEntry, StatConverter, StatService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.StatCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<TypeEntry>(
-                    collectionSettings.TypeCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<TypeService>();
+            AddNamedService<Type, TypeEntry, TypeConverter, TypeService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.TypeCollectionName);
 
-            services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<VersionEntry>(
-                    collectionSettings.VersionCollectionName,
-                    dataStoreSettings.DatabaseName,
-                    dataStoreSettings.PrivateKey,
-                    dataStoreSettings.ConnectionString)
-            );
-            services.AddSingleton<VersionService>();
+            AddNamedService<Version, VersionEntry, VersionConverter, VersionService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.VersionCollectionName);
 
+            AddNamedService<VersionGroup, VersionGroupEntry, VersionGroupConverter, VersionGroupService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.VersionGroupCollectionName);
+        }
+
+        private static void AddNamedService<TResource, TEntry, TConverter, TService>(
+            IServiceCollection services,
+            DataStoreSourceFactory dataStoreSourceFactory,
+            DataStoreSettings dataStoreSettings,
+            string collectionName)
+            where TResource : NamedApiResource
+            where TEntry : NamedApiResourceEntry
+            where TConverter : class, IResourceConverter<TResource, TEntry>
+            where TService : class, INamedEntryService<TResource, TEntry>
+        {
             services.AddSingleton(sp =>
-                dataStoreSourceFactory.Create<VersionGroupEntry>(
-                    collectionSettings.VersionGroupCollectionName,
+                dataStoreSourceFactory.Create<TEntry>(
+                    collectionName,
                     dataStoreSettings.DatabaseName,
                     dataStoreSettings.PrivateKey,
                     dataStoreSettings.ConnectionString)
             );
-            services.AddSingleton<VersionGroupService>();
+
+            services.AddSingleton<IResourceConverter<TResource, TEntry>, TConverter>();
+            services.AddSingleton<TService>();
+        }
+
+        private static void AddService<TResource, TEntry, TConverter, TService>(
+            IServiceCollection services,
+            DataStoreSourceFactory dataStoreSourceFactory,
+            DataStoreSettings dataStoreSettings,
+            string collectionName)
+            where TResource : ApiResource
+            where TEntry : EntryBase
+            where TConverter : class, IResourceConverter<TResource, TEntry>
+            where TService : class, IEntryService<TResource, TEntry>
+        {
+            services.AddSingleton(sp =>
+                dataStoreSourceFactory.Create<TEntry>(
+                    collectionName,
+                    dataStoreSettings.DatabaseName,
+                    dataStoreSettings.PrivateKey,
+                    dataStoreSettings.ConnectionString)
+            );
+
+            services.AddSingleton<IResourceConverter<TResource, TEntry>, TConverter>();
+            services.AddSingleton<TService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

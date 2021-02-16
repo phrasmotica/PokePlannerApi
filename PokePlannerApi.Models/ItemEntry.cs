@@ -10,12 +10,28 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the item.
         /// </summary>
-        public int ItemId => Key;
+        public int ItemId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the item.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the item entry.
+        /// </summary>
+        public NamedEntryRef<ItemEntry> ToRef()
+        {
+            return new NamedEntryRef<ItemEntry>
+            {
+                Key = ItemId,
+                Name = Name,
+            };
+        }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
@@ -48,7 +64,7 @@ namespace PokePlannerApi.Models
         {
             return new VersionHeldItemContext
             {
-                Key = e.Key,
+                ItemId = e.ItemId,
                 Name = e.Name,
                 DisplayNames = e.DisplayNames
             };

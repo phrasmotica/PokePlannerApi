@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -12,7 +11,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the type.
         /// </summary>
-        public int TypeId => Key;
+        public int TypeId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the type's display names.
@@ -27,10 +30,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the generation in which the type was introduced.
         /// </summary>
-        public Generation Generation { get; set; }
+        public NamedEntryRef<GenerationEntry> Generation { get; set; }
 
         /// <summary>
-        /// Gets or sets the type's efficacy indexed by version group ID and then type ID.
+        /// Gets or sets the type's efficacy, indexed by version group ID and then type ID.
+        /// TODO: store this separate to TypeEntry
         /// </summary>
         public EfficacyMap EfficacyMap { get; set; }
 
@@ -40,6 +44,18 @@ namespace PokePlannerApi.Models
         public EfficacySet GetEfficacySet(int versionGroupId)
         {
             return EfficacyMap.GetEfficacySet(versionGroupId);
+        }
+
+        /// <summary>
+        /// Returns a reference to the type entry.
+        /// </summary>
+        public NamedEntryRef<TypeEntry> ToRef()
+        {
+            return new NamedEntryRef<TypeEntry>
+            {
+                Key = TypeId,
+                Name = Name,
+            };
         }
 
         /// <summary>

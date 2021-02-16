@@ -11,17 +11,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class EvolutionChainController : ResourceControllerBase
     {
-        /// <summary>
-        /// The evolution chain service.
-        /// </summary>
-        private readonly EvolutionChainService EvolutionChainService;
+        private readonly EvolutionChainService _evolutionChainService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public EvolutionChainController(EvolutionChainService evolutionChainService, ILogger<EvolutionChainController> logger) : base(logger)
+        public EvolutionChainController(
+            EvolutionChainService evolutionChainService,
+            ILogger<EvolutionChainController> logger) : base(logger)
         {
-            EvolutionChainService = evolutionChainService;
+            _evolutionChainService = evolutionChainService;
         }
 
         /// <summary>
@@ -30,8 +26,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{speciesId:int}")]
         public async Task<EvolutionChainEntry> GetEvolutionChainBySpeciesId(int speciesId)
         {
-            Logger.LogInformation($"Getting evolution chain {speciesId}...");
-            return await EvolutionChainService.GetBySpeciesId(speciesId);
+            _logger.LogInformation($"Getting evolution chain {speciesId}...");
+            return await _evolutionChainService.GetBySpeciesId(speciesId);
         }
     }
 }

@@ -1,107 +1,76 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
+using PokePlannerApi.Clients;
+using PokePlannerApi.Data.DataStore.Abstractions;
 using PokePlannerApi.Data.DataStore.Converters;
-using PokePlannerApi.Data.Extensions;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the ability entries in the data store.
+    /// Service for accessing ability entries.
     /// </summary>
-    public class AbilityService : IResourceConverter<Ability, AbilityEntry>
+    public class AbilityService : INamedEntryService<Ability, AbilityEntry>
     {
-        private readonly NamedApiResourceServiceBase<Ability, AbilityEntry> _sourceService;
-        private readonly VersionGroupService _versionGroupService;
-        private readonly ILogger<AbilityService> _logger;
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Ability, AbilityEntry> _converter;
+        private readonly IDataStoreSource<AbilityEntry> _dataSource;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public AbilityService(
-            NamedApiResourceServiceBase<Ability, AbilityEntry> sourceService,
-            VersionGroupService versionGroupService,
-            ILogger<AbilityService> logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Ability, AbilityEntry> converter,
+            IDataStoreSource<AbilityEntry> dataSource)
         {
-            _sourceService = sourceService;
-            _versionGroupService = versionGroupService;
-            _logger = logger;
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
-
-        #region Entry conversion methods
 
         /// <inheritdoc />
-        public async Task<AbilityEntry> ConvertToEntry(Ability ability)
+        public async Task<AbilityEntry> Get(NamedApiResource<Ability> resource)
         {
-            var displayNames = ability.Names.Localise();
-            var flavourTextEntries = await GetFlavourTextEntries(ability);
+            var ability = await _pokeApi.Get(resource);
 
-            return new AbilityEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.AbilityId == ability.Id);
+            if (hasEntry)
             {
-                Key = ability.Id,
-                Name = ability.Name,
-                DisplayNames = displayNames.ToList(),
-                FlavourTextEntries = flavourTextEntries.ToList()
-            };
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Returns all abilities.
-        /// </summary>
-        public async Task<AbilityEntry[]> GetAll()
-        {
-            var allAbilities = await _sourceService.UpsertAll();
-            return allAbilities.OrderBy(g => g.Id).ToArray();
-        }
-
-        /// <summary>
-        /// Returns the abilities references by the given resource pointers.
-        /// </summary>
-        public async Task<AbilityEntry[]> Get(IEnumerable<NamedApiResource<Ability>> resources)
-        {
-            var allAbilities = await _sourceService.UpsertMany(resources);
-            return allAbilities.OrderBy(g => g.Id).ToArray();
-        }
-
-        #endregion
-
-        #region Helper methods
-
-        /// <summary>
-        /// Returns flavour text entries for the given ability, indexed by version group ID.
-        /// </summary>
-        private async Task<IEnumerable<WithId<LocalString[]>>> GetFlavourTextEntries(Ability ability)
-        {
-            var descriptionsList = new List<WithId<LocalString[]>>();
-
-            if (ability.FlavorTextEntries.Any())
-            {
-                foreach (var vg in await _versionGroupService.GetAll())
-                {
-                    var relevantDescriptions = ability.FlavorTextEntries.Where(f => f.VersionGroup.Name == vg.Name);
-                    if (relevantDescriptions.Any())
-                    {
-                        var descriptions = relevantDescriptions.Select(d => new LocalString
-                        {
-                            Language = d.Language.Name,
-                            Value = d.FlavorText
-                        });
-
-                        descriptionsList.Add(new WithId<LocalString[]>(vg.VersionGroupId, descriptions.ToArray()));
-                    }
-                }
+                return entry;
             }
 
-            return descriptionsList;
+            var newEntry = await _converter.Convert(ability);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<AbilityEntry> Get(NamedEntryRef<AbilityEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.AbilityId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var ability = await _pokeApi.Get<Ability>(entryRef.Key);
+            var newEntry = await _converter.Convert(ability);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<AbilityEntry[]> Get(IEnumerable<NamedApiResource<Ability>> resources)
+        {
+            var entries = new List<AbilityEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

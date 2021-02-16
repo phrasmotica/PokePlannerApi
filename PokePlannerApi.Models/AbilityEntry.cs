@@ -10,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the ability.
         /// </summary>
-        public int AbilityId => Key;
+        public int AbilityId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the ability.
@@ -20,7 +24,19 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the flavour text entries of the ability, indexed by version group ID.
         /// </summary>
-        public List<WithId<LocalString[]>> FlavourTextEntries { get; set; }
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the ability entry.
+        /// </summary>
+        public NamedEntryRef<AbilityEntry> ToRef()
+        {
+            return new NamedEntryRef<AbilityEntry>
+            {
+                Key = AbilityId,
+                Name = Name,
+            };
+        }
     }
 
     /// <summary>
@@ -40,7 +56,7 @@ namespace PokePlannerApi.Models
         {
             return new PokemonAbilityContext
             {
-                Key = e.Key,
+                AbilityId = e.AbilityId,
                 DisplayNames = e.DisplayNames,
                 FlavourTextEntries = e.FlavourTextEntries
             };

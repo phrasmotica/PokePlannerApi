@@ -1,58 +1,86 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the stat entries in the data store.
+    /// Service for accessing stat entries.
     /// </summary>
-    public class StatService : NamedApiResourceServiceBase<Stat, StatEntry>
+    public class StatService : INamedEntryService<Stat, StatEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Stat, StatEntry> _converter;
+        private readonly IDataStoreSource<StatEntry> _dataSource;
+
         public StatService(
-            IDataStoreSource<StatEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<StatService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Stat, StatEntry> converter,
+            IDataStoreSource<StatEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a stat entry for the given stat.
-        /// </summary>
-        protected override Task<StatEntry> ConvertToEntry(Stat stat)
+        /// <inheritdoc />
+        public async Task<StatEntry> Get(NamedApiResource<Stat> resource)
         {
-            var displayNames = stat.Names.Localise();
+            var stat = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new StatEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.StatId == stat.Id);
+            if (hasEntry)
             {
-                Key = stat.Id,
-                Name = stat.Name,
-                IsBattleOnly = stat.IsBattleOnly,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(stat);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<StatEntry> Get(NamedEntryRef<StatEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.StatId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
 
-        #region Public methods
+            var stat = await _pokeApi.Get<Stat>(entryRef.Key);
+            var newEntry = await _converter.Convert(stat);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<StatEntry[]> Get(IEnumerable<NamedApiResource<Stat>> resources)
+        {
+            var entries = new List<StatEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
         /// Returns all stats.
         /// </summary>
         public async Task<StatEntry[]> GetAll()
         {
-            var allStats = await UpsertAll();
-            return allStats.ToArray();
+            var resources = await _pokeApi.GetNamedFullPage<Stat>();
+            return await Get(resources.Results);
         }
 
         /// <summary>
@@ -60,11 +88,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<StatEntry[]> GetBaseStats(int versionGroupId)
         {
-            Logger.LogInformation($"Getting base stats in version group with ID {versionGroupId}...");
             var allStats = await GetAll();
             return allStats.Where(e => !e.IsBattleOnly).ToArray();
         }
-
-        #endregion
     }
 }

@@ -12,17 +12,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class SpeciesController : ResourceControllerBase
     {
-        /// <summary>
-        /// The Pokemon species service.
-        /// </summary>
-        private readonly PokemonSpeciesService PokemonSpeciesService;
+        private readonly PokemonSpeciesService _pokemonSpeciesService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SpeciesController(PokemonSpeciesService pokemonSpeciesService, ILogger<SpeciesController> logger) : base(logger)
+        public SpeciesController(
+            PokemonSpeciesService pokemonSpeciesService,
+            ILogger<SpeciesController> logger) : base(logger)
         {
-            PokemonSpeciesService = pokemonSpeciesService;
+            _pokemonSpeciesService = pokemonSpeciesService;
         }
 
         /// <summary>
@@ -34,16 +30,16 @@ namespace PokePlannerApi.Controllers
             {
                 if (offset.HasValue)
                 {
-                    Logger.LogInformation($"Getting first {limit.Value} Pokemon species starting at {offset.Value}...");
-                    return await PokemonSpeciesService.GetPokemonSpecies(limit.Value, offset.Value);
+                    _logger.LogInformation($"Getting first {limit.Value} Pokemon species starting at {offset.Value}...");
+                    return await _pokemonSpeciesService.GetPokemonSpecies(limit.Value, offset.Value);
                 }
 
-                Logger.LogInformation($"Getting first {limit.Value} Pokemon species...");
-                return await PokemonSpeciesService.GetPokemonSpecies(limit.Value, 0);
+                _logger.LogInformation($"Getting first {limit.Value} Pokemon species...");
+                return await _pokemonSpeciesService.GetPokemonSpecies(limit.Value, 0);
             }
 
-            Logger.LogInformation("Getting all Pokemon species...");
-            return await PokemonSpeciesService.GetPokemonSpecies();
+            _logger.LogInformation("Getting all Pokemon species...");
+            return await _pokemonSpeciesService.GetPokemonSpecies();
         }
 
         /// <summary>
@@ -53,8 +49,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{speciesId:int}/varieties/{versionGroupId:int}")]
         public async Task<PokemonEntry[]> GetPokemonSpeciesVarieties(int speciesId, int versionGroupId)
         {
-            Logger.LogInformation($"Getting varieties of Pokemon species {speciesId} in version group {versionGroupId}...");
-            return await PokemonSpeciesService.GetPokemonSpeciesVarieties(speciesId, versionGroupId);
+            _logger.LogInformation($"Getting varieties of Pokemon species {speciesId} in version group {versionGroupId}...");
+            return await _pokemonSpeciesService.GetPokemonSpeciesVarieties(speciesId, versionGroupId);
         }
 
         /// <summary>
@@ -62,10 +58,10 @@ namespace PokePlannerApi.Controllers
         /// version group with the given ID.
         /// </summary>
         [HttpGet("{speciesId:int}/forms/{versionGroupId:int}")]
-        public async Task<IEnumerable<WithId<PokemonFormEntry[]>>> GetPokemonSpeciesForms(int speciesId, int versionGroupId)
+        public async Task<IEnumerable<WithId<List<PokemonFormEntry>>>> GetPokemonSpeciesForms(int speciesId, int versionGroupId)
         {
-            Logger.LogInformation($"Getting forms of varieties of Pokemon species {speciesId} in version group {versionGroupId}...");
-            return await PokemonSpeciesService.GetPokemonSpeciesForms(speciesId, versionGroupId);
+            _logger.LogInformation($"Getting forms of varieties of Pokemon species {speciesId} in version group {versionGroupId}...");
+            return await _pokemonSpeciesService.GetPokemonSpeciesForms(speciesId, versionGroupId);
         }
     }
 }

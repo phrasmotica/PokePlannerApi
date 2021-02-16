@@ -1,59 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the generation entries in the data store.
+    /// Service for accessing evolution trigger entries.
     /// </summary>
-    public class EvolutionTriggerService : NamedApiResourceServiceBase<EvolutionTrigger, EvolutionTriggerEntry>
+    public class EvolutionTriggerService : INamedEntryService<EvolutionTrigger, EvolutionTriggerEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<EvolutionTrigger, EvolutionTriggerEntry> _converter;
+        private readonly IDataStoreSource<EvolutionTriggerEntry> _dataSource;
+
         public EvolutionTriggerService(
-            IDataStoreSource<EvolutionTriggerEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<EvolutionTriggerService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<EvolutionTrigger, EvolutionTriggerEntry> converter,
+            IDataStoreSource<EvolutionTriggerEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a evolution trigger entry for the given evolution trigger.
-        /// </summary>
-        protected override Task<EvolutionTriggerEntry> ConvertToEntry(EvolutionTrigger evolutionTrigger)
+        /// <inheritdoc />
+        public async Task<EvolutionTriggerEntry> Get(NamedApiResource<EvolutionTrigger> resource)
         {
-            var displayNames = evolutionTrigger.Names.Localise();
+            var evolutionTrigger = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new EvolutionTriggerEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EvolutionTriggerId == evolutionTrigger.Id);
+            if (hasEntry)
             {
-                Key = evolutionTrigger.Id,
-                Name = evolutionTrigger.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(evolutionTrigger);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Returns all evolution triggers.
-        /// </summary>
-        public async Task<EvolutionTriggerEntry[]> GetAll()
+        /// <inheritdoc />
+        public async Task<EvolutionTriggerEntry> Get(NamedEntryRef<EvolutionTriggerEntry> entryRef)
         {
-            var allEvolutionTriggers = await UpsertAll();
-            return allEvolutionTriggers.OrderBy(g => g.Id).ToArray();
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EvolutionTriggerId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var evolutionTrigger = await _pokeApi.Get<EvolutionTrigger>(entryRef.Key);
+            var newEntry = await _converter.Convert(evolutionTrigger);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<EvolutionTriggerEntry[]> Get(IEnumerable<NamedApiResource<EvolutionTrigger>> resources)
+        {
+            var entries = new List<EvolutionTriggerEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

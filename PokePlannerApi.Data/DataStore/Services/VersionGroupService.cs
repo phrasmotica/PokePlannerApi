@@ -1,92 +1,94 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the version group entries in the data store.
+    /// Service for accessing version group entries.
     /// </summary>
-    public class VersionGroupService : NamedApiResourceServiceBase<VersionGroup, VersionGroupEntry>
+    public class VersionGroupService : INamedEntryService<VersionGroup, VersionGroupEntry>
     {
-        /// <summary>
-        /// The generations service.
-        /// </summary>
-        private readonly GenerationService GenerationsService;
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<VersionGroup, VersionGroupEntry> _converter;
+        private readonly IDataStoreSource<VersionGroupEntry> _dataSource;
 
-        /// <summary>
-        /// The pokedexes service.
-        /// </summary>
-        private readonly PokedexService PokedexesService;
-
-        /// <summary>
-        /// The versions service.
-        /// </summary>
-        private readonly VersionService VersionsService;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public VersionGroupService(
-            IDataStoreSource<VersionGroupEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            GenerationService generationsService,
-            PokedexService pokedexesService,
-            VersionService versionsService,
-            ILogger<VersionGroupService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<VersionGroup, VersionGroupEntry> converter,
+            IDataStoreSource<VersionGroupEntry> dataSource)
         {
-            GenerationsService = generationsService;
-            PokedexesService = pokedexesService;
-            VersionsService = versionsService;
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
+        /// <inheritdoc />
+        public async Task<VersionGroupEntry> Get(NamedApiResource<VersionGroup> resource)
+        {
+            var versionGroup = await _pokeApi.Get(resource);
+
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionGroupId == versionGroup.Id);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(versionGroup);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<VersionGroupEntry> Get(NamedEntryRef<VersionGroupEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionGroupId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var versionGroup = await _pokeApi.Get<VersionGroup>(entryRef.Key);
+            var newEntry = await _converter.Convert(versionGroup);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<VersionGroupEntry[]> Get(IEnumerable<NamedApiResource<VersionGroup>> resources)
+        {
+            var entries = new List<VersionGroupEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
-        /// Returns a version group entry for the given version group.
+        /// Returns all version groups.
         /// </summary>
-        protected override async Task<VersionGroupEntry> ConvertToEntry(VersionGroup versionGroup)
+        public async Task<VersionGroupEntry[]> GetAll()
         {
-            var displayNames = await GetDisplayNames(versionGroup);
-            var generation = await GenerationsService.GetByVersionGroup(versionGroup);
-            var versions = await VersionsService.UpsertMany(versionGroup.Versions);
-            var pokedexes = await PokedexesService.UpsertMany(versionGroup.Pokedexes);
-
-            return new VersionGroupEntry
-            {
-                Key = versionGroup.Id,
-                Name = versionGroup.Name,
-                Order = versionGroup.Order,
-                DisplayNames = displayNames.ToList(),
-                Generation = new Generation
-                {
-                    Id = generation.GenerationId,
-                    Name = generation.Name
-                },
-                Versions = versions.ToList(),
-                Pokedexes = pokedexes.Select(p => new Pokedex
-                {
-                    Id = p.PokedexId,
-                    Name = p.Name
-                }).ToList()
-            };
+            var resources = await _pokeApi.GetNamedFullPage<VersionGroup>();
+            return await Get(resources.Results);
         }
-
-        #endregion
-
-        #region Public methods
 
         /// <summary>
         /// Returns the index of the oldest version group.
         /// </summary>
         public async Task<int> GetOldestVersionGroupId()
         {
-            var entries = await GetAllEntries();
+            var entries = await GetAll();
             return entries.Select(vg => vg.VersionGroupId).Min();
         }
 
@@ -95,17 +97,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<int> GetNewestVersionGroupId()
         {
-            var entries = await GetAllEntries();
+            var entries = await GetAll();
             return entries.Select(vg => vg.VersionGroupId).Max();
-        }
-
-        /// <summary>
-        /// Returns all version groups.
-        /// </summary>
-        public async Task<VersionGroupEntry[]> GetAll()
-        {
-            var allVersionGroups = await UpsertAll();
-            return allVersionGroups.OrderBy(vg => vg.Order).ToArray();
         }
 
         /// <summary>
@@ -113,40 +106,14 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// </summary>
         public async Task<VersionGroupEntry[]> UpsertManyByVersionIds(IEnumerable<int> versionIds)
         {
-            var allVersionGroups = await UpsertAll();
+            var allVersionGroups = await GetAll();
             var relevantVersionGroups = allVersionGroups.Where(vg =>
             {
-                var myVersionIds = vg.Versions.Select(v => v.VersionId);
+                var myVersionIds = vg.Versions.Select(v => v.Key);
                 return myVersionIds.Intersect(versionIds).Any();
             });
 
             return relevantVersionGroups.ToArray();
         }
-
-        #endregion
-
-        #region Helpers
-
-        /// <summary>
-        /// Returns the display names of the given version group in all locales.
-        /// </summary>
-        private async Task<IEnumerable<LocalString>> GetDisplayNames(VersionGroup versionGroup)
-        {
-            var versions = await VersionsService.UpsertMany(versionGroup.Versions);
-            var versionsNames = versions.Select(v => v.DisplayNames.OrderBy(n => n.Language).ToList());
-            var namesList = versionsNames.Aggregate(
-                (nv1, nv2) => nv1.Zip(
-                    nv2, (n1, n2) => new LocalString
-                    {
-                        Language = n1.Language,
-                        Value = n1.Value + "/" + n2.Value
-                    }
-                ).ToList()
-            );
-
-            return namesList;
-        }
-
-        #endregion
     }
 }

@@ -14,32 +14,18 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
     /// </summary>
     public class CosmosDbDataStoreSource<TEntry> : IDataStoreSource<TEntry> where TEntry : EntryBase
     {
-        /// <summary>
-        /// The client to Cosmos DB.
-        /// </summary>
-        protected CosmosClient CosmosClient;
-
-        /// <summary>
-        /// The database name.
-        /// </summary>
-        protected readonly string DatabaseName;
-
-        /// <summary>
-        /// The container name.
-        /// </summary>
-        protected readonly string ContainerName;
-
-        /// <summary>
-        /// The container of entries.
-        /// </summary>
-        protected Container Container;
+        private readonly CosmosClient _cosmosClient;
+        private readonly string _databaseName;
+        private readonly string _containerName;
+        private readonly TimeSpan timeToLive = TimeSpan.FromDays(365);
+        private Container container;
 
         /// <summary>
         /// Create connection to database container.
         /// </summary>
         public CosmosDbDataStoreSource(string connectionString, string privateKey, string databaseName, string collectionName)
         {
-            CosmosClient = new CosmosClient(connectionString, privateKey, new CosmosClientOptions
+            _cosmosClient = new CosmosClient(connectionString, privateKey, new CosmosClientOptions
             {
                 SerializerOptions = new CosmosSerializationOptions
                 {
@@ -47,8 +33,8 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
                 }
             });
 
-            DatabaseName = databaseName;
-            ContainerName = collectionName;
+            _databaseName = databaseName;
+            _containerName = collectionName;
         }
 
         /// <summary>
@@ -77,12 +63,12 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
 
             if (string.IsNullOrEmpty(entry.Id))
             {
-                entry.Id = entry.Key.ToString();
+                entry.Id = Guid.NewGuid().ToString();
             }
 
             try
             {
-                await Container.UpsertItemAsync(entry, GetPartitionKey(entry));
+                await container.UpsertItemAsync(entry, GetPartitionKey(entry));
             }
             catch (CosmosException e)
             {
@@ -99,7 +85,15 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         public async Task DeleteOne(Expression<Func<TEntry, bool>> predicate)
         {
             var entry = await GetOne(predicate);
-            await Container.DeleteItemAsync<TEntry>(entry.Id, GetPartitionKey(entry));
+            await container.DeleteItemAsync<TEntry>(entry.Id, GetPartitionKey(entry));
+        }
+
+        /// <inheritdoc />
+        public async Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate)
+        {
+            var entry = await GetOne(predicate);
+            var hasIt = entry != null && entry.CreationTime >= DateTime.UtcNow - timeToLive;
+            return (hasIt, entry);
         }
 
         /// <summary>
@@ -109,7 +103,7 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         {
             await CreateIfNeeded();
 
-            var resources = await Container.GetItemLinqQueryable<T>()
+            var resources = await container.GetItemLinqQueryable<T>()
                                            .ToFeedIterator()
                                            .ReadNextAsync();
 
@@ -121,12 +115,12 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         /// </summary>
         protected async Task CreateIfNeeded()
         {
-            var databaseResponse = await CosmosClient.CreateDatabaseIfNotExistsAsync(DatabaseName);
+            var databaseResponse = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseName);
             var database = databaseResponse.Database;
 
-            var containerProperties = new ContainerProperties(ContainerName, "/id");
+            var containerProperties = new ContainerProperties(_containerName, "/id");
             var containerResponse = await database.CreateContainerIfNotExistsAsync(containerProperties);
-            Container = containerResponse.Container;
+            container = containerResponse.Container;
         }
 
         /// <summary>

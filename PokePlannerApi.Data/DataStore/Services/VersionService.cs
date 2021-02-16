@@ -1,59 +1,85 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the version entries in the data store.
+    /// Service for accessing version entries.
     /// </summary>
-    public class VersionService : NamedApiResourceServiceBase<Version, VersionEntry>
+    public class VersionService : INamedEntryService<Version, VersionEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Version, VersionEntry> _converter;
+        private readonly IDataStoreSource<VersionEntry> _dataSource;
+
         public VersionService(
-            IDataStoreSource<VersionEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<VersionService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Version, VersionEntry> converter,
+            IDataStoreSource<VersionEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a version entry for the given version.
-        /// </summary>
-        protected override Task<VersionEntry> ConvertToEntry(Version version)
+        /// <inheritdoc />
+        public async Task<VersionEntry> Get(NamedApiResource<Version> resource)
         {
-            var displayNames = version.Names.Localise();
+            var version = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new VersionEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionId == version.Id);
+            if (hasEntry)
             {
-                Key = version.Id,
-                Name = version.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(version);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<VersionEntry> Get(NamedEntryRef<VersionEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
 
-        #region Public methods
+            var version = await _pokeApi.Get<Version>(entryRef.Key);
+            var newEntry = await _converter.Convert(version);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<VersionEntry[]> Get(IEnumerable<NamedApiResource<Version>> resources)
+        {
+            var entries = new List<VersionEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
         /// Returns all versions.
         /// </summary>
         public async Task<VersionEntry[]> GetAll()
         {
-            var allStats = await UpsertAll();
-            return allStats.ToArray();
+            var resources = await _pokeApi.GetNamedFullPage<Version>();
+            return await Get(resources.Results);
         }
-
-        #endregion
     }
 }

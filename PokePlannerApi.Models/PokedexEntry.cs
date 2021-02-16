@@ -10,11 +10,27 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the pokedex.
         /// </summary>
-        public int PokedexId => Key;
+        public int PokedexId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the pokedex.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the pokedex entry.
+        /// </summary>
+        public NamedEntryRef<PokedexEntry> ToRef()
+        {
+            return new NamedEntryRef<PokedexEntry>
+            {
+                Key = PokedexId,
+                Name = Name,
+            };
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the key of the entry.
         /// </summary>
-        public int Key { get; set; }
+        protected int Key { get; set; }
 
         /// <summary>
         /// Gets the time that the entry was created.

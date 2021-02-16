@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the location area.
         /// </summary>
-        public int LocationAreaId => Key;
+        public int LocationAreaId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the location area.
@@ -21,6 +24,18 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the location of the location area.
         /// </summary>
-        public Location Location { get; set; }
+        public NamedEntryRef<LocationEntry> Location { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the location area entry.
+        /// </summary>
+        public NamedEntryRef<LocationAreaEntry> ToRef()
+        {
+            return new NamedEntryRef<LocationAreaEntry>
+            {
+                Key = LocationAreaId,
+                Name = Name,
+            };
+        }
     }
 }

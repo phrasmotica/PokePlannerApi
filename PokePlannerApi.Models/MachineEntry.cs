@@ -1,6 +1,4 @@
-﻿using PokeApiNet;
-
-namespace PokePlannerApi.Models
+﻿namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a machine in the data store.
@@ -10,11 +8,26 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the machine.
         /// </summary>
-        public int MachineId => Key;
+        public int MachineId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the item this machine represents.
         /// </summary>
-        public Item Item { get; set; }
+        public NamedEntryRef<ItemEntry> Item { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the machine entry.
+        /// </summary>
+        public EntryRef<MachineEntry> ToRef()
+        {
+            return new EntryRef<MachineEntry>
+            {
+                Key = MachineId,
+            };
+        }
     }
 }

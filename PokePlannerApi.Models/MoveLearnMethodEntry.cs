@@ -10,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the move learn method.
         /// </summary>
-        public int MoveLearnMethodId => Key;
+        public int MoveLearnMethodId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the move learn method.
@@ -21,5 +25,17 @@ namespace PokePlannerApi.Models
         /// Gets or sets the descriptions of the move learn method.
         /// </summary>
         public List<LocalString> Descriptions { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the move learn method entry.
+        /// </summary>
+        public NamedEntryRef<MoveLearnMethodEntry> ToRef()
+        {
+            return new NamedEntryRef<MoveLearnMethodEntry>
+            {
+                Key = MoveLearnMethodId,
+                Name = Name,
+            };
+        }
     }
 }

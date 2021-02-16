@@ -11,17 +11,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class VersionGroupController : ResourceControllerBase
     {
-        /// <summary>
-        /// The version groups service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupsService;
+        private readonly VersionGroupService _versionGroupService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public VersionGroupController(VersionGroupService versionGroupsService, ILogger<VersionGroupController> logger) : base(logger)
+        public VersionGroupController(
+            VersionGroupService versionGroupsService,
+            ILogger<VersionGroupController> logger) : base(logger)
         {
-            VersionGroupsService = versionGroupsService;
+            _versionGroupService = versionGroupsService;
         }
 
         /// <summary>
@@ -30,8 +26,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("all")]
         public async Task<VersionGroupEntry[]> GetVersionGroups()
         {
-            Logger.LogInformation("VersionGroupController: getting version groups...");
-            return await VersionGroupsService.GetAll();
+            _logger.LogInformation("VersionGroupController: getting version groups...");
+            return await _versionGroupService.GetAll();
         }
     }
 }

@@ -12,10 +12,8 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
     /// </summary>
     public class MongoDbDataStoreSource<TEntry> : IDataStoreSource<TEntry> where TEntry : EntryBase
     {
-        /// <summary>
-        /// The collection of entries.
-        /// </summary>
-        protected IMongoCollection<TEntry> Collection;
+        private readonly IMongoCollection<TEntry> _collection;
+        private readonly TimeSpan timeToLive = TimeSpan.FromDays(365);
 
         /// <summary>
         /// Create connection to database collection.
@@ -24,43 +22,43 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         {
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase(databaseName);
-            Collection = database.GetCollection<TEntry>(collectionName);
+            _collection = database.GetCollection<TEntry>(collectionName);
         }
 
-        /// <summary>
-        /// Returns all entries.
-        /// </summary>
+        /// <inheritdoc />
         public Task<IEnumerable<TEntry>> GetAll()
         {
-            var entries = Collection.Find(_ => true).ToEnumerable();
+            var entries = _collection.Find(_ => true).ToEnumerable();
             return Task.FromResult(entries);
         }
 
-        /// <summary>
-        /// Returns the first entry that matches the given predicate.
-        /// </summary>
+        /// <inheritdoc />
         public Task<TEntry> GetOne(Expression<Func<TEntry, bool>> predicate)
         {
-            var entry = Collection.Find(predicate).FirstOrDefault();
+            var entry = _collection.Find(predicate).FirstOrDefault();
             return Task.FromResult(entry);
         }
 
-        /// <summary>
-        /// Creates the given entry and returns it.
-        /// </summary>
+        /// <inheritdoc />
         public Task<TEntry> Create(TEntry entry)
         {
-            Collection.InsertOne(entry);
+            _collection.InsertOne(entry);
             return Task.FromResult(entry);
         }
 
-        /// <summary>
-        /// Deletes the first entry that matches the given predicate.
-        /// </summary>
+        /// <inheritdoc />
         public Task DeleteOne(Expression<Func<TEntry, bool>> predicate)
         {
-            Collection.DeleteOne(predicate);
+            _collection.DeleteOne(predicate);
             return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate)
+        {
+            var entry = GetOne(predicate).Result;
+            var hasIt = entry != null && entry.CreationTime >= DateTime.UtcNow - timeToLive;
+            return Task.FromResult((hasIt, entry));
         }
     }
 }

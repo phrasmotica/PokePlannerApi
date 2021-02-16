@@ -6,13 +6,14 @@ using NUnit.Framework;
 using PokeApiNet;
 using PokePlannerApi.Models;
 using PokePlannerApi.Data.DataStore.Services;
+using PokePlannerApi.Data.DataStore.Converters;
 
-namespace PokePlannerApi.Tests.DataStore.Services
+namespace PokePlannerApi.Tests.DataStore.Converters
 {
     /// <summary>
-    /// Tests for the encounters service.
+    /// Tests for the encounters converter.
     /// </summary>
-    public class EncountersServiceTests
+    public class EncountersConverterTests
     {
         /// <summary>
         /// Verifies that encounter details from multiple versions are grouped correctly.
@@ -102,7 +103,7 @@ namespace PokePlannerApi.Tests.DataStore.Services
 
             // assert
             var methodData = entryList[0].Data;
-            Assert.That(methodData.Length, Is.EqualTo(2));
+            Assert.That(methodData.Count, Is.EqualTo(2));
         }
 
         /// <summary>
@@ -163,7 +164,7 @@ namespace PokePlannerApi.Tests.DataStore.Services
 
             foreach (var entry in entryList)
             {
-                Assert.That(entry.Data.Length, Is.EqualTo(2));
+                Assert.That(entry.Data.Count, Is.EqualTo(2));
             }
         }
 
@@ -205,7 +206,7 @@ namespace PokePlannerApi.Tests.DataStore.Services
             var entry = entryList[0];
 
             // should only be one method
-            Assert.That(entry.Data.Length, Is.EqualTo(1));
+            Assert.That(entry.Data.Count, Is.EqualTo(1));
             var methodDetail = entry.Data[0];
 
             // should be two condition values details
@@ -213,15 +214,15 @@ namespace PokePlannerApi.Tests.DataStore.Services
         }
 
         /// <summary>
-        /// Returns an EncountersService instance for testing
-        /// <see cref="EncountersService.GetEncounterDetails(IEnumerable{VersionEncounterDetail})"/>.
+        /// Returns an EncountersConverter instance for testing
+        /// <see cref="EncountersConverter.GetEncounterDetails(IEnumerable{VersionEncounterDetail})"/>.
         /// </summary>
-        private static EncountersService SetupForGetEncounterDetails()
+        private static EncountersConverter SetupForGetEncounterDetails()
         {
             var encounterConditionValueService = new Mock<EncounterConditionValueService>(null, null, null, null);
             encounterConditionValueService
                 .Setup(
-                    s => s.UpsertMany(
+                    s => s.Get(
                         It.IsAny<IEnumerable<NamedApiResource<EncounterConditionValue>>>()
                     )
                 )
@@ -232,14 +233,14 @@ namespace PokePlannerApi.Tests.DataStore.Services
                             {
                                 Name = nav.Name
                             }
-                        )
+                        ).ToArray()
                     )
                 );
 
             var encounterMethodService = new Mock<EncounterMethodService>(null, null, null, null);
             encounterMethodService
                 .Setup(
-                    s => s.Upsert(
+                    s => s.Get(
                         It.IsAny<NamedApiResource<EncounterMethod>>()
                     )
                 )
@@ -255,7 +256,7 @@ namespace PokePlannerApi.Tests.DataStore.Services
             var versionService = new Mock<VersionService>(null, null, null, null);
             versionService
                 .Setup(
-                    s => s.Upsert(
+                    s => s.Get(
                         It.IsAny<NamedApiResource<Version>>()
                     )
                 )
@@ -268,16 +269,13 @@ namespace PokePlannerApi.Tests.DataStore.Services
                     )
                 );
 
-            return new EncountersService(
-                null,
-                null,
+            return new EncountersConverter(
                 null,
                 encounterConditionValueService.Object,
                 encounterMethodService.Object,
                 null,
                 null,
                 versionService.Object,
-                null,
                 null
             );
         }

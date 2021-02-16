@@ -11,17 +11,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class FormController : ResourceControllerBase
     {
-        /// <summary>
-        /// THe Pokemon forms service.
-        /// </summary>
-        private readonly PokemonFormService PokemonFormsService;
+        private readonly PokemonFormService _pokemonFormService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FormController(PokemonFormService pokemonFormsService, ILogger<FormController> logger) : base(logger)
+        public FormController(
+            PokemonFormService pokemonFormService,
+            ILogger<FormController> logger) : base(logger)
         {
-            PokemonFormsService = pokemonFormsService;
+            _pokemonFormService = pokemonFormService;
         }
 
         /// <summary>
@@ -30,8 +26,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{formId:int}")]
         public async Task<PokemonFormEntry> GetFormById(int formId)
         {
-            Logger.LogInformation($"Getting Pokemon form {formId}...");
-            return await PokemonFormsService.GetPokemonForm(formId);
+            _logger.LogInformation($"Getting Pokemon form {formId}...");
+            return await _pokemonFormService.Get(formId);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon species.
         /// </summary>
-        public int SpeciesId => Key;
+        public int PokemonSpeciesId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets this species' front default sprite URL.
@@ -36,35 +39,36 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the flavour text entries of the species, indexed by version ID.
         /// </summary>
-        public List<WithId<LocalString[]>> FlavourTextEntries { get; set; }
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
 
         /// <summary>
-        /// Gets or sets the types of this species' primary variety indexed by version group ID.
+        /// Gets or sets the types of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<Type[]>> Types { get; set; }
+        public List<WithId<List<NamedEntryRef<TypeEntry>>>> Types { get; set; }
 
         /// <summary>
-        /// Gets or sets the base stats of this species' primary variety indexed by version group ID.
+        /// Gets or sets the base stats of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<int[]>> BaseStats { get; set; }
+        public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
         /// </summary>
-        public List<Pokemon> Varieties { get; set; }
+        public List<NamedEntryRef<PokemonEntry>> Varieties { get; set; }
 
         /// <summary>
         /// Gets or sets the generation in which this species was introduced.
         /// </summary>
-        public Generation Generation { get; set; }
+        public NamedEntryRef<GenerationEntry> Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the species' evolution chain.
         /// </summary>
-        public EvolutionChain EvolutionChain { get; set; }
+        public EntryRef<EvolutionChainEntry> EvolutionChain { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon species is valid.
+        /// TODO: change to NamedEntryRef
         /// </summary>
         public List<int> Validity { get; set; }
 
@@ -72,6 +76,18 @@ namespace PokePlannerApi.Models
         /// Gets or sets the catch rate of the species.
         /// </summary>
         public int CatchRate { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the Pokemon species entry.
+        /// </summary>
+        public NamedEntryRef<PokemonSpeciesEntry> ToRef()
+        {
+            return new NamedEntryRef<PokemonSpeciesEntry>
+            {
+                Key = PokemonSpeciesId,
+                Name = Name,
+            };
+        }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.

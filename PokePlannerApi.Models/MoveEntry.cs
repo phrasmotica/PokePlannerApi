@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the move.
         /// </summary>
-        public int MoveId => Key;
+        public int MoveId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the display names of the move.
@@ -21,17 +24,17 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the flavour text entries of the move, indexed by version group ID.
         /// </summary>
-        public List<WithId<LocalString[]>> FlavourTextEntries { get; set; }
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the move.
         /// </summary>
-        public Type Type { get; set; }
+        public NamedEntryRef<TypeEntry> Type { get; set; }
 
         /// <summary>
         /// Gets or sets the category of the move.
         /// </summary>
-        public MoveCategory Category { get; set; }
+        public NamedEntryRef<MoveCategoryEntry> Category { get; set; }
 
         /// <summary>
         /// Gets or sets the move's base power.
@@ -41,7 +44,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the damage class of the move.
         /// </summary>
-        public MoveDamageClass DamageClass { get; set; }
+        public NamedEntryRef<MoveDamageClassEntry> DamageClass { get; set; }
 
         /// <summary>
         /// Gets or sets the move's accuracy.
@@ -61,12 +64,24 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's target.
         /// </summary>
-        public MoveTarget Target { get; set; }
+        public NamedEntryRef<MoveTargetEntry> Target { get; set; }
 
         /// <summary>
         /// Gets or sets the machines that teach the move, indexed by version group ID.
         /// </summary>
-        public List<WithId<Machine[]>> Machines { get; set; }
+        public List<WithId<List<EntryRef<MachineEntry>>>> Machines { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the move entry.
+        /// </summary>
+        public NamedEntryRef<MoveEntry> ToRef()
+        {
+            return new NamedEntryRef<MoveEntry>
+            {
+                Key = MoveId,
+                Name = Name,
+            };
+        }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
@@ -109,7 +124,7 @@ namespace PokePlannerApi.Models
         {
             return new PokemonMoveContext
             {
-                Key = e.Key,
+                MoveId = e.MoveId,
                 Name = e.Name,
                 DisplayNames = e.DisplayNames,
                 FlavourTextEntries = e.FlavourTextEntries,
@@ -120,7 +135,7 @@ namespace PokePlannerApi.Models
                 Accuracy = e.Accuracy,
                 PP = e.PP,
                 Priority = e.Priority,
-                Target = e.Target
+                Target = e.Target,
             };
         }
     }

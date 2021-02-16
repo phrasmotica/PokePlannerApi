@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
@@ -13,163 +11,66 @@ namespace PokePlannerApi.Data.DataStore.Services
     /// <summary>
     /// Service for managing the move entries in the data store.
     /// </summary>
-    public class MoveService : NamedApiResourceServiceBase<Move, MoveEntry>
+    public class MoveService : INamedEntryService<Move, MoveEntry>
     {
-        /// <summary>
-        /// The move category service.
-        /// </summary>
-        private readonly MoveCategoryService MoveCategoryService;
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Move, MoveEntry> _converter;
+        private readonly IDataStoreSource<MoveEntry> _dataSource;
 
-        /// <summary>
-        /// The move damage class service.
-        /// </summary>
-        private readonly MoveDamageClassService MoveDamageClassService;
-
-        /// <summary>
-        /// The move target service.
-        /// </summary>
-        private readonly MoveTargetService MoveTargetService;
-
-        /// <summary>
-        /// The type service.
-        /// </summary>
-        private readonly TypeService TypeService;
-
-        /// <summary>
-        /// The version group service.
-        /// </summary>
-        private readonly VersionGroupService VersionGroupService;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public MoveService(
-            IDataStoreSource<MoveEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            MoveCategoryService moveCategoryService,
-            MoveDamageClassService moveDamageClassService,
-            MoveTargetService moveTargetService,
-            TypeService typeService,
-            VersionGroupService versionGroupService,
-            ILogger<MoveService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Move, MoveEntry> converter,
+            IDataStoreSource<MoveEntry> dataSource)
         {
-            MoveCategoryService = moveCategoryService;
-            MoveDamageClassService = moveDamageClassService;
-            MoveTargetService = moveTargetService;
-            TypeService = typeService;
-            VersionGroupService = versionGroupService;
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a move entry for the given move.
-        /// </summary>
-        protected override async Task<MoveEntry> ConvertToEntry(Move move)
+        /// <inheritdoc />
+        public async Task<MoveEntry> Get(NamedApiResource<Move> resource)
         {
-            var displayNames = move.Names.Localise();
-            var flavourTextEntries = await GetFlavourTextEntries(move);
-            var type = await TypeService.Upsert(move.Type);
-            var category = await MoveCategoryService.Upsert(move.Meta.Category);
-            var damageClass = await MoveDamageClassService.Upsert(move.DamageClass);
-            var target = await MoveTargetService.Upsert(move.Target);
-            var machines = await GetMachines(move);
+            var move = await _pokeApi.Get(resource);
 
-            return new MoveEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveId == move.Id);
+            if (hasEntry)
             {
-                Key = move.Id,
-                Name = move.Name,
-                DisplayNames = displayNames.ToList(),
-                FlavourTextEntries = flavourTextEntries.ToList(),
-                Type = new Type
-                {
-                    Id = type.TypeId,
-                    Name = type.Name
-                },
-                Category = new MoveCategory
-                {
-                    Id = category.MoveCategoryId,
-                    Name = category.Name
-                },
-                Power = move.Power,
-                DamageClass = new MoveDamageClass
-                {
-                    Id = damageClass.MoveDamageClassId,
-                    Name = damageClass.Name
-                },
-                Accuracy = move.Accuracy,
-                PP = move.Pp,
-                Priority = move.Priority,
-                Target = new MoveTarget
-                {
-                    Id = target.MoveTargetId,
-                    Name = target.Name
-                },
-                Machines = machines.ToList()
-            };
-        }
-
-        #endregion
-
-        #region Helper methods
-
-        /// <summary>
-        /// Returns flavour text entries for the given move, indexed by version group ID.
-        /// </summary>
-        private async Task<IEnumerable<WithId<LocalString[]>>> GetFlavourTextEntries(Move move)
-        {
-            var descriptionsList = new List<WithId<LocalString[]>>();
-
-            if (move.FlavorTextEntries.Any())
-            {
-                foreach (var vg in await VersionGroupService.GetAll())
-                {
-                    var relevantDescriptions = move.FlavorTextEntries.Where(f => f.VersionGroup.Name == vg.Name);
-                    if (relevantDescriptions.Any())
-                    {
-                        var descriptions = relevantDescriptions.Select(d => new LocalString
-                        {
-                            Language = d.Language.Name,
-                            Value = d.FlavorText
-                        });
-
-                        descriptionsList.Add(new WithId<LocalString[]>(vg.VersionGroupId, descriptions.ToArray()));
-                    }
-                }
+                return entry;
             }
 
-            return descriptionsList;
+            var newEntry = await _converter.Convert(move);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        /// <summary>
-        /// Returns machines for the given move, indexed by version group ID.
-        /// </summary>
-        private async Task<IEnumerable<WithId<Machine[]>>> GetMachines(Move move)
+        /// <inheritdoc />
+        public async Task<MoveEntry> Get(NamedEntryRef<MoveEntry> entryRef)
         {
-            var machinesList = new List<WithId<Machine[]>>();
-
-            if (move.Machines.Any())
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveId == entryRef.Key);
+            if (hasEntry)
             {
-                foreach (var vg in await VersionGroupService.GetAll())
-                {
-                    var relevantMachines = move.Machines.Where(m => m.VersionGroup.Name == vg.Name);
-                    if (relevantMachines.Any())
-                    {
-                        var machines = new List<Machine>();
-                        foreach (var m in relevantMachines)
-                        {
-                            var machine = await _pokeApi.Get(m.Machine);
-                            machines.Add(machine);
-                        }
-
-                        machinesList.Add(new WithId<Machine[]>(vg.VersionGroupId, machines.ToArray()));
-                    }
-                }
+                return entry;
             }
 
-            return machinesList;
+            var move = await _pokeApi.Get<Move>(entryRef.Key);
+            var newEntry = await _converter.Convert(move);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<MoveEntry[]> Get(IEnumerable<NamedApiResource<Move>> resources)
+        {
+            var entries = new List<MoveEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

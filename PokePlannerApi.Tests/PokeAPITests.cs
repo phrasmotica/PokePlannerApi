@@ -68,7 +68,7 @@ namespace PokePlannerApi.Tests
         public async Task PokemonNamesLoadingTest()
         {
             // load all Pokemon names
-            var pokeApi = serviceProvider.GetService<IPokeAPI>();
+            var pokeApi = serviceProvider.GetService<IPokeApi>();
             var speciesPage = await pokeApi.GetNamedFullPage<PokemonSpecies>();
 
             // verify they're all there
@@ -97,7 +97,7 @@ namespace PokePlannerApi.Tests
         [Category("Integration")]
         public async Task PokemonFormsVarietiesDifferencesTest()
         {
-            var pokeApi = serviceProvider.GetService<IPokeAPI>();
+            var pokeApi = serviceProvider.GetService<IPokeApi>();
 
             // list of Pokemon IDs
             var ids = new[] { 3, 6, 9, 386, 479, 493, 649 };
@@ -233,7 +233,7 @@ namespace PokePlannerApi.Tests
         public async Task PokemonFormsNamesTest()
         {
             // get secondary forms
-            var pokeApi = serviceProvider.GetService<IPokeAPI>();
+            var pokeApi = serviceProvider.GetService<IPokeApi>();
             var forms = await pokeApi.GetNamedPage<PokemonForm>(316, 807);
 
             // filter to those with type names in their name
@@ -258,7 +258,7 @@ namespace PokePlannerApi.Tests
         public async Task PokemonLocationAreaEncountersTest()
         {
             // get location area encounters for Abra
-            var pokeApi = serviceProvider.GetService<IPokeAPI>();
+            var pokeApi = serviceProvider.GetService<IPokeApi>();
             var pokemon = await pokeApi.Get<Pokemon>(63);
             var encounters = await pokeApi.GetEncounters(pokemon);
             Assert.IsNotNull(encounters);

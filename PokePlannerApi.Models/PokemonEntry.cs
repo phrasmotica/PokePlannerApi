@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon.
         /// </summary>
-        public int PokemonId => Key;
+        public int PokemonId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets this Pokemon's front default sprite URL.
@@ -31,31 +34,43 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon's forms.
         /// </summary>
-        public List<PokemonForm> Forms { get; set; }
+        public List<NamedEntryRef<PokemonFormEntry>> Forms { get; set; }
 
         /// <summary>
-        /// Gets or sets this Pokemon's types indexed by version group ID.
+        /// Gets or sets this Pokemon's types, indexed by version group ID.
         /// </summary>
-        public List<WithId<Type[]>> Types { get; set; }
+        public List<WithId<List<NamedEntryRef<TypeEntry>>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's abilities.
         /// </summary>
-        public List<Ability> Abilities { get; set; }
+        public List<NamedEntryRef<AbilityEntry>> Abilities { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's base stats indexed by version group ID.
         /// </summary>
-        public List<WithId<int[]>> BaseStats { get; set; }
+        public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's moves indexed by version group ID.
         /// </summary>
-        public List<WithId<Move[]>> Moves { get; set; }
+        public List<WithId<List<NamedEntryRef<MoveEntry>>>> Moves { get; set; }
 
         /// <summary>
         /// Gets or sets the held items this Pokemon may bear in a wild encounter, indexed by version ID.
         /// </summary>
-        public List<WithId<VersionHeldItemContext[]>> HeldItems { get; set; }
+        public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the Pokemon entry.
+        /// </summary>
+        public NamedEntryRef<PokemonEntry> ToRef()
+        {
+            return new NamedEntryRef<PokemonEntry>
+            {
+                Key = PokemonId,
+                Name = Name,
+            };
+        }
     }
 }

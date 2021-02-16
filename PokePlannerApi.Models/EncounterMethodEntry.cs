@@ -10,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the encounter method.
         /// </summary>
-        public int EncounterMethodId => Key;
+        public int EncounterMethodId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the order of the encounter method.
@@ -21,5 +25,17 @@ namespace PokePlannerApi.Models
         /// Gets or sets the display names of the encounter method.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the encounter method entry.
+        /// </summary>
+        public NamedEntryRef<EncounterMethodEntry> ToRef()
+        {
+            return new NamedEntryRef<EncounterMethodEntry>
+            {
+                Key = EncounterMethodId,
+                Name = Name,
+            };
+        }
     }
 }

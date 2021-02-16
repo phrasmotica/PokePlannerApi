@@ -12,7 +12,7 @@ namespace PokePlannerApi.Clients
     /// <summary>
     /// Class for fetching PokeAPI resources.
     /// </summary>
-    public class PokeAPI : IPokeAPI
+    public class PokeAPI : IPokeApi
     {
         /// <summary>
         /// The logger.

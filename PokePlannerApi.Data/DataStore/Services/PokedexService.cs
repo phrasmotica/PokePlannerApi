@@ -1,59 +1,85 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the pokedex entries in the data store.
+    /// Service for access pokedex entries.
     /// </summary>
-    public class PokedexService : NamedApiResourceServiceBase<Pokedex, PokedexEntry>
+    public class PokedexService : INamedEntryService<Pokedex, PokedexEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Pokedex, PokedexEntry> _converter;
+        private readonly IDataStoreSource<PokedexEntry> _dataSource;
+
         public PokedexService(
-            IDataStoreSource<PokedexEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<PokedexService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Pokedex, PokedexEntry> converter,
+            IDataStoreSource<PokedexEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a pokedex entry for the given pokedex.
-        /// </summary>
-        protected override Task<PokedexEntry> ConvertToEntry(Pokedex pokedex)
+        /// <inheritdoc />
+        public async Task<PokedexEntry> Get(NamedApiResource<Pokedex> resource)
         {
-            var displayNames = pokedex.Names.Localise();
+            var pokedex = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new PokedexEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokedexId == pokedex.Id);
+            if (hasEntry)
             {
-                Key = pokedex.Id,
-                Name = pokedex.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(pokedex);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<PokedexEntry> Get(NamedEntryRef<PokedexEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokedexId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
 
-        #region Public methods
+            var pokedex = await _pokeApi.Get<Pokedex>(entryRef.Key);
+            var newEntry = await _converter.Convert(pokedex);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<PokedexEntry[]> Get(IEnumerable<NamedApiResource<Pokedex>> resources)
+        {
+            var entries = new List<PokedexEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
 
         /// <summary>
         /// Returns all pokedexes.
         /// </summary>
         public async Task<PokedexEntry[]> GetAll()
         {
-            var allPokedexes = await UpsertAll();
-            return allPokedexes.ToArray();
+            var resources = await _pokeApi.GetNamedFullPage<Pokedex>();
+            return await Get(resources.Results);
         }
-
-        #endregion
     }
 }

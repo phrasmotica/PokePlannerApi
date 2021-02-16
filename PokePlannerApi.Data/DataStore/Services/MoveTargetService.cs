@@ -1,46 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the move damage class entries in the data store.
+    /// Service for accessing move damage class entries.
     /// </summary>
-    public class MoveTargetService : NamedApiResourceServiceBase<MoveTarget, MoveTargetEntry>
+    public class MoveTargetService : INamedEntryService<MoveTarget, MoveTargetEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<MoveTarget, MoveTargetEntry> _converter;
+        private readonly IDataStoreSource<MoveTargetEntry> _dataSource;
+
         public MoveTargetService(
-            IDataStoreSource<MoveTargetEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<MoveTargetService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<MoveTarget, MoveTargetEntry> converter,
+            IDataStoreSource<MoveTargetEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a move target entry for the given move target.
-        /// </summary>
-        protected override Task<MoveTargetEntry> ConvertToEntry(MoveTarget target)
+        /// <inheritdoc />
+        public async Task<MoveTargetEntry> Get(NamedApiResource<MoveTarget> resource)
         {
-            var displayNames = target.Names.Localise();
+            var moveTarget = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new MoveTargetEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveTargetId == moveTarget.Id);
+            if (hasEntry)
             {
-                Key = target.Id,
-                Name = target.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(moveTarget);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<MoveTargetEntry> Get(NamedEntryRef<MoveTargetEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveTargetId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var moveTarget = await _pokeApi.Get<MoveTarget>(entryRef.Key);
+            var newEntry = await _converter.Convert(moveTarget);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<MoveTargetEntry[]> Get(IEnumerable<NamedApiResource<MoveTarget>> resources)
+        {
+            var entries = new List<MoveTargetEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

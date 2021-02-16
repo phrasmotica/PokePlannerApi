@@ -1,47 +1,76 @@
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the encounter method entries in the data store.
+    /// Service for accessing encounter method entries.
     /// </summary>
-    public class EncounterMethodService : NamedApiResourceServiceBase<EncounterMethod, EncounterMethodEntry>
+    public class EncounterMethodService : INamedEntryService<EncounterMethod, EncounterMethodEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<EncounterMethod, EncounterMethodEntry> _converter;
+        private readonly IDataStoreSource<EncounterMethodEntry> _dataSource;
+
         public EncounterMethodService(
-            IDataStoreSource<EncounterMethodEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<EncounterMethodService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<EncounterMethod, EncounterMethodEntry> converter,
+            IDataStoreSource<EncounterMethodEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns an encounter method entry for the given encounter method.
-        /// </summary>
-        protected override Task<EncounterMethodEntry> ConvertToEntry(EncounterMethod method)
+        /// <inheritdoc />
+        public async Task<EncounterMethodEntry> Get(NamedApiResource<EncounterMethod> resource)
         {
-            var displayNames = method.Names.Localise();
+            var encounterMethod = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new EncounterMethodEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EncounterMethodId == encounterMethod.Id);
+            if (hasEntry)
             {
-                Key = method.Id,
-                Name = method.Name,
-                Order = method.Order,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(encounterMethod);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<EncounterMethodEntry> Get(NamedEntryRef<EncounterMethodEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EncounterMethodId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var ability = await _pokeApi.Get<EncounterMethod>(entryRef.Key);
+            var newEntry = await _converter.Convert(ability);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<EncounterMethodEntry[]> Get(IEnumerable<NamedApiResource<EncounterMethod>> resources)
+        {
+            var entries = new List<EncounterMethodEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -12,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon form.
         /// </summary>
-        public int FormId => Key;
+        public int PokemonFormId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the form name of the Pokemon form.
@@ -27,7 +29,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the version group in which this form was introduced.
         /// </summary>
-        public VersionGroup VersionGroup { get; set; }
+        public NamedEntryRef<VersionGroupEntry> VersionGroup { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon form's display names.
@@ -45,13 +47,26 @@ namespace PokePlannerApi.Models
         public string ShinySpriteUrl { get; set; }
 
         /// <summary>
-        /// Gets or sets this Pokemon form's types indexed by version group ID.
+        /// Gets or sets this Pokemon form's types, indexed by version group ID.
         /// </summary>
-        public List<WithId<Type[]>> Types { get; set; }
+        public List<WithId<List<NamedEntryRef<TypeEntry>>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon form is valid.
+        /// TODO: change to NamedEntryRef
         /// </summary>
         public List<int> Validity { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the Pokemon form entry.
+        /// </summary>
+        public NamedEntryRef<PokemonFormEntry> ToRef()
+        {
+            return new NamedEntryRef<PokemonFormEntry>
+            {
+                Key = PokemonFormId,
+                Name = Name,
+            };
+        }
     }
 }

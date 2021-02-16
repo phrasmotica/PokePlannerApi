@@ -11,17 +11,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class EncounterController : ResourceControllerBase
     {
-        /// <summary>
-        /// The encounters service.
-        /// </summary>
-        private readonly EncountersService EncountersService;
+        private readonly EncountersService _encountersService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public EncounterController(EncountersService encountersService, ILogger<EncounterController> logger) : base(logger)
+        public EncounterController(
+            EncountersService encountersService,
+            ILogger<EncounterController> logger) : base(logger)
         {
-            EncountersService = encountersService;
+            _encountersService = encountersService;
         }
 
         /// <summary>
@@ -31,8 +27,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{pokemonId:int}")]
         public async Task<EncountersEntry> GetCaptureLocations(int pokemonId)
         {
-            Logger.LogInformation($"Getting capture locations for Pokemon {pokemonId}...");
-            return await EncountersService.GetEncounters(pokemonId);
+            _logger.LogInformation($"Getting capture locations for Pokemon {pokemonId}...");
+            return await _encountersService.GetEncounters(pokemonId);
         }
     }
 }

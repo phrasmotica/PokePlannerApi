@@ -1,46 +1,76 @@
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the encounter condition value entries in the data store.
+    /// Service for accessing encounter condition value entries.
     /// </summary>
-    public class EncounterConditionValueService : NamedApiResourceServiceBase<EncounterConditionValue, EncounterConditionValueEntry>
+    public class EncounterConditionValueService : INamedEntryService<EncounterConditionValue, EncounterConditionValueEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<EncounterConditionValue, EncounterConditionValueEntry> _converter;
+        private readonly IDataStoreSource<EncounterConditionValueEntry> _dataSource;
+
         public EncounterConditionValueService(
-            IDataStoreSource<EncounterConditionValueEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<EncounterConditionValueService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<EncounterConditionValue, EncounterConditionValueEntry> converter,
+            IDataStoreSource<EncounterConditionValueEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns an encounter condition value entry for the given encounter condition value.
-        /// </summary>
-        protected override Task<EncounterConditionValueEntry> ConvertToEntry(EncounterConditionValue condition)
+        /// <inheritdoc />
+        public async Task<EncounterConditionValueEntry> Get(NamedApiResource<EncounterConditionValue> resource)
         {
-            var displayNames = condition.Names.Localise();
+            var encounterConditionValue = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new EncounterConditionValueEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EncounterConditionValueId == encounterConditionValue.Id);
+            if (hasEntry)
             {
-                Key = condition.Id,
-                Name = condition.Name,
-                DisplayNames = displayNames.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(encounterConditionValue);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<EncounterConditionValueEntry> Get(NamedEntryRef<EncounterConditionValueEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EncounterConditionValueId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var encounterConditionValue = await _pokeApi.Get<EncounterConditionValue>(entryRef.Key);
+            var newEntry = await _converter.Convert(encounterConditionValue);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<EncounterConditionValueEntry[]> Get(IEnumerable<NamedApiResource<EncounterConditionValue>> resources)
+        {
+            var entries = new List<EncounterConditionValueEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

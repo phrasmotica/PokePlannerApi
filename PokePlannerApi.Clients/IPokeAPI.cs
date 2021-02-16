@@ -7,7 +7,7 @@ namespace PokePlannerApi.Clients
     /// <summary>
     /// Interface for classes that fetch data from PokeAPI.
     /// </summary>
-    public interface IPokeAPI
+    public interface IPokeApi
     {
         /// <summary>
         /// Returns the resource of the given type with the given ID.

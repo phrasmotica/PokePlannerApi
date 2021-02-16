@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the version group.
         /// </summary>
-        public int VersionGroupId => Key;
+        public int VersionGroupId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the order of the version group.
@@ -24,18 +27,30 @@ namespace PokePlannerApi.Models
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
-        /// Gets or set the generation the version group belongs to.
+        /// Gets or sets the generation the version group belongs to.
         /// </summary>
-        public Generation Generation { get; set; }
+        public NamedEntryRef<GenerationEntry> Generation { get; set; }
 
         /// <summary>
-        /// Gets or set the versions belonging to the version group.
+        /// Gets or sets the versions belonging to the version group.
         /// </summary>
-        public List<VersionEntry> Versions { get; set; }
+        public List<NamedEntryRef<VersionEntry>> Versions { get; set; }
 
         /// <summary>
-        /// Gets or set the Pokedexes present in the version group.
+        /// Gets or sets the pokedexes present in the version group.
         /// </summary>
-        public List<Pokedex> Pokedexes { get; set; }
+        public List<NamedEntryRef<PokedexEntry>> Pokedexes { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the version group entry.
+        /// </summary>
+        public NamedEntryRef<VersionGroupEntry> ToRef()
+        {
+            return new NamedEntryRef<VersionGroupEntry>
+            {
+                Key = VersionGroupId,
+                Name = Name,
+            };
+        }
     }
 }

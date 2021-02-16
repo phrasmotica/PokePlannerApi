@@ -1,52 +1,76 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the machine entries in the data store.
+    /// Service for accessing machine entries.
     /// </summary>
-    public class MachineService : ServiceBase<Machine, MachineEntry>
+    public class MachineService : IEntryService<Machine, MachineEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Machine, MachineEntry> _converter;
+        private readonly IDataStoreSource<MachineEntry> _dataSource;
+
         public MachineService(
-            IDataStoreSource<MachineEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<MachineService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<Machine, MachineEntry> converter,
+            IDataStoreSource<MachineEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a machine entry for the given machine.
-        /// </summary>
-        protected override async Task<MachineEntry> ConvertToEntry(Machine machine)
+        /// <inheritdoc />
+        public async Task<MachineEntry> Get(ApiResource<Machine> resource)
         {
-            var item = await _pokeApi.Get(machine.Item);
+            var machine = await _pokeApi.Get(resource);
 
-            return new MachineEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MachineId == machine.Id);
+            if (hasEntry)
             {
-                Key = machine.Id,
-                Item = item
-            };
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(machine);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        /// <summary>
-        /// Returns the machine required to create an machine entry with the given ID.
-        /// </summary>
-        protected override async Task<Machine> FetchSource(int key)
+        /// <inheritdoc />
+        public async Task<MachineEntry> Get(EntryRef<MachineEntry> entryRef)
         {
-            Logger.LogInformation($"Fetching machine source object with ID {key}...");
-            return await _pokeApi.Get<Machine>(key);
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MachineId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var machine = await _pokeApi.Get<Machine>(entryRef.Key);
+            var newEntry = await _converter.Convert(machine);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<MachineEntry[]> Get(IEnumerable<ApiResource<Machine>> resources)
+        {
+            var entries = new List<MachineEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

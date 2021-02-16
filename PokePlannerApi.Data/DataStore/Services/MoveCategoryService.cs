@@ -1,46 +1,76 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PokeApiNet;
 using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Abstractions;
-using PokePlannerApi.Data.Extensions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for managing the move category class entries in the data store.
+    /// Service for accessing move category class entries.
     /// </summary>
-    public class MoveCategoryService : NamedApiResourceServiceBase<MoveCategory, MoveCategoryEntry>
+    public class MoveCategoryService : INamedEntryService<MoveCategory, MoveCategoryEntry>
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<MoveCategory, MoveCategoryEntry> _converter;
+        private readonly IDataStoreSource<MoveCategoryEntry> _dataSource;
+
         public MoveCategoryService(
-            IDataStoreSource<MoveCategoryEntry> dataStoreSource,
-            IPokeAPI pokeApi,
-            ILogger<MoveCategoryService> logger) : base(dataStoreSource, pokeApi, logger)
+            IPokeApi pokeApi,
+            IResourceConverter<MoveCategory, MoveCategoryEntry> converter,
+            IDataStoreSource<MoveCategoryEntry> dataSource)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
         }
 
-        #region Entry conversion methods
-
-        /// <summary>
-        /// Returns a move category entry for the given move category.
-        /// </summary>
-        protected override Task<MoveCategoryEntry> ConvertToEntry(MoveCategory moveCategory)
+        /// <inheritdoc />
+        public async Task<MoveCategoryEntry> Get(NamedApiResource<MoveCategory> resource)
         {
-            var displayDescriptions = moveCategory.Descriptions.Localise();
+            var moveCategory = await _pokeApi.Get(resource);
 
-            return Task.FromResult(new MoveCategoryEntry
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveCategoryId == moveCategory.Id);
+            if (hasEntry)
             {
-                Key = moveCategory.Id,
-                Name = moveCategory.Name,
-                Descriptions = displayDescriptions.ToList()
-            });
+                return entry;
+            }
+
+            var newEntry = await _converter.Convert(moveCategory);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        #endregion
+        /// <inheritdoc />
+        public async Task<MoveCategoryEntry> Get(NamedEntryRef<MoveCategoryEntry> entryRef)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveCategoryId == entryRef.Key);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var moveCategory = await _pokeApi.Get<MoveCategory>(entryRef.Key);
+            var newEntry = await _converter.Convert(moveCategory);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <inheritdoc />
+        public async Task<MoveCategoryEntry[]> Get(IEnumerable<NamedApiResource<MoveCategory>> resources)
+        {
+            var entries = new List<MoveCategoryEntry>();
+
+            foreach (var v in resources)
+            {
+                entries.Add(await Get(v));
+            }
+
+            return entries.ToArray();
+        }
     }
 }

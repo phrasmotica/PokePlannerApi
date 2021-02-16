@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PokePlannerApi.Data.DataStore.Services;
@@ -11,17 +12,13 @@ namespace PokePlannerApi.Controllers
     /// </summary>
     public class PokemonController : ResourceControllerBase
     {
-        /// <summary>
-        /// The Pokemon service.
-        /// </summary>
-        private readonly PokemonService PokemonService;
+        private readonly PokemonService _pokemonService;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PokemonController(PokemonService pokemonService, ILogger<PokemonController> logger) : base(logger)
+        public PokemonController(
+            PokemonService pokemonService,
+            ILogger<PokemonController> logger) : base(logger)
         {
-            PokemonService = pokemonService;
+            _pokemonService = pokemonService;
         }
 
         /// <summary>
@@ -30,18 +27,18 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{pokemonId:int}")]
         public async Task<PokemonEntry> GetPokemonById(int pokemonId)
         {
-            Logger.LogInformation($"Getting Pokemon {pokemonId}...");
-            return await PokemonService.GetPokemon(pokemonId);
+            _logger.LogInformation($"Getting Pokemon {pokemonId}...");
+            return await _pokemonService.Get(pokemonId);
         }
 
         /// <summary>
         /// Returns the forms of the Pokemon with the given ID.
         /// </summary>
         [HttpGet("{pokemonId:int}/forms/{versionGroupId:int}")]
-        public async Task<PokemonFormEntry[]> GetPokemonFormsById(int pokemonId, int versionGroupId)
+        public async Task<List<PokemonFormEntry>> GetPokemonFormsById(int pokemonId, int versionGroupId)
         {
-            Logger.LogInformation($"Getting forms of Pokemon {pokemonId} in version group {versionGroupId}...");
-            return await PokemonService.GetPokemonForms(pokemonId, versionGroupId);
+            _logger.LogInformation($"Getting forms of Pokemon {pokemonId} in version group {versionGroupId}...");
+            return await _pokemonService.GetPokemonForms(pokemonId, versionGroupId);
         }
 
         /// <summary>
@@ -50,8 +47,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{pokemonId:int}/moves/{versionGroupId:int}")]
         public async Task<PokemonMoveContext[]> GetPokemonMovesById(int pokemonId, int versionGroupId)
         {
-            Logger.LogInformation($"Getting moves of Pokemon {pokemonId} in version group {versionGroupId}...");
-            return await PokemonService.GetPokemonMoves(pokemonId, versionGroupId);
+            _logger.LogInformation($"Getting moves of Pokemon {pokemonId} in version group {versionGroupId}...");
+            return await _pokemonService.GetPokemonMoves(pokemonId, versionGroupId);
         }
 
         /// <summary>
@@ -60,8 +57,8 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{pokemonId:int}/abilities")]
         public async Task<PokemonAbilityContext[]> GetPokemonAbilitiesById(int pokemonId)
         {
-            Logger.LogInformation($"Getting abilities of Pokemon {pokemonId}...");
-            return await PokemonService.GetPokemonAbilities(pokemonId);
+            _logger.LogInformation($"Getting abilities of Pokemon {pokemonId}...");
+            return await _pokemonService.GetPokemonAbilities(pokemonId);
         }
     }
 }

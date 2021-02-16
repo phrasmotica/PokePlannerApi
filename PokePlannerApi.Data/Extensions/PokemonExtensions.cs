@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using PokeApiNet;
 
 namespace PokePlannerApi.Data.Extensions
@@ -11,11 +12,11 @@ namespace PokePlannerApi.Data.Extensions
         /// <summary>
         /// Returns this Pokemon's base stats in the version group with the given ID.
         /// </summary>
-        public static int[] GetBaseStats(this Pokemon pokemon, int versionGroupId)
+        public static List<int> GetBaseStats(this Pokemon pokemon, int versionGroupId)
         {
             // FUTURE: anticipating a generation-based base stats changelog
 
-            return pokemon.Stats.Select(bs => bs.BaseStat).ToArray();
+            return pokemon.Stats.Select(bs => bs.BaseStat).ToList();
         }
     }
 }

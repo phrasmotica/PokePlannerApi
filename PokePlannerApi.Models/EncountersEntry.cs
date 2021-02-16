@@ -10,12 +10,27 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon.
         /// </summary>
-        public int PokemonId => Key;
+        public int PokemonId
+        {
+            get => Key;
+            set => Key = value;
+        }
 
         /// <summary>
         /// Gets or sets the encounters indexed by version group ID.
         /// </summary>
-        public List<WithId<EncounterEntry[]>> Encounters { get; set; }
+        public List<WithId<List<EncounterEntry>>> Encounters { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the encounters entry.
+        /// </summary>
+        public EntryRef<EncountersEntry> ToRef()
+        {
+            return new EntryRef<EncountersEntry>
+            {
+                Key = PokemonId,
+            };
+        }
     }
 
     /// <summary>
@@ -36,7 +51,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the details of the encounter indexed by version ID.
         /// </summary>
-        public List<WithId<EncounterMethodDetails[]>> Details { get; set; }
+        public List<WithId<List<EncounterMethodDetails>>> Details { get; set; }
     }
 
     /// <summary>
