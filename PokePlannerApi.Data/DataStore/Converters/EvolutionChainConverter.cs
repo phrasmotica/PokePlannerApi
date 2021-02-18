@@ -7,6 +7,7 @@ using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Converters
 {
+    // TODO: figure out the circular dependency between this and PokemonSpeciesService
     public class EvolutionChainConverter : IResourceConverter<EvolutionChain, EvolutionChainEntry>
     {
         private readonly EvolutionTriggerService _evolutionTriggerService;
