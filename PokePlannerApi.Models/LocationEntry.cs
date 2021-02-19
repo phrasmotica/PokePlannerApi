@@ -32,18 +32,5 @@ namespace PokePlannerApi.Models
                 Name = Name,
             };
         }
-
-        /// <summary>
-        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
-        /// </summary>
-        public LocationEntry ForEvolutionChain()
-        {
-            return new LocationEntry
-            {
-                Key = Key,
-                Name = Name,
-                DisplayNames = DisplayNames
-            };
-        }
     }
 }

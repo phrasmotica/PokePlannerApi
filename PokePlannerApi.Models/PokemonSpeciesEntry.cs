@@ -88,22 +88,5 @@ namespace PokePlannerApi.Models
                 Name = Name,
             };
         }
-
-        /// <summary>
-        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
-        /// </summary>
-        public PokemonSpeciesEntry ForEvolutionChain()
-        {
-            return new PokemonSpeciesEntry
-            {
-                Key = Key,
-                Name = Name,
-                SpriteUrl = SpriteUrl,
-                ShinySpriteUrl = ShinySpriteUrl,
-                DisplayNames = DisplayNames,
-                Generation = Generation,
-                Validity = Validity
-            };
-        }
     }
 }

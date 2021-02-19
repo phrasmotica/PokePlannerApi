@@ -30,6 +30,11 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<LocationEntry> Get(NamedApiResource<Location> resource)
         {
+            if (resource is null)
+            {
+                return null;
+            }
+
             var location = await _pokeApi.Get(resource);
 
             var (hasEntry, entry) = await _dataSource.HasOne(e => e.LocationId == location.Id);

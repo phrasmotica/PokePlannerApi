@@ -53,7 +53,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<PokemonSpeciesEntry> Get(NamedEntryRef<PokemonSpeciesEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonSpeciesId == entryRef.Key);
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonSpeciesId == entryRef.Key || e.Name == entryRef.Name);
             if (hasEntry)
             {
                 return entry;

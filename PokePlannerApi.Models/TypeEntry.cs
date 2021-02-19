@@ -57,19 +57,6 @@ namespace PokePlannerApi.Models
                 Name = Name,
             };
         }
-
-        /// <summary>
-        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
-        /// </summary>
-        public TypeEntry ForEvolutionChain()
-        {
-            return new TypeEntry
-            {
-                Key = Key,
-                Name = Name,
-                DisplayNames = DisplayNames
-            };
-        }
     }
 
     /// <summary>
