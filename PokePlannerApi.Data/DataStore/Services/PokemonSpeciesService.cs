@@ -79,9 +79,23 @@ namespace PokePlannerApi.Data.DataStore.Services
             return entries.ToArray();
         }
 
-        public Task<PokemonSpeciesEntry> Get(int speciesId)
+        /// <summary>
+        /// Returns the entry for the Pokemon species with the given ID.
+        /// </summary>
+        /// <param name="speciesId">The Pokemon species' ID.</param>
+        public async Task<PokemonSpeciesEntry> Get(int speciesId)
         {
-            throw new NotImplementedException();
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonSpeciesId == speciesId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var pokemonSpecies = await _pokeApi.Get<PokemonSpecies>(speciesId);
+            var newEntry = await _converter.Convert(pokemonSpecies);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
         /// <summary>

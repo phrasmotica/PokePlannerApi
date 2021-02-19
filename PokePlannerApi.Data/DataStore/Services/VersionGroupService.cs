@@ -48,17 +48,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<VersionGroupEntry> Get(NamedEntryRef<VersionGroupEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionGroupId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var versionGroup = await _pokeApi.Get<VersionGroup>(entryRef.Key);
-            var newEntry = await _converter.Convert(versionGroup);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return await Get(entryRef.Key);
         }
 
         /// <inheritdoc />
@@ -72,6 +62,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the version group with the given ID.
+        /// </summary>
+        /// <param name="versionGroupId">The version group ID.</param>
+        public async Task<VersionGroupEntry> Get(int versionGroupId)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.VersionGroupId == versionGroupId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var versionGroup = await _pokeApi.Get<VersionGroup>(versionGroupId);
+            var newEntry = await _converter.Convert(versionGroup);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
         /// <summary>

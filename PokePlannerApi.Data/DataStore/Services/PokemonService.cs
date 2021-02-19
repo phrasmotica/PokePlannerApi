@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using PokeApiNet;
 using PokePlannerApi.Clients;
@@ -19,15 +20,36 @@ namespace PokePlannerApi.Data.DataStore.Services
         private readonly IPokeApi _pokeApi;
         private readonly IResourceConverter<Pokemon, PokemonEntry> _converter;
         private readonly IDataStoreSource<PokemonEntry> _dataSource;
+        private readonly AbilityService _abilityService;
+        private readonly ItemService _itemService;
+        private readonly MachineService _machineService;
+        private readonly MoveLearnMethodService _moveLearnMethodService;
+        private readonly MoveService _moveService;
+        private readonly PokemonFormService _pokemonFormService;
+        private readonly VersionGroupService _versionGroupService;
 
         public PokemonService(
             IPokeApi pokeApi,
             IResourceConverter<Pokemon, PokemonEntry> converter,
-            IDataStoreSource<PokemonEntry> dataSource)
+            IDataStoreSource<PokemonEntry> dataSource,
+            AbilityService abilityService,
+            ItemService itemService,
+            MachineService machineService,
+            MoveLearnMethodService moveLearnMethodService,
+            MoveService moveService,
+            PokemonFormService pokemonFormService,
+            VersionGroupService versionGroupService)
         {
             _pokeApi = pokeApi;
             _converter = converter;
             _dataSource = dataSource;
+            _abilityService = abilityService;
+            _itemService = itemService;
+            _machineService = machineService;
+            _moveLearnMethodService = moveLearnMethodService;
+            _moveService = moveService;
+            _pokemonFormService = pokemonFormService;
+            _versionGroupService = versionGroupService;
         }
 
         /// <inheritdoc />
@@ -50,17 +72,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<PokemonEntry> Get(NamedEntryRef<PokemonEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var pokemon = await _pokeApi.Get<Pokemon>(entryRef.Key);
-            var newEntry = await _converter.Convert(pokemon);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return await Get(entryRef.Key);
         }
 
         /// <inheritdoc />
@@ -76,29 +88,127 @@ namespace PokePlannerApi.Data.DataStore.Services
             return entries.ToArray();
         }
 
-        public Task<PokemonEntry> Get(int pokemonId)
+        /// <summary>
+        /// Returns the entry for the Pokemon with the given ID.
+        /// </summary>
+        /// <param name="pokemonId">The Pokemon's ID.</param>
+        public async Task<PokemonEntry> Get(int pokemonId)
         {
-            throw new NotImplementedException();
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonId == pokemonId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var pokemon = await _pokeApi.Get<Pokemon>(pokemonId);
+            var newEntry = await _converter.Convert(pokemon);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
-        public Task<PokemonEntry[]> Get(IEnumerable<NamedEntryRef<PokemonEntry>> entryRefs)
+        /// <summary>
+        /// Returns the Pokemon in the given reference objects.
+        /// </summary>
+        /// <param name="entryRefs">The reference objects.</param>
+        public async Task<PokemonEntry[]> Get(IEnumerable<NamedEntryRef<PokemonEntry>> entryRefs)
         {
-            throw new NotImplementedException();
+            var varietiesList = new List<PokemonEntry>();
+
+            foreach (var er in entryRefs)
+            {
+                varietiesList.Add(await Get(er));
+            }
+
+            return varietiesList.ToArray();
         }
 
-        public Task<PokemonAbilityContext[]> GetPokemonAbilities(int pokemonId)
+        /// <summary>
+        /// Returns the abilities of the Pokemon with the given ID.
+        /// </summary>
+        public async Task<PokemonAbilityContext[]> GetPokemonAbilities(int pokemonId)
         {
-            throw new NotImplementedException();
+            var resource = await _pokeApi.Get<Pokemon>(pokemonId);
+            var orderedAbilities = resource.Abilities.OrderBy(a => a.Slot).ToArray();
+            var abilityEntries = await _abilityService.Get(orderedAbilities.Select(a => a.Ability));
+
+            var abilityContexts = abilityEntries.Select((e, i) =>
+            {
+                var context = PokemonAbilityContext.From(e);
+                context.IsHidden = orderedAbilities[i].IsHidden;
+                return context;
+            });
+
+            return abilityContexts.ToArray();
         }
 
-        public Task<List<PokemonFormEntry>> GetPokemonForms(int pokemonId, int versionGroupId)
+        public async Task<List<PokemonFormEntry>> GetPokemonForms(int pokemonId, int versionGroupId)
         {
-            throw new NotImplementedException();
+            var entry = await Get(pokemonId);
+            var formEntries = await _pokemonFormService.Get(entry.Forms);
+            return formEntries.OrderBy(f => f.PokemonFormId).ToList();
         }
 
-        public Task<PokemonMoveContext[]> GetPokemonMoves(int pokemonId, int versionGroupId)
+        public async Task<PokemonMoveContext[]> GetPokemonMoves(int pokemonId, int versionGroupId)
         {
-            throw new NotImplementedException();
+            var resource = await _pokeApi.Get<Pokemon>(pokemonId);
+            var versionGroup = await _versionGroupService.Get(versionGroupId);
+
+            var relevantMoves = resource.Moves.Where(m =>
+            {
+                var versionGroupNames = m.VersionGroupDetails.Select(d => d.VersionGroup.Name);
+                return versionGroupNames.Contains(versionGroup.Name);
+            }).ToArray();
+
+            var moveEntries = await _moveService.Get(relevantMoves.Select(m => m.Move));
+            var entryList = moveEntries.ToList();
+
+            var moveContexts = new List<PokemonMoveContext>();
+
+            for (int i = 0; i < entryList.Count; i++)
+            {
+                var moveEntry = entryList[i];
+                var context = PokemonMoveContext.From(moveEntry);
+
+                var relevantDetails = relevantMoves[i].VersionGroupDetails
+                                                      .Where(d => d.VersionGroup.Name == versionGroup.Name);
+
+                var methodList = new List<MoveLearnMethodEntry>();
+                foreach (var detail in relevantDetails)
+                {
+                    var method = await _moveLearnMethodService.Get(detail.MoveLearnMethod);
+                    if (method.Name == "level-up")
+                    {
+                        context.Level = detail.LevelLearnedAt;
+                    }
+
+                    if (method.Name == "machine")
+                    {
+                        var machineRefs = moveEntry.Machines.SingleOrDefault(m => m.Id == versionGroupId)?.Data;
+                        if (machineRefs.Any())
+                        {
+                            var machineItems = new List<ItemEntry>();
+
+                            foreach (var mr in machineRefs)
+                            {
+                                var machineEntry = await _machineService.Get(mr);
+                                var machineItem = await _itemService.Get(machineEntry.Item);
+                                machineItems.Add(machineItem);
+                            }
+
+                            context.LearnMachines = machineItems;
+                        }
+                    }
+
+                    methodList.Add(method);
+                }
+
+                context.Methods = methodList;
+
+                moveContexts.Add(context);
+            }
+
+            return moveContexts.ToArray();
         }
     }
 }

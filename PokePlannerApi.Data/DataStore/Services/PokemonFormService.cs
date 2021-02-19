@@ -48,17 +48,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<PokemonFormEntry> Get(NamedEntryRef<PokemonFormEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonFormId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var pokemonForm = await _pokeApi.Get<PokemonForm>(entryRef.Key);
-            var newEntry = await _converter.Convert(pokemonForm);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return await Get(entryRef.Key);
         }
 
         /// <inheritdoc />
@@ -74,9 +64,39 @@ namespace PokePlannerApi.Data.DataStore.Services
             return entries.ToArray();
         }
 
-        public Task<PokemonFormEntry> Get(int formId)
+        /// <summary>
+        /// Returns the entry for the Pokemon form with the given ID.
+        /// </summary>
+        /// <param name="formId">The Pokemon form's ID.</param>
+        public async Task<PokemonFormEntry> Get(int formId)
         {
-            throw new NotImplementedException();
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonFormId == formId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var pokemonForm = await _pokeApi.Get<PokemonForm>(formId);
+            var newEntry = await _converter.Convert(pokemonForm);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <summary>
+        /// Returns the Pokemon forms in the given reference objects.
+        /// </summary>
+        /// <param name="entryRef">The reference objects.</param>
+        public async Task<PokemonFormEntry[]> Get(IEnumerable<NamedEntryRef<PokemonFormEntry>> entryRefs)
+        {
+            var entries = new List<PokemonFormEntry>();
+
+            foreach (var er in entryRefs)
+            {
+                entries.Add(await Get(er));
+            }
+
+            return entries.ToArray();
         }
     }
 }
