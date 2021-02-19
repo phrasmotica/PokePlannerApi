@@ -66,6 +66,8 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
                 entry.Id = Guid.NewGuid().ToString();
             }
 
+            entry.CreationTime = DateTime.UtcNow;
+
             try
             {
                 await container.UpsertItemAsync(entry, GetPartitionKey(entry));

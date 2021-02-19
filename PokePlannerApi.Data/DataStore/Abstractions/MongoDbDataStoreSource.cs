@@ -42,6 +42,7 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         /// <inheritdoc />
         public Task<TEntry> Create(TEntry entry)
         {
+            entry.CreationTime = DateTime.UtcNow;
             _collection.InsertOne(entry);
             return Task.FromResult(entry);
         }
@@ -54,11 +55,11 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         }
 
         /// <inheritdoc />
-        public Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate)
+        public async Task<(bool, TEntry)> HasOne(Expression<Func<TEntry, bool>> predicate)
         {
-            var entry = GetOne(predicate).Result;
+            var entry = await GetOne(predicate);
             var hasIt = entry != null && entry.CreationTime >= DateTime.UtcNow - timeToLive;
-            return Task.FromResult((hasIt, entry));
+            return (hasIt, entry);
         }
     }
 }
