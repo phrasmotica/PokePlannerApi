@@ -30,39 +30,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<EvolutionTriggerEntry> Get(NamedApiResource<EvolutionTrigger> resource)
         {
-            if (resource is null)
-            {
-                return null;
-            }
-
-            var evolutionTrigger = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EvolutionTriggerId == evolutionTrigger.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(evolutionTrigger);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<EvolutionTriggerEntry> Get(NamedEntryRef<EvolutionTriggerEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EvolutionTriggerId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var evolutionTrigger = await _pokeApi.Get<EvolutionTrigger>(entryRef.Key);
-            var newEntry = await _converter.Convert(evolutionTrigger);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -76,6 +50,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the evolution trigger with the given name.
+        /// </summary>
+        /// <param name="name">The evolution trigger's name.</param>
+        private async Task<EvolutionTriggerEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<EvolutionTrigger>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
     }
 }

@@ -30,39 +30,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<ItemEntry> Get(NamedApiResource<Item> resource)
         {
-            if (resource is null)
-            {
-                return null;
-            }
-
-            var item = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.ItemId == item.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(item);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<ItemEntry> Get(NamedEntryRef<ItemEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.ItemId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var item = await _pokeApi.Get<Item>(entryRef.Key);
-            var newEntry = await _converter.Convert(item);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -76,6 +50,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the item with the given name.
+        /// </summary>
+        /// <param name="name">The item's name.</param>
+        private async Task<ItemEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<Item>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
     }
 }

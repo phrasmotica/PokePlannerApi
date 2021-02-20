@@ -30,34 +30,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<AbilityEntry> Get(NamedApiResource<Ability> resource)
         {
-            var ability = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.AbilityId == ability.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(ability);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<AbilityEntry> Get(NamedEntryRef<AbilityEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.AbilityId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var ability = await _pokeApi.Get<Ability>(entryRef.Key);
-            var newEntry = await _converter.Convert(ability);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -71,6 +50,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the ability with the given name.
+        /// </summary>
+        /// <param name="name">The ability's name.</param>
+        private async Task<AbilityEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<Ability>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
     }
 }

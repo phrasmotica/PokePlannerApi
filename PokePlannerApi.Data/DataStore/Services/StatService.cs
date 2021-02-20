@@ -31,34 +31,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<StatEntry> Get(NamedApiResource<Stat> resource)
         {
-            var stat = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.StatId == stat.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(stat);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<StatEntry> Get(NamedEntryRef<StatEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.StatId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var stat = await _pokeApi.Get<Stat>(entryRef.Key);
-            var newEntry = await _converter.Convert(stat);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -72,6 +51,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the stat with the given name.
+        /// </summary>
+        /// <param name="name">The stat's name.</param>
+        private async Task<StatEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<Stat>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
 
         /// <summary>

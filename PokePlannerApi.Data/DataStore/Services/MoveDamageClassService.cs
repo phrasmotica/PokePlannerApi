@@ -30,34 +30,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<MoveDamageClassEntry> Get(NamedApiResource<MoveDamageClass> resource)
         {
-            var moveDamageClass = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveDamageClassId == moveDamageClass.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(moveDamageClass);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<MoveDamageClassEntry> Get(NamedEntryRef<MoveDamageClassEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MoveDamageClassId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var moveDamageClass = await _pokeApi.Get<MoveDamageClass>(entryRef.Key);
-            var newEntry = await _converter.Convert(moveDamageClass);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -71,6 +50,25 @@ namespace PokePlannerApi.Data.DataStore.Services
             }
 
             return entries.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the move damage class with the given name.
+        /// </summary>
+        /// <param name="name">The move damage class' name.</param>
+        private async Task<MoveDamageClassEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<MoveDamageClass>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
     }
 }

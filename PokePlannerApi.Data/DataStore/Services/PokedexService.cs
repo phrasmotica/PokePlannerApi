@@ -30,34 +30,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<PokedexEntry> Get(NamedApiResource<Pokedex> resource)
         {
-            var pokedex = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokedexId == pokedex.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(pokedex);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<PokedexEntry> Get(NamedEntryRef<PokedexEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokedexId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var pokedex = await _pokeApi.Get<Pokedex>(entryRef.Key);
-            var newEntry = await _converter.Convert(pokedex);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -80,6 +59,25 @@ namespace PokePlannerApi.Data.DataStore.Services
         {
             var resources = await _pokeApi.GetNamedFullPage<Pokedex>();
             return await Get(resources.Results);
+        }
+
+        /// <summary>
+        /// Returns the pokedex with the given name.
+        /// </summary>
+        /// <param name="name">The pokedex's name.</param>
+        private async Task<PokedexEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<Pokedex>(name);
+            var newEntry = await _converter.Convert(resource);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
         }
     }
 }

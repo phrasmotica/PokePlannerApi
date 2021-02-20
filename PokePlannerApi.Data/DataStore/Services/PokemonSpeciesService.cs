@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PokeApiNet;
@@ -36,34 +35,13 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <inheritdoc />
         public async Task<PokemonSpeciesEntry> Get(NamedApiResource<PokemonSpecies> resource)
         {
-            var pokemonSpecies = await _pokeApi.Get(resource);
-
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonSpeciesId == pokemonSpecies.Id);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var newEntry = await _converter.Convert(pokemonSpecies);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return resource is null ? null : await Get(resource.Name);
         }
 
         /// <inheritdoc />
         public async Task<PokemonSpeciesEntry> Get(NamedEntryRef<PokemonSpeciesEntry> entryRef)
         {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.PokemonSpeciesId == entryRef.Key || e.Name == entryRef.Name);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var pokemonSpecies = await _pokeApi.Get<PokemonSpecies>(entryRef.Key);
-            var newEntry = await _converter.Convert(pokemonSpecies);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
+            return entryRef is null ? null : await Get(entryRef.Name);
         }
 
         /// <inheritdoc />
@@ -93,6 +71,25 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             var pokemonSpecies = await _pokeApi.Get<PokemonSpecies>(speciesId);
             var newEntry = await _converter.Convert(pokemonSpecies);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <summary>
+        /// Returns the Pokemon species with the given name.
+        /// </summary>
+        /// <param name="name">The Pokemon species' name.</param>
+        private async Task<PokemonSpeciesEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var resource = await _pokeApi.Get<PokemonSpecies>(name);
+            var newEntry = await _converter.Convert(resource);
             await _dataSource.Create(newEntry);
 
             return newEntry;
