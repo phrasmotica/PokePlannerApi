@@ -37,14 +37,14 @@ namespace PokePlannerApi.Data.DataStore.Abstractions
         /// <summary>
         /// Configures settings for Mongo DB.
         /// </summary>
-        private void ConfigureMongoDb()
+        private static void ConfigureMongoDb()
         {
             // ignore null values of certain types
             ConventionRegistry.Register(
-                "IgnoreIfDefault",
+                "IgnoreIfNull",
                 new ConventionPack
                 {
-                    new IgnoreIfDefaultConvention(true)
+                    new IgnoreIfNullConvention(true)
                 },
                 t => true
             );

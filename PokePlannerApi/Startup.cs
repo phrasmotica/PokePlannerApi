@@ -38,7 +38,7 @@ namespace PokePlannerApi
             services.AddControllers()
                     .AddJsonOptions(options =>
                     {
-                        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     });
 
             services.AddSwaggerGen(c =>
