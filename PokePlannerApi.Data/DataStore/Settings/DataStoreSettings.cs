@@ -3,7 +3,7 @@
     /// <summary>
     /// Class for PokePlannerApi data store settings.
     /// </summary>
-    public class DataStoreSettings : IDataStoreSettings
+    public class DataStoreSettings
     {
         public string ConnectionString { get; set; }
         public string PrivateKey { get; set; }

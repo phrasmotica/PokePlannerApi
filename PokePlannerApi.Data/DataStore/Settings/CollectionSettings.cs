@@ -3,7 +3,7 @@
     /// <summary>
     /// Class for settings related to the collections of data in the data store.
     /// </summary>
-    public class CollectionSettings : ICollectionSettings
+    public class CollectionSettings
     {
         /// <summary>
         /// The name of the collection of abilities.
