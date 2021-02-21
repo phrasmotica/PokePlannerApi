@@ -29,9 +29,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the encounter method entry.
         /// </summary>
-        public NamedEntryRef<EncounterMethodEntry> ToRef()
+        public EntryRef<EncounterMethodEntry> ToRef()
         {
-            return new NamedEntryRef<EncounterMethodEntry>
+            return new EntryRef<EncounterMethodEntry>
             {
                 Key = EncounterMethodId,
                 Name = Name,

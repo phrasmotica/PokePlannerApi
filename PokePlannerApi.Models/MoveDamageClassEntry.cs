@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the move damage class entry.
         /// </summary>
-        public NamedEntryRef<MoveDamageClassEntry> ToRef()
+        public EntryRef<MoveDamageClassEntry> ToRef()
         {
-            return new NamedEntryRef<MoveDamageClassEntry>
+            return new EntryRef<MoveDamageClassEntry>
             {
                 Key = MoveDamageClassId,
                 Name = Name,

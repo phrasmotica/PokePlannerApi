@@ -24,14 +24,14 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the possible values of the encounter condition.
         /// </summary>
-        public List<NamedEntryRef<EncounterConditionValueEntry>> Values { get; set; }
+        public List<EntryRef<EncounterConditionValueEntry>> Values { get; set; }
 
         /// <summary>
         /// Returns a reference to the encounter condition entry.
         /// </summary>
-        public NamedEntryRef<EncounterConditionEntry> ToRef()
+        public EntryRef<EncounterConditionEntry> ToRef()
         {
-            return new NamedEntryRef<EncounterConditionEntry>
+            return new EntryRef<EncounterConditionEntry>
             {
                 Key = EncounterConditionId,
                 Name = Name,

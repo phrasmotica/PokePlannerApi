@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the generation entry.
         /// </summary>
-        public NamedEntryRef<GenerationEntry> ToRef()
+        public EntryRef<GenerationEntry> ToRef()
         {
-            return new NamedEntryRef<GenerationEntry>
+            return new EntryRef<GenerationEntry>
             {
                 Key = GenerationId,
                 Name = Name,

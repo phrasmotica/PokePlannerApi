@@ -29,9 +29,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the stat entry.
         /// </summary>
-        public NamedEntryRef<StatEntry> ToRef()
+        public EntryRef<StatEntry> ToRef()
         {
-            return new NamedEntryRef<StatEntry>
+            return new EntryRef<StatEntry>
             {
                 Key = StatId,
                 Name = Name,

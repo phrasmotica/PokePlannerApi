@@ -29,12 +29,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the type of the move.
         /// </summary>
-        public NamedEntryRef<TypeEntry> Type { get; set; }
+        public EntryRef<TypeEntry> Type { get; set; }
 
         /// <summary>
         /// Gets or sets the category of the move.
         /// </summary>
-        public NamedEntryRef<MoveCategoryEntry> Category { get; set; }
+        public EntryRef<MoveCategoryEntry> Category { get; set; }
 
         /// <summary>
         /// Gets or sets the move's base power.
@@ -44,7 +44,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the damage class of the move.
         /// </summary>
-        public NamedEntryRef<MoveDamageClassEntry> DamageClass { get; set; }
+        public EntryRef<MoveDamageClassEntry> DamageClass { get; set; }
 
         /// <summary>
         /// Gets or sets the move's accuracy.
@@ -64,7 +64,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's target.
         /// </summary>
-        public NamedEntryRef<MoveTargetEntry> Target { get; set; }
+        public EntryRef<MoveTargetEntry> Target { get; set; }
 
         /// <summary>
         /// Gets or sets the machines that teach the move, indexed by version group ID.
@@ -74,9 +74,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the move entry.
         /// </summary>
-        public NamedEntryRef<MoveEntry> ToRef()
+        public EntryRef<MoveEntry> ToRef()
         {
-            return new NamedEntryRef<MoveEntry>
+            return new EntryRef<MoveEntry>
             {
                 Key = MoveId,
                 Name = Name,

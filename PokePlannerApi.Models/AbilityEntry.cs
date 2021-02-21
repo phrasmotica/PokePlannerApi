@@ -29,9 +29,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the ability entry.
         /// </summary>
-        public NamedEntryRef<AbilityEntry> ToRef()
+        public EntryRef<AbilityEntry> ToRef()
         {
-            return new NamedEntryRef<AbilityEntry>
+            return new EntryRef<AbilityEntry>
             {
                 Key = AbilityId,
                 Name = Name,

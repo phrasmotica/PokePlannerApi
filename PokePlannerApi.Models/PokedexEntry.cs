@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the pokedex entry.
         /// </summary>
-        public NamedEntryRef<PokedexEntry> ToRef()
+        public EntryRef<PokedexEntry> ToRef()
         {
-            return new NamedEntryRef<PokedexEntry>
+            return new EntryRef<PokedexEntry>
             {
                 Key = PokedexId,
                 Name = Name,

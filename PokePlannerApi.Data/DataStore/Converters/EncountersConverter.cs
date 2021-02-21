@@ -46,6 +46,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             return new EncountersEntry
             {
                 PokemonId = resource.Id,
+                Name = resource.Id.ToString(),
                 Encounters = encounters.ToList()
             };
         }

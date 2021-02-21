@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the move category entry.
         /// </summary>
-        public NamedEntryRef<MoveCategoryEntry> ToRef()
+        public EntryRef<MoveCategoryEntry> ToRef()
         {
-            return new NamedEntryRef<MoveCategoryEntry>
+            return new EntryRef<MoveCategoryEntry>
             {
                 Key = MoveCategoryId,
                 Name = Name,

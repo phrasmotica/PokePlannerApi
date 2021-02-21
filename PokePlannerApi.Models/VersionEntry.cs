@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the version entry.
         /// </summary>
-        public NamedEntryRef<VersionEntry> ToRef()
+        public EntryRef<VersionEntry> ToRef()
         {
-            return new NamedEntryRef<VersionEntry>
+            return new EntryRef<VersionEntry>
             {
                 Key = VersionId,
                 Name = Name,

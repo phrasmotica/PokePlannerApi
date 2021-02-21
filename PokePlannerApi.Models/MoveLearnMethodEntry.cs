@@ -29,9 +29,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the move learn method entry.
         /// </summary>
-        public NamedEntryRef<MoveLearnMethodEntry> ToRef()
+        public EntryRef<MoveLearnMethodEntry> ToRef()
         {
-            return new NamedEntryRef<MoveLearnMethodEntry>
+            return new EntryRef<MoveLearnMethodEntry>
             {
                 Key = MoveLearnMethodId,
                 Name = Name,

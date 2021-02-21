@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the item entry.
         /// </summary>
-        public NamedEntryRef<ItemEntry> ToRef()
+        public EntryRef<ItemEntry> ToRef()
         {
-            return new NamedEntryRef<ItemEntry>
+            return new EntryRef<ItemEntry>
             {
                 Key = ItemId,
                 Name = Name,

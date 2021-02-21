@@ -9,5 +9,10 @@
         /// Gets or sets the key of the entry.
         /// </summary>
         public int Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the entry.
+        /// </summary>
+        public string Name { get; set; }
     }
 }

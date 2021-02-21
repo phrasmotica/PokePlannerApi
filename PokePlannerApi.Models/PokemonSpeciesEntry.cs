@@ -44,7 +44,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the types of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<NamedEntryRef<TypeEntry>>>> Types { get; set; }
+        public List<WithId<List<EntryRef<TypeEntry>>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the base stats of this species' primary variety, indexed by version group ID.
@@ -54,12 +54,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
         /// </summary>
-        public List<NamedEntryRef<PokemonEntry>> Varieties { get; set; }
+        public List<EntryRef<PokemonEntry>> Varieties { get; set; }
 
         /// <summary>
         /// Gets or sets the generation in which this species was introduced.
         /// </summary>
-        public NamedEntryRef<GenerationEntry> Generation { get; set; }
+        public EntryRef<GenerationEntry> Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the species' evolution chain.
@@ -80,9 +80,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the Pokemon species entry.
         /// </summary>
-        public NamedEntryRef<PokemonSpeciesEntry> ToRef()
+        public EntryRef<PokemonSpeciesEntry> ToRef()
         {
-            return new NamedEntryRef<PokemonSpeciesEntry>
+            return new EntryRef<PokemonSpeciesEntry>
             {
                 Key = PokemonSpeciesId,
                 Name = Name,

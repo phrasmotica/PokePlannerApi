@@ -93,9 +93,9 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the Pokemon that this Pokemon species represents.
         /// </summary>
-        private async Task<IEnumerable<NamedEntryRef<PokemonEntry>>> GetVarieties(PokemonSpecies species)
+        private async Task<IEnumerable<EntryRef<PokemonEntry>>> GetVarieties(PokemonSpecies species)
         {
-            var varietiesList = new List<NamedEntryRef<PokemonEntry>>();
+            var varietiesList = new List<EntryRef<PokemonEntry>>();
 
             foreach (var res in species.Varieties)
             {

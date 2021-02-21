@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the encounter condition value entry.
         /// </summary>
-        public NamedEntryRef<EncounterConditionValueEntry> ToRef()
+        public EntryRef<EncounterConditionValueEntry> ToRef()
         {
-            return new NamedEntryRef<EncounterConditionValueEntry>
+            return new EntryRef<EncounterConditionValueEntry>
             {
                 Key = EncounterConditionValueId,
                 Name = Name,

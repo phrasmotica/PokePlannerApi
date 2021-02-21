@@ -34,7 +34,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<VersionEntry> Get(NamedEntryRef<VersionEntry> entryRef)
+        public async Task<VersionEntry> Get(EntryRef<VersionEntry> entryRef)
         {
             return entryRef is null ? null : await Get(entryRef.Name);
         }

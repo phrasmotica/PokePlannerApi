@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,7 +59,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<PokemonEntry> Get(NamedEntryRef<PokemonEntry> entryRef)
+        public async Task<PokemonEntry> Get(EntryRef<PokemonEntry> entryRef)
         {
             return entryRef is null ? null : await Get(entryRef.Name);
         }
@@ -100,7 +100,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// Returns the Pokemon in the given reference objects.
         /// </summary>
         /// <param name="entryRefs">The reference objects.</param>
-        public async Task<PokemonEntry[]> Get(IEnumerable<NamedEntryRef<PokemonEntry>> entryRefs)
+        public async Task<PokemonEntry[]> Get(IEnumerable<EntryRef<PokemonEntry>> entryRefs)
         {
             var varietiesList = new List<PokemonEntry>();
 

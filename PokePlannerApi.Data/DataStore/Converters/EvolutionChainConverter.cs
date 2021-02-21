@@ -37,6 +37,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             return new EvolutionChainEntry
             {
                 EvolutionChainId = resource.Id,
+                Name = resource.Chain.Species.Name,
                 Chain = chain
             };
         }
@@ -60,7 +61,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             return new ChainLinkEntry
             {
                 IsBaby = chainLink.IsBaby,
-                Species = new NamedEntryRef<PokemonSpeciesEntry>
+                Species = new EntryRef<PokemonSpeciesEntry>
                 {
                     Name = chainLink.Species.Name,
                 },
@@ -126,11 +127,11 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// the Pokemon species service.
         /// </summary>
         /// <param name="species">The Pokemon species.</param>
-        private static NamedEntryRef<PokemonSpeciesEntry> ToRef(NamedApiResource<PokemonSpecies> species)
+        private static EntryRef<PokemonSpeciesEntry> ToRef(NamedApiResource<PokemonSpecies> species)
         {
             if (species is not null)
             {
-                return new NamedEntryRef<PokemonSpeciesEntry>
+                return new EntryRef<PokemonSpeciesEntry>
                 {
                     Name = species.Name,
                 };

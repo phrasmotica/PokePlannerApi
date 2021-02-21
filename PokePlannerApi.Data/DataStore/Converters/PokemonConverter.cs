@@ -109,15 +109,15 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the types of the given Pokemon in past version groups, if any.
         /// </summary>
-        private async Task<List<WithId<List<NamedEntryRef<TypeEntry>>>>> GetTypes(Pokemon pokemon)
+        private async Task<List<WithId<List<EntryRef<TypeEntry>>>>> GetTypes(Pokemon pokemon)
         {
-            var typesList = new List<WithId<List<NamedEntryRef<TypeEntry>>>>();
+            var typesList = new List<WithId<List<EntryRef<TypeEntry>>>>();
 
             var newestId = await _versionGroupService.GetNewestVersionGroupId();
             var newestTypeEntries = await _typeService.Get(pokemon.Types.Select(t => t.Type));
 
             typesList.Add(
-                new WithId<List<NamedEntryRef<TypeEntry>>>(
+                new WithId<List<EntryRef<TypeEntry>>>(
                     newestId,
                     newestTypeEntries.Select(e => e.ToRef()).ToList()
                 )
@@ -147,15 +147,15 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the moves of the given Pokemon.
         /// </summary>
-        private async Task<IEnumerable<WithId<List<NamedEntryRef<MoveEntry>>>>> GetMoves(Pokemon pokemon)
+        private async Task<IEnumerable<WithId<List<EntryRef<MoveEntry>>>>> GetMoves(Pokemon pokemon)
         {
-            var movesList = new List<WithId<List<NamedEntryRef<MoveEntry>>>>();
+            var movesList = new List<WithId<List<EntryRef<MoveEntry>>>>();
 
             var versionGroups = await _versionGroupService.GetAll();
             foreach (var vg in versionGroups)
             {
                 var moves = await GetMoves(pokemon, vg);
-                var movesEntry = new WithId<List<NamedEntryRef<MoveEntry>>>(
+                var movesEntry = new WithId<List<EntryRef<MoveEntry>>>(
                     vg.VersionGroupId,
                     moves.Select(e => e.ToRef()).ToList()
                 );

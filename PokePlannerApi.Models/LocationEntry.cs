@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the location entry.
         /// </summary>
-        public NamedEntryRef<LocationEntry> ToRef()
+        public EntryRef<LocationEntry> ToRef()
         {
-            return new NamedEntryRef<LocationEntry>
+            return new EntryRef<LocationEntry>
             {
                 Key = LocationId,
                 Name = Name,

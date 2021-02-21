@@ -38,7 +38,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 DisplayNames = resource.Names.Localise().ToList(),
                 SpriteUrl = GetSpriteUrl(resource),
                 ShinySpriteUrl = GetShinySpriteUrl(resource),
-                Types = new List<WithId<List<NamedEntryRef<TypeEntry>>>>(),
+                Types = new List<WithId<List<EntryRef<TypeEntry>>>>(),
                 Validity = validity.ToList()
             };
         }

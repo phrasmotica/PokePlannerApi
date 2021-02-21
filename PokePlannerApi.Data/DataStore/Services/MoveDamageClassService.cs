@@ -34,7 +34,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<MoveDamageClassEntry> Get(NamedEntryRef<MoveDamageClassEntry> entryRef)
+        public async Task<MoveDamageClassEntry> Get(EntryRef<MoveDamageClassEntry> entryRef)
         {
             return entryRef is null ? null : await Get(entryRef.Name);
         }

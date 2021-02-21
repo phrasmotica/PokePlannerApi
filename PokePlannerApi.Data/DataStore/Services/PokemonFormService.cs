@@ -35,7 +35,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<PokemonFormEntry> Get(NamedEntryRef<PokemonFormEntry> entryRef)
+        public async Task<PokemonFormEntry> Get(EntryRef<PokemonFormEntry> entryRef)
         {
             return entryRef is null ? null : await Get(entryRef.Name);
         }
@@ -76,7 +76,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// Returns the Pokemon forms in the given reference objects.
         /// </summary>
         /// <param name="entryRef">The reference objects.</param>
-        public async Task<PokemonFormEntry[]> Get(IEnumerable<NamedEntryRef<PokemonFormEntry>> entryRefs)
+        public async Task<PokemonFormEntry[]> Get(IEnumerable<EntryRef<PokemonFormEntry>> entryRefs)
         {
             var entries = new List<PokemonFormEntry>();
 

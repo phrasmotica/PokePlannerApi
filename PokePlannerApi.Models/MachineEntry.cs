@@ -17,7 +17,7 @@
         /// <summary>
         /// Gets or sets the item this machine represents.
         /// </summary>
-        public NamedEntryRef<ItemEntry> Item { get; set; }
+        public EntryRef<ItemEntry> Item { get; set; }
 
         /// <summary>
         /// Returns a reference to the machine entry.

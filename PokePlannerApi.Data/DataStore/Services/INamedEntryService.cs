@@ -19,7 +19,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// Returns the entry in the given reference object.
         /// </summary>
         /// <param name="entryRef">The reference object.</param>
-        Task<TEntry> Get(NamedEntryRef<TEntry> entryRef);
+        Task<TEntry> Get(EntryRef<TEntry> entryRef);
 
         /// <summary>
         /// Returns entries for the resources in the given reference objects.

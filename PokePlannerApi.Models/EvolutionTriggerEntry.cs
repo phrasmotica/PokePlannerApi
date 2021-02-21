@@ -24,9 +24,9 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Returns a reference to the evolution trigger entry.
         /// </summary>
-        public NamedEntryRef<EvolutionTriggerEntry> ToRef()
+        public EntryRef<EvolutionTriggerEntry> ToRef()
         {
-            return new NamedEntryRef<EvolutionTriggerEntry>
+            return new EntryRef<EvolutionTriggerEntry>
             {
                 Key = EvolutionTriggerId,
                 Name = Name,

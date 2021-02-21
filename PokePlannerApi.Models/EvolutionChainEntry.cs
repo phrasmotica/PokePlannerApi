@@ -46,7 +46,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// The Pokemon species at this stage of the evolution chain.
         /// </summary>
-        public NamedEntryRef<PokemonSpeciesEntry> Species { get; set; }
+        public EntryRef<PokemonSpeciesEntry> Species { get; set; }
 
         /// <summary>
         /// All details regarding the specific details of the referenced species evolution.
@@ -67,12 +67,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the item required to cause evolution into this species.
         /// </summary>
-        public NamedEntryRef<ItemEntry> Item { get; set; }
+        public EntryRef<ItemEntry> Item { get; set; }
 
         /// <summary>
         /// Gets or sets the type of event that triggers evolution into this species.
         /// </summary>
-        public NamedEntryRef<EvolutionTriggerEntry> Trigger { get; set; }
+        public EntryRef<EvolutionTriggerEntry> Trigger { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the gender of the evolving Pokémon species must be in order to
@@ -84,24 +84,24 @@ namespace PokePlannerApi.Models
         /// Gets or sets the item the evolving species must be holding during the evolution trigger
         /// event to evolve into this species.
         /// </summary>
-        public NamedEntryRef<ItemEntry> HeldItem { get; set; }
+        public EntryRef<ItemEntry> HeldItem { get; set; }
 
         /// <summary>
         /// Gets or sets the move that must be known by the evolving species during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public NamedEntryRef<MoveEntry> KnownMove { get; set; }
+        public EntryRef<MoveEntry> KnownMove { get; set; }
 
         /// <summary>
         /// Gets or sets the evolving species must know a move with this type during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public NamedEntryRef<TypeEntry> KnownMoveType { get; set; }
+        public EntryRef<TypeEntry> KnownMoveType { get; set; }
 
         /// <summary>
         /// Gets or sets the location the evolution must be triggered at.
         /// </summary>
-        public NamedEntryRef<LocationEntry> Location { get; set; }
+        public EntryRef<LocationEntry> Location { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum required level of the evolving Pokémon species to evolve into
@@ -137,13 +137,13 @@ namespace PokePlannerApi.Models
         /// Gets or sets the species that must be in the players party in order for the evolving
         /// species to evolve into this species.
         /// </summary>
-        public NamedEntryRef<PokemonSpeciesEntry> PartySpecies { get; set; }
+        public EntryRef<PokemonSpeciesEntry> PartySpecies { get; set; }
 
         /// <summary>
         /// Gets or sets the type of Pokemon the player must have in their party during the
         /// evolution trigger event in order for the evolving species to evolve into this species.
         /// </summary>
-        public NamedEntryRef<TypeEntry> PartyType { get; set; }
+        public EntryRef<TypeEntry> PartyType { get; set; }
 
         /// <summary>
         /// Gets or sets the required relation between the Pokémon's Attack and Defense stats:
@@ -161,7 +161,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the species for which this one must be traded.
         /// </summary>
-        public NamedEntryRef<PokemonSpeciesEntry> TradeSpecies { get; set; }
+        public EntryRef<PokemonSpeciesEntry> TradeSpecies { get; set; }
 
         /// <summary>
         /// Gets or sets whether or not the 3DS needs to be turned upside-down as this Pokemon

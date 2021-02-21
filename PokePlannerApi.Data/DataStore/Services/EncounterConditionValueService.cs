@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using PokeApiNet;
 using PokePlannerApi.Clients;
@@ -34,7 +34,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<EncounterConditionValueEntry> Get(NamedEntryRef<EncounterConditionValueEntry> entryRef)
+        public async Task<EncounterConditionValueEntry> Get(EntryRef<EncounterConditionValueEntry> entryRef)
         {
             return entryRef is null ? null : await Get(entryRef.Name);
         }
