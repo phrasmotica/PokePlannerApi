@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a pokedex in the data store.
     /// </summary>
-    public class PokedexEntry : NamedApiResourceEntry
+    public class PokedexEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the pokedex.

@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents an encounter condition in the data store.
     /// </summary>
-    public class EncounterConditionEntry : NamedApiResourceEntry
+    public class EncounterConditionEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the encounter condition.

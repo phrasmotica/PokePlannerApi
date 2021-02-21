@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a move learn method in the data store.
     /// </summary>
-    public class MoveLearnMethodEntry : NamedApiResourceEntry
+    public class MoveLearnMethodEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the move learn method.

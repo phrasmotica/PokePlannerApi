@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -233,7 +233,7 @@ namespace PokePlannerApi
             DataStoreSettings dataStoreSettings,
             string collectionName)
             where TResource : NamedApiResource
-            where TEntry : NamedApiResourceEntry
+            where TEntry : EntryBase
             where TConverter : class, IResourceConverter<TResource, TEntry>
             where TService : class, INamedEntryService<TResource, TEntry>
         {

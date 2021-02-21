@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a generation in the data store.
     /// </summary>
-    public class GenerationEntry : NamedApiResourceEntry
+    public class GenerationEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the generation.

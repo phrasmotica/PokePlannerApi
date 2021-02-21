@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a move in the data store.
     /// </summary>
-    public class MoveEntry : NamedApiResourceEntry
+    public class MoveEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the move.

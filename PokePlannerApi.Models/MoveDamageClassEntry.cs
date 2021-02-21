@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a move damage class in the data store.
     /// </summary>
-    public class MoveDamageClassEntry : NamedApiResourceEntry
+    public class MoveDamageClassEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the move damage class.

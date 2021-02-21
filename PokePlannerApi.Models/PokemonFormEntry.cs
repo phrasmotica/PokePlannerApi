@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a Pokemon form in the data store.
     /// </summary>
-    public class PokemonFormEntry : NamedApiResourceEntry
+    public class PokemonFormEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the Pokemon form.

@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a move category in the data store.
     /// </summary>
-    public class MoveCategoryEntry : NamedApiResourceEntry
+    public class MoveCategoryEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the move category.

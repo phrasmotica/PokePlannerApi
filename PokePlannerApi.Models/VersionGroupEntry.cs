@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a version group in the data store.
     /// </summary>
-    public class VersionGroupEntry : NamedApiResourceEntry
+    public class VersionGroupEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the version group.

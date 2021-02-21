@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents an item in the data store.
     /// </summary>
-    public class ItemEntry : NamedApiResourceEntry
+    public class ItemEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the item.

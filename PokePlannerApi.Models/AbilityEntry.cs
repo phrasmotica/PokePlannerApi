@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents an ability in the data store.
     /// </summary>
-    public class AbilityEntry : NamedApiResourceEntry
+    public class AbilityEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the ability.

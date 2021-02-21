@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents an encounter method in the data store.
     /// </summary>
-    public class EncounterMethodEntry : NamedApiResourceEntry
+    public class EncounterMethodEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the encounter method.

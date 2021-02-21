@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a evolution trigger in the data store.
     /// </summary>
-    public class EvolutionTriggerEntry : NamedApiResourceEntry
+    public class EvolutionTriggerEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the evolution trigger.

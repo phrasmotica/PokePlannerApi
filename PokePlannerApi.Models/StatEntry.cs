@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a stat in the data store.
     /// </summary>
-    public class StatEntry : NamedApiResourceEntry
+    public class StatEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the stat.

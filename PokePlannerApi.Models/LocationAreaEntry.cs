@@ -5,7 +5,7 @@ namespace PokePlannerApi.Models
     /// <summary>
     /// Represents a location area in the data store.
     /// </summary>
-    public class LocationAreaEntry : NamedApiResourceEntry
+    public class LocationAreaEntry : EntryBase
     {
         /// <summary>
         /// Gets the ID of the location area.

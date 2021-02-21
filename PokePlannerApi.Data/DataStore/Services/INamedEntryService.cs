@@ -7,7 +7,7 @@ namespace PokePlannerApi.Data.DataStore.Services
 {
     public interface INamedEntryService<TResource, TEntry>
         where TResource : NamedApiResource
-        where TEntry : NamedApiResourceEntry
+        where TEntry : EntryBase
     {
         /// <summary>
         /// Returns an entry for the resource in the given reference object.
