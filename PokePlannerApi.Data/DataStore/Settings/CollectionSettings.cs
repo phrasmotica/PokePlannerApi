@@ -11,6 +11,11 @@
         public string AbilityCollectionName { get; set; }
 
         /// <summary>
+        /// The name of the collection of efficacies.
+        /// </summary>
+        public string EfficacyCollectionName { get; set; }
+
+        /// <summary>
         /// The name of the collection of encounter conditions.
         /// </summary>
         public string EncounterConditionCollectionName { get; set; }

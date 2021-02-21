@@ -82,7 +82,11 @@ namespace PokePlannerApi
                 dataStoreSettings,
                 collectionSettings.AbilityCollectionName);
 
-            services.AddSingleton<EfficacyService>();
+            AddNamedService<Type, EfficacyEntry, EfficacyConverter, EfficacyService>(
+                services,
+                dataStoreSourceFactory,
+                dataStoreSettings,
+                collectionSettings.EfficacyCollectionName);
 
             //AddNamedService<EncounterCondition, EncounterConditionEntry, EncounterConditionConverter, EncounterConditionService>(
             //    services,

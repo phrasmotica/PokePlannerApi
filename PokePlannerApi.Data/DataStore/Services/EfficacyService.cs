@@ -1,76 +1,142 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using PokeApiNet;
+using PokePlannerApi.Clients;
+using PokePlannerApi.Data.DataStore.Abstractions;
+using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Models;
 
 namespace PokePlannerApi.Data.DataStore.Services
 {
     /// <summary>
-    /// Service for accessing efficacy information.
+    /// Service for accessing efficacy entries.
     /// </summary>
-    public class EfficacyService
+    public class EfficacyService : INamedEntryService<Type, EfficacyEntry>
     {
+        private readonly IPokeApi _pokeApi;
+        private readonly IResourceConverter<Type, EfficacyEntry> _converter;
+        private readonly IDataStoreSource<EfficacyEntry> _dataSource;
         private readonly PokemonService _pokemonService;
         private readonly TypeService _typeService;
-        private readonly ILogger<EfficacyService> _logger;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public EfficacyService(
+            IPokeApi pokeApi,
+            IResourceConverter<Type, EfficacyEntry> converter,
+            IDataStoreSource<EfficacyEntry> dataSource,
             PokemonService pokemonService,
-            TypeService typesService,
-            ILogger<EfficacyService> logger)
+            TypeService typeService)
         {
+            _pokeApi = pokeApi;
+            _converter = converter;
+            _dataSource = dataSource;
             _pokemonService = pokemonService;
-            _typeService = typesService;
-            _logger = logger;
+            _typeService = typeService;
         }
 
-        /// <summary>
-        /// Returns the efficacy of the Pokemon with the given ID in the version group with the
-        /// given ID.
-        /// </summary>
-        public async Task<EfficacySet> GetTypeEfficacyByTypeId(int typeId, int versionGroupId)
+        /// <inheritdoc />
+        public async Task<EfficacyEntry> Get(NamedApiResource<Type> resource)
         {
-            var entry = await _typeService.Get(typeId);
-            return await _typeService.GetTypesEfficacySet(new[] { entry.TypeId }, versionGroupId);
+            return resource is null ? null : await Get(resource.Name);
         }
 
-        /// <summary>
-        /// Returns the efficacy of the Pokemon with the given ID in the version group with the
-        /// given ID.
-        /// </summary>
-        public async Task<EfficacySet> GetTypeEfficacyByTypeIds(IEnumerable<int> typeIds, int versionGroupId)
+        /// <inheritdoc />
+        public async Task<EfficacyEntry[]> Get(IEnumerable<NamedApiResource<Type>> resources)
         {
-            var validTypeIds = ValidateTypeIds(typeIds).ToArray();
-            if (validTypeIds.Length != typeIds.ToArray().Length)
+            var entries = new List<EfficacyEntry>();
+
+            foreach (var v in resources)
             {
-                var invalidTypes = typeIds.Except(validTypeIds).ToArray();
-                var invalidTypesStr = string.Join(", ", invalidTypes);
-                _logger.LogWarning($"Attempted to get type efficacy for {invalidTypes.Length} invalid type(s): {invalidTypesStr}");
+                entries.Add(await Get(v));
             }
 
-            return await _typeService.GetTypesEfficacySet(validTypeIds, versionGroupId);
+            return entries.ToArray();
         }
 
         /// <summary>
         /// Returns the efficacy of the Pokemon with the given ID in the version group with the
         /// given ID.
         /// </summary>
-        public async Task<EfficacySet> GetTypeEfficacyByPokemonId(int pokemonId, int versionGroupId)
+        public async Task<EfficacySet> GetEfficacySet(int typeId, int versionGroupId)
         {
-            var pokemon = await _pokemonService.Get(pokemonId);
-            return await _typeService.GetTypesEfficacySet(pokemon.Types.Select(t => t.Id), versionGroupId);
+            var entry = await _typeService.Get(typeId);
+            return await GetEfficacySet(new[] { entry.TypeId }, versionGroupId);
         }
 
         /// <summary>
-        /// Returns all valid type IDs from the given list.
+        /// Returns the efficacy of the Pokemon with the given ID in the version group with the
+        /// given ID.
         /// </summary>
-        private static IEnumerable<int> ValidateTypeIds(IEnumerable<int> typeIds)
+        public async Task<EfficacySet> GetEfficacySetByPokemonId(int pokemonId, int versionGroupId)
         {
-            return typeIds.Where(id => id != 0);
+            var pokemon = await _pokemonService.Get(pokemonId);
+            var types = pokemon.Types.SingleOrDefault(e => e.Id == versionGroupId)?.Data;
+            return await GetEfficacySet(types.Select(t => t.TypeId), versionGroupId);
+        }
+
+        /// <summary>
+        /// Returns the efficacy set of the type with the given ID in the
+        /// version group with the given ID.
+        /// </summary>
+        public async Task<EfficacySet> GetEfficacySet(IEnumerable<int> typeIds, int versionGroupId)
+        {
+            var entries = await Get(typeIds);
+            var efficacySets = entries.Select(e => e.GetEfficacySet(versionGroupId));
+            return efficacySets.Aggregate((e1, e2) => e1.Product(e2));
+        }
+
+        /// <summary>
+        /// Returns the efficacy of the type with the given ID.
+        /// </summary>
+        /// <param name="typeId">The type ID.</param>
+        public async Task<EfficacyEntry> Get(int typeId)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.TypeId == typeId);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var type = await _pokeApi.Get<Type>(typeId);
+            var newEntry = await _converter.Convert(type);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <summary>
+        /// Returns the efficacy of the type with the given name.
+        /// </summary>
+        /// <param name="name">The type's name.</param>
+        private async Task<EfficacyEntry> Get(string name)
+        {
+            var (hasEntry, entry) = await _dataSource.HasOne(e => e.Name == name);
+            if (hasEntry)
+            {
+                return entry;
+            }
+
+            var type = await _pokeApi.Get<Type>(name);
+            var newEntry = await _converter.Convert(type);
+            await _dataSource.Create(newEntry);
+
+            return newEntry;
+        }
+
+        /// <summary>
+        /// Returns the efficacies of the types with the given IDs.
+        /// </summary>
+        /// <param name="typeIds">The type IDs.</param>
+        private async Task<EfficacyEntry[]> Get(IEnumerable<int> typeIds)
+        {
+            var entries = new List<EfficacyEntry>();
+
+            foreach (var id in typeIds)
+            {
+                entries.Add(await Get(id));
+            }
+
+            return entries.ToArray();
         }
     }
 }
