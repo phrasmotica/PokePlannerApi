@@ -23,6 +23,11 @@ namespace PokePlannerApi.Models
         protected int Key { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the entry.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Gets the time that the entry was created.
         /// </summary>
         public DateTime CreationTime { get; set; }
