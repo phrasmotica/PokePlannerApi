@@ -22,14 +22,15 @@ namespace PokePlannerApi.Models
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
-        /// Returns a reference to the evolution trigger entry.
+        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
         /// </summary>
-        public EntryRef<EvolutionTriggerEntry> ToRef()
+        public EvolutionTriggerEntry ForEvolutionChain()
         {
-            return new EntryRef<EvolutionTriggerEntry>
+            return new EvolutionTriggerEntry
             {
-                Key = EvolutionTriggerId,
+                EvolutionTriggerId = EvolutionTriggerId,
                 Name = Name,
+                DisplayNames = DisplayNames
             };
         }
     }

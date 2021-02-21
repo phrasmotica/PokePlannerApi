@@ -25,17 +25,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets the descriptions of the move learn method.
         /// </summary>
         public List<LocalString> Descriptions { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the move learn method entry.
-        /// </summary>
-        public EntryRef<MoveLearnMethodEntry> ToRef()
-        {
-            return new EntryRef<MoveLearnMethodEntry>
-            {
-                Key = MoveLearnMethodId,
-                Name = Name,
-            };
-        }
     }
 }

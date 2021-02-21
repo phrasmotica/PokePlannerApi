@@ -16,7 +16,6 @@ namespace PokePlannerApi.Data.DataStore.Converters
         private readonly EncounterConditionValueService _encounterConditionValueService;
         private readonly EncounterMethodService _encounterMethodService;
         private readonly LocationAreaService _locationAreaService;
-        private readonly LocationService _locationService;
         private readonly VersionService _versionService;
         private readonly VersionGroupService _versionGroupService;
 
@@ -25,7 +24,6 @@ namespace PokePlannerApi.Data.DataStore.Converters
             EncounterConditionValueService encounterConditionValueService,
             EncounterMethodService encounterMethodService,
             LocationAreaService locationAreaService,
-            LocationService locationService,
             VersionService versionService,
             VersionGroupService versionGroupService)
         {
@@ -33,7 +31,6 @@ namespace PokePlannerApi.Data.DataStore.Converters
             _encounterConditionValueService = encounterConditionValueService;
             _encounterMethodService = encounterMethodService;
             _locationAreaService = locationAreaService;
-            _locationService = locationService;
             _versionService = versionService;
             _versionGroupService = versionGroupService;
         }
@@ -216,9 +213,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
         {
             var locationArea = await _locationAreaService.Get(encounter.LocationArea);
             var locationAreaNames = locationArea.DisplayNames;
-
-            var location = await _locationService.Get(locationArea.Location);
-            var locationNames = location.DisplayNames;
+            var locationNames = locationArea.Location.DisplayNames;
 
             // only provide names in locales that have name data for both location and location area
             var availableLocales = locationNames.Select(n => n.Language)

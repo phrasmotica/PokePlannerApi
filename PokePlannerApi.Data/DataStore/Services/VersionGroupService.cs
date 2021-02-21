@@ -35,12 +35,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<VersionGroupEntry> Get(EntryRef<VersionGroupEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<VersionGroupEntry[]> Get(IEnumerable<NamedApiResource<VersionGroup>> resources)
         {
             var entries = new List<VersionGroupEntry>();
@@ -126,7 +120,7 @@ namespace PokePlannerApi.Data.DataStore.Services
             var allVersionGroups = await GetAll();
             var relevantVersionGroups = allVersionGroups.Where(vg =>
             {
-                var myVersionIds = vg.Versions.Select(v => v.Key);
+                var myVersionIds = vg.Versions.Select(v => v.VersionId);
                 return myVersionIds.Intersect(versionIds).Any();
             });
 

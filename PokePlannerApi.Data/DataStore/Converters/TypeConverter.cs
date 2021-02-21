@@ -38,7 +38,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 DisplayNames = displayNames.ToList(),
                 IsConcrete = resource.Pokemon.Any(), // would like to use presence of move damage class but Fairy doesn't have it...
                 EfficacyMap = efficacyMap,
-                Generation = generation.ToRef(),
+                Generation = generation,
             };
         }
 

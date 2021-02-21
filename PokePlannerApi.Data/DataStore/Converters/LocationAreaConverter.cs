@@ -28,7 +28,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 LocationAreaId = resource.Id,
                 Name = resource.Name,
                 DisplayNames = displayNames.ToList(),
-                Location = location.ToRef(),
+                Location = location,
             };
         }
     }

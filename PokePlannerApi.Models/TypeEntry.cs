@@ -30,7 +30,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the generation in which the type was introduced.
         /// </summary>
-        public EntryRef<GenerationEntry> Generation { get; set; }
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the type's efficacy, indexed by version group ID and then type ID.
@@ -47,14 +47,15 @@ namespace PokePlannerApi.Models
         }
 
         /// <summary>
-        /// Returns a reference to the type entry.
+        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
         /// </summary>
-        public EntryRef<TypeEntry> ToRef()
+        public TypeEntry ForEvolutionChain()
         {
-            return new EntryRef<TypeEntry>
+            return new TypeEntry
             {
-                Key = TypeId,
+                Key = Key,
                 Name = Name,
+                DisplayNames = DisplayNames
             };
         }
     }

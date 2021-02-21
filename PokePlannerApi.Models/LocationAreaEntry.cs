@@ -24,18 +24,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the location of the location area.
         /// </summary>
-        public EntryRef<LocationEntry> Location { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the location area entry.
-        /// </summary>
-        public EntryRef<LocationAreaEntry> ToRef()
-        {
-            return new EntryRef<LocationAreaEntry>
-            {
-                Key = LocationAreaId,
-                Name = Name,
-            };
-        }
+        public LocationEntry Location { get; set; }
     }
 }

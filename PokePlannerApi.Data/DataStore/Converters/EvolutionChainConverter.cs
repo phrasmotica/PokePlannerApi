@@ -13,6 +13,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
         private readonly ItemService _itemService;
         private readonly LocationService _locationService;
         private readonly MoveService _moveService;
+        private readonly PokemonSpeciesService _pokemonSpeciesService;
         private readonly TypeService _typeService;
 
         public EvolutionChainConverter(
@@ -20,12 +21,14 @@ namespace PokePlannerApi.Data.DataStore.Converters
             ItemService itemService,
             LocationService locationService,
             MoveService moveService,
+            PokemonSpeciesService pokemonSpeciesService,
             TypeService typeService)
         {
             _evolutionTriggerService = evolutionTriggerService;
             _itemService = itemService;
             _locationService = locationService;
             _moveService = moveService;
+            _pokemonSpeciesService = pokemonSpeciesService;
             _typeService = typeService;
         }
 
@@ -47,6 +50,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// </summary>
         private async Task<ChainLinkEntry> CreateChainLinkEntry(ChainLink chainLink)
         {
+            var species = await _pokemonSpeciesService.Get(chainLink.Species);
             var evolutionDetailEntries = await CreateEvolutionDetailEntries(chainLink.EvolutionDetails);
 
             var evolvesTo = new List<ChainLinkEntry>();
@@ -61,10 +65,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             return new ChainLinkEntry
             {
                 IsBaby = chainLink.IsBaby,
-                Species = new EntryRef<PokemonSpeciesEntry>
-                {
-                    Name = chainLink.Species.Name,
-                },
+                Species = species.ForEvolutionChain(),
                 EvolutionDetails = evolutionDetailEntries.ToList(),
                 EvolvesTo = evolvesTo
             };
@@ -97,47 +98,31 @@ namespace PokePlannerApi.Data.DataStore.Converters
             var knownMove = await _moveService.Get(evolutionDetail.KnownMove);
             var knownMoveType = await _typeService.Get(evolutionDetail.KnownMoveType);
             var location = await _locationService.Get(evolutionDetail.Location);
+            var partySpecies = await _pokemonSpeciesService.Get(evolutionDetail.PartySpecies);
             var partyType = await _typeService.Get(evolutionDetail.PartyType);
+            var tradeSpecies = await _pokemonSpeciesService.Get(evolutionDetail.TradeSpecies);
 
             return new EvolutionDetailEntry
             {
-                Item = item?.ToRef(),
-                Trigger = trigger?.ToRef(),
+                Item = item?.ForEvolutionChain(),
+                Trigger = trigger?.ForEvolutionChain(),
                 Gender = evolutionDetail.Gender,
-                HeldItem = heldItem?.ToRef(),
-                KnownMove = knownMove?.ToRef(),
-                KnownMoveType = knownMoveType?.ToRef(),
-                Location = location?.ToRef(),
+                HeldItem = heldItem?.ForEvolutionChain(),
+                KnownMove = knownMove?.ForEvolutionChain(),
+                KnownMoveType = knownMoveType?.ForEvolutionChain(),
+                Location = location?.ForEvolutionChain(),
                 MinLevel = evolutionDetail.MinLevel,
                 MinHappiness = evolutionDetail.MinHappiness,
                 MinBeauty = evolutionDetail.MinBeauty,
                 MinAffection = evolutionDetail.MinAffection,
                 NeedsOverworldRain = evolutionDetail.NeedsOverworldRain,
-                PartySpecies = ToRef(evolutionDetail.PartySpecies),
-                PartyType = partyType?.ToRef(),
+                PartySpecies = partySpecies?.ForEvolutionChain(),
+                PartyType = partyType?.ForEvolutionChain(),
                 RelativePhysicalStats = evolutionDetail.RelativePhysicalStats,
                 TimeOfDay = !string.IsNullOrEmpty(evolutionDetail.TimeOfDay) ? evolutionDetail.TimeOfDay : null,
-                TradeSpecies = ToRef(evolutionDetail.TradeSpecies),
+                TradeSpecies = tradeSpecies?.ForEvolutionChain(),
                 TurnUpsideDown = evolutionDetail.TurnUpsideDown
             };
-        }
-
-        /// <summary>
-        /// Returns a reference to the entry for the given Pokemon species without needing to call
-        /// the Pokemon species service.
-        /// </summary>
-        /// <param name="species">The Pokemon species.</param>
-        private static EntryRef<PokemonSpeciesEntry> ToRef(NamedApiResource<PokemonSpecies> species)
-        {
-            if (species is not null)
-            {
-                return new EntryRef<PokemonSpeciesEntry>
-                {
-                    Name = species.Name,
-                };
-            }
-
-            return null;
         }
     }
 }

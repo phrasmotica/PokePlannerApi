@@ -29,12 +29,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the type of the move.
         /// </summary>
-        public EntryRef<TypeEntry> Type { get; set; }
+        public TypeEntry Type { get; set; }
 
         /// <summary>
         /// Gets or sets the category of the move.
         /// </summary>
-        public EntryRef<MoveCategoryEntry> Category { get; set; }
+        public MoveCategoryEntry Category { get; set; }
 
         /// <summary>
         /// Gets or sets the move's base power.
@@ -44,7 +44,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the damage class of the move.
         /// </summary>
-        public EntryRef<MoveDamageClassEntry> DamageClass { get; set; }
+        public MoveDamageClassEntry DamageClass { get; set; }
 
         /// <summary>
         /// Gets or sets the move's accuracy.
@@ -64,22 +64,23 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's target.
         /// </summary>
-        public EntryRef<MoveTargetEntry> Target { get; set; }
+        public MoveTargetEntry Target { get; set; }
 
         /// <summary>
         /// Gets or sets the machines that teach the move, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EntryRef<MachineEntry>>>> Machines { get; set; }
+        public List<WithId<List<MachineEntry>>> Machines { get; set; }
 
         /// <summary>
-        /// Returns a reference to the move entry.
+        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
         /// </summary>
-        public EntryRef<MoveEntry> ToRef()
+        public MoveEntry ForEvolutionChain()
         {
-            return new EntryRef<MoveEntry>
+            return new MoveEntry
             {
-                Key = MoveId,
+                MoveId = MoveId,
                 Name = Name,
+                DisplayNames = DisplayNames
             };
         }
     }

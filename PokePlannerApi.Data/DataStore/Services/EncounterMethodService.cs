@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<EncounterMethodEntry> Get(EntryRef<EncounterMethodEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<EncounterMethodEntry[]> Get(IEnumerable<NamedApiResource<EncounterMethod>> resources)
         {
             var entries = new List<EncounterMethodEntry>();

@@ -29,28 +29,16 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the generation the version group belongs to.
         /// </summary>
-        public EntryRef<GenerationEntry> Generation { get; set; }
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the versions belonging to the version group.
         /// </summary>
-        public List<EntryRef<VersionEntry>> Versions { get; set; }
+        public List<VersionEntry> Versions { get; set; }
 
         /// <summary>
         /// Gets or sets the pokedexes present in the version group.
         /// </summary>
-        public List<EntryRef<PokedexEntry>> Pokedexes { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the version group entry.
-        /// </summary>
-        public EntryRef<VersionGroupEntry> ToRef()
-        {
-            return new EntryRef<VersionGroupEntry>
-            {
-                Key = VersionGroupId,
-                Name = Name,
-            };
-        }
+        public List<PokedexEntry> Pokedexes { get; set; }
     }
 }

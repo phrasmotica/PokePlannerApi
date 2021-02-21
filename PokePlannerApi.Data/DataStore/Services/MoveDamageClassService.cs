@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<MoveDamageClassEntry> Get(EntryRef<MoveDamageClassEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<MoveDamageClassEntry[]> Get(IEnumerable<NamedApiResource<MoveDamageClass>> resources)
         {
             var entries = new List<MoveDamageClassEntry>();

@@ -20,17 +20,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets the descriptions of the move category.
         /// </summary>
         public List<LocalString> Descriptions { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the move category entry.
-        /// </summary>
-        public EntryRef<MoveCategoryEntry> ToRef()
-        {
-            return new EntryRef<MoveCategoryEntry>
-            {
-                Key = MoveCategoryId,
-                Name = Name,
-            };
-        }
     }
 }

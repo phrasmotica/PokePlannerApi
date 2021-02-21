@@ -59,9 +59,9 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 SpriteUrl = GetSpriteUrl(resource),
                 ShinySpriteUrl = GetShinySpriteUrl(resource),
                 DisplayNames = displayNames.ToList(),
-                Forms = forms.Select(e => e.ToRef()).ToList(),
+                Forms = forms.ToList(),
                 Types = types.ToList(),
-                Abilities = abilities.Select(e => e.ToRef()).ToList(),
+                Abilities = abilities.ToList(),
                 BaseStats = baseStats,
                 Moves = moves.ToList(),
                 HeldItems = heldItems.ToList()
@@ -109,17 +109,17 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the types of the given Pokemon in past version groups, if any.
         /// </summary>
-        private async Task<List<WithId<List<EntryRef<TypeEntry>>>>> GetTypes(Pokemon pokemon)
+        private async Task<List<WithId<List<TypeEntry>>>> GetTypes(Pokemon pokemon)
         {
-            var typesList = new List<WithId<List<EntryRef<TypeEntry>>>>();
+            var typesList = new List<WithId<List<TypeEntry>>>();
 
             var newestId = await _versionGroupService.GetNewestVersionGroupId();
             var newestTypeEntries = await _typeService.Get(pokemon.Types.Select(t => t.Type));
 
             typesList.Add(
-                new WithId<List<EntryRef<TypeEntry>>>(
+                new WithId<List<TypeEntry>>(
                     newestId,
-                    newestTypeEntries.Select(e => e.ToRef()).ToList()
+                    newestTypeEntries.ToList()
                 )
             );
 
@@ -147,17 +147,17 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the moves of the given Pokemon.
         /// </summary>
-        private async Task<IEnumerable<WithId<List<EntryRef<MoveEntry>>>>> GetMoves(Pokemon pokemon)
+        private async Task<IEnumerable<WithId<List<MoveEntry>>>> GetMoves(Pokemon pokemon)
         {
-            var movesList = new List<WithId<List<EntryRef<MoveEntry>>>>();
+            var movesList = new List<WithId<List<MoveEntry>>>();
 
             var versionGroups = await _versionGroupService.GetAll();
             foreach (var vg in versionGroups)
             {
                 var moves = await GetMoves(pokemon, vg);
-                var movesEntry = new WithId<List<EntryRef<MoveEntry>>>(
+                var movesEntry = new WithId<List<MoveEntry>>(
                     vg.VersionGroupId,
-                    moves.Select(e => e.ToRef()).ToList()
+                    moves.ToList()
                 );
 
                 movesList.Add(movesEntry);

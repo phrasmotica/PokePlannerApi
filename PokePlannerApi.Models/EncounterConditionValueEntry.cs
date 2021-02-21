@@ -20,17 +20,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets the display names of the encounter condition value.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the encounter condition value entry.
-        /// </summary>
-        public EntryRef<EncounterConditionValueEntry> ToRef()
-        {
-            return new EntryRef<EncounterConditionValueEntry>
-            {
-                Key = EncounterConditionValueId,
-                Name = Name,
-            };
-        }
     }
 }

@@ -274,7 +274,6 @@ namespace PokePlannerApi.Tests.DataStore.Converters
                 encounterConditionValueService.Object,
                 encounterMethodService.Object,
                 null,
-                null,
                 versionService.Object,
                 null
             );

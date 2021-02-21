@@ -32,11 +32,6 @@ namespace PokePlannerApi.Data.DataStore.Services
             return resource is null ? null : await Get(resource.Name);
         }
 
-        public async Task<MoveLearnMethodEntry> Get(EntryRef<MoveLearnMethodEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
         public async Task<MoveLearnMethodEntry[]> Get(IEnumerable<NamedApiResource<MoveLearnMethod>> resources)
         {
             var entries = new List<MoveLearnMethodEntry>();

@@ -25,17 +25,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets whether this stat is a battle-only stat.
         /// </summary>
         public bool IsBattleOnly { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the stat entry.
-        /// </summary>
-        public EntryRef<StatEntry> ToRef()
-        {
-            return new EntryRef<StatEntry>
-            {
-                Key = StatId,
-                Name = Name,
-            };
-        }
     }
 }

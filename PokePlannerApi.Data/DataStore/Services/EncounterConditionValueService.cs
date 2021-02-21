@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<EncounterConditionValueEntry> Get(EntryRef<EncounterConditionValueEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<EncounterConditionValueEntry[]> Get(IEnumerable<NamedApiResource<EncounterConditionValue>> resources)
         {
             var entries = new List<EncounterConditionValueEntry>();

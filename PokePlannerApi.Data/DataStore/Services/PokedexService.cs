@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<PokedexEntry> Get(EntryRef<PokedexEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<PokedexEntry[]> Get(IEnumerable<NamedApiResource<Pokedex>> resources)
         {
             var entries = new List<PokedexEntry>();

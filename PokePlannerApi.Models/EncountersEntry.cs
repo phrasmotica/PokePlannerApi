@@ -20,17 +20,6 @@ namespace PokePlannerApi.Models
         /// Gets or sets the encounters indexed by version group ID.
         /// </summary>
         public List<WithId<List<EncounterEntry>>> Encounters { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the encounters entry.
-        /// </summary>
-        public EntryRef<EncountersEntry> ToRef()
-        {
-            return new EntryRef<EncountersEntry>
-            {
-                Key = PokemonId,
-            };
-        }
     }
 
     /// <summary>

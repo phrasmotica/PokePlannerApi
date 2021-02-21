@@ -29,7 +29,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the version group in which this form was introduced.
         /// </summary>
-        public EntryRef<VersionGroupEntry> VersionGroup { get; set; }
+        public VersionGroupEntry VersionGroup { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon form's display names.
@@ -49,24 +49,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon form's types, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EntryRef<TypeEntry>>>> Types { get; set; }
+        public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon form is valid.
-        /// TODO: change to NamedEntryRef
         /// </summary>
         public List<int> Validity { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the Pokemon form entry.
-        /// </summary>
-        public EntryRef<PokemonFormEntry> ToRef()
-        {
-            return new EntryRef<PokemonFormEntry>
-            {
-                Key = PokemonFormId,
-                Name = Name,
-            };
-        }
     }
 }

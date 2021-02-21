@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<MoveEntry> Get(EntryRef<MoveEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<MoveEntry[]> Get(IEnumerable<NamedApiResource<Move>> resources)
         {
             var entries = new List<MoveEntry>();

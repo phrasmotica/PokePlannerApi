@@ -25,18 +25,6 @@ namespace PokePlannerApi.Models
         /// Gets or sets the flavour text entries of the ability, indexed by version group ID.
         /// </summary>
         public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the ability entry.
-        /// </summary>
-        public EntryRef<AbilityEntry> ToRef()
-        {
-            return new EntryRef<AbilityEntry>
-            {
-                Key = AbilityId,
-                Name = Name,
-            };
-        }
     }
 
     /// <summary>

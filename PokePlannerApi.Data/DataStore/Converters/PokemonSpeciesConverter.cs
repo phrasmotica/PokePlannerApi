@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PokeApiNet;
+using PokePlannerApi.Clients;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Data.Extensions;
 using PokePlannerApi.Models;
@@ -11,20 +12,20 @@ namespace PokePlannerApi.Data.DataStore.Converters
 {
     public class PokemonSpeciesConverter : IResourceConverter<PokemonSpecies, PokemonSpeciesEntry>
     {
-        private readonly EvolutionChainService _evolutionChainService;
+        private readonly IPokeApi _pokeApi;
         private readonly GenerationService _generationService;
         private readonly PokemonService _pokemonService;
         private readonly VersionGroupService _versionGroupService;
         private readonly VersionService _versionService;
 
         public PokemonSpeciesConverter(
-            EvolutionChainService evolutionChainService,
+            IPokeApi pokeApi,
             GenerationService generationService,
             PokemonService pokemonService,
             VersionGroupService versionGroupService,
             VersionService versionService)
         {
-            _evolutionChainService = evolutionChainService;
+            _pokeApi = pokeApi;
             _generationService = generationService;
             _pokemonService = pokemonService;
             _versionGroupService = versionGroupService;
@@ -40,7 +41,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             var flavourTextEntries = await GetFlavourTextEntries(resource);
             var varieties = await GetVarieties(resource);
             var generation = await _generationService.Get(resource.Generation);
-            var evolutionChain = await _evolutionChainService.Get(resource.EvolutionChain);
+            var evolutionChain = await _pokeApi.Get(resource.EvolutionChain);
             var validity = await GetValidity(resource);
 
             return new PokemonSpeciesEntry
@@ -55,8 +56,8 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 Types = primaryVariety.Types.ToList(),
                 BaseStats = primaryVariety.BaseStats.ToList(),
                 Varieties = varieties.ToList(),
-                Generation = generation.ToRef(),
-                EvolutionChain = evolutionChain.ToRef(),
+                Generation = generation,
+                EvolutionChain = evolutionChain,
                 Validity = validity.ToList(),
                 CatchRate = resource.CaptureRate
             };
@@ -93,14 +94,14 @@ namespace PokePlannerApi.Data.DataStore.Converters
         /// <summary>
         /// Returns the Pokemon that this Pokemon species represents.
         /// </summary>
-        private async Task<IEnumerable<EntryRef<PokemonEntry>>> GetVarieties(PokemonSpecies species)
+        private async Task<IEnumerable<PokemonEntry>> GetVarieties(PokemonSpecies species)
         {
-            var varietiesList = new List<EntryRef<PokemonEntry>>();
+            var varietiesList = new List<PokemonEntry>();
 
             foreach (var res in species.Varieties)
             {
                 var pokemon = await _pokemonService.Get(res.Pokemon);
-                varietiesList.Add(pokemon.ToRef());
+                varietiesList.Add(pokemon);
             }
 
             return varietiesList;

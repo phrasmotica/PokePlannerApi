@@ -45,22 +45,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<EvolutionChainEntry> Get(EntryRef<EvolutionChainEntry> entryRef)
-        {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.EvolutionChainId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var evolutionChain = await _pokeApi.Get<EvolutionChain>(entryRef.Key);
-            var newEntry = await _converter.Convert(evolutionChain);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
-        }
-
-        /// <inheritdoc />
         public async Task<EvolutionChainEntry[]> Get(IEnumerable<ApiResource<EvolutionChain>> resources)
         {
             var entries = new List<EvolutionChainEntry>();

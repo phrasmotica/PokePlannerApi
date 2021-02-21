@@ -17,17 +17,6 @@
         /// <summary>
         /// Gets or sets the item this machine represents.
         /// </summary>
-        public EntryRef<ItemEntry> Item { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the machine entry.
-        /// </summary>
-        public EntryRef<MachineEntry> ToRef()
-        {
-            return new EntryRef<MachineEntry>
-            {
-                Key = MachineId,
-            };
-        }
+        public ItemEntry Item { get; set; }
     }
 }

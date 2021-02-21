@@ -20,17 +20,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets the display names of the version.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the version entry.
-        /// </summary>
-        public EntryRef<VersionEntry> ToRef()
-        {
-            return new EntryRef<VersionEntry>
-            {
-                Key = VersionId,
-                Name = Name,
-            };
-        }
     }
 }

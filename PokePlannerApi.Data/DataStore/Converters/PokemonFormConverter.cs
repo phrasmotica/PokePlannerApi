@@ -34,11 +34,11 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 Name = resource.Name,
                 FormName = resource.FormName,
                 IsMega = resource.IsMega,
-                VersionGroup = versionGroup.ToRef(),
+                VersionGroup = versionGroup,
                 DisplayNames = resource.Names.Localise().ToList(),
                 SpriteUrl = GetSpriteUrl(resource),
                 ShinySpriteUrl = GetShinySpriteUrl(resource),
-                Types = new List<WithId<List<EntryRef<TypeEntry>>>>(),
+                Types = new List<WithId<List<TypeEntry>>>(),
                 Validity = validity.ToList()
             };
         }

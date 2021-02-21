@@ -20,17 +20,5 @@ namespace PokePlannerApi.Models
         /// Gets or sets the display names of the generation.
         /// </summary>
         public List<LocalString> DisplayNames { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the generation entry.
-        /// </summary>
-        public EntryRef<GenerationEntry> ToRef()
-        {
-            return new EntryRef<GenerationEntry>
-            {
-                Key = GenerationId,
-                Name = Name,
-            };
-        }
     }
 }

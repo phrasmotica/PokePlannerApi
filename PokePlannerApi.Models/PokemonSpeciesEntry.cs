@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PokeApiNet;
 
 namespace PokePlannerApi.Models
 {
@@ -44,7 +45,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the types of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EntryRef<TypeEntry>>>> Types { get; set; }
+        public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the base stats of this species' primary variety, indexed by version group ID.
@@ -54,21 +55,20 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
         /// </summary>
-        public List<EntryRef<PokemonEntry>> Varieties { get; set; }
+        public List<PokemonEntry> Varieties { get; set; }
 
         /// <summary>
         /// Gets or sets the generation in which this species was introduced.
         /// </summary>
-        public EntryRef<GenerationEntry> Generation { get; set; }
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the species' evolution chain.
         /// </summary>
-        public EntryRef<EvolutionChainEntry> EvolutionChain { get; set; }
+        public EvolutionChain EvolutionChain { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon species is valid.
-        /// TODO: change to NamedEntryRef
         /// </summary>
         public List<int> Validity { get; set; }
 
@@ -78,14 +78,19 @@ namespace PokePlannerApi.Models
         public int CatchRate { get; set; }
 
         /// <summary>
-        /// Returns a reference to the Pokemon species entry.
+        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
         /// </summary>
-        public EntryRef<PokemonSpeciesEntry> ToRef()
+        public PokemonSpeciesEntry ForEvolutionChain()
         {
-            return new EntryRef<PokemonSpeciesEntry>
+            return new PokemonSpeciesEntry
             {
-                Key = PokemonSpeciesId,
+                Key = Key,
                 Name = Name,
+                SpriteUrl = SpriteUrl,
+                ShinySpriteUrl = ShinySpriteUrl,
+                DisplayNames = DisplayNames,
+                Generation = Generation,
+                Validity = Validity
             };
         }
     }

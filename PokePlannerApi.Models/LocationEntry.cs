@@ -22,14 +22,15 @@ namespace PokePlannerApi.Models
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
-        /// Returns a reference to the location entry.
+        /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
         /// </summary>
-        public EntryRef<LocationEntry> ToRef()
+        public LocationEntry ForEvolutionChain()
         {
-            return new EntryRef<LocationEntry>
+            return new LocationEntry
             {
-                Key = LocationId,
+                LocationId = LocationId,
                 Name = Name,
+                DisplayNames = DisplayNames
             };
         }
     }

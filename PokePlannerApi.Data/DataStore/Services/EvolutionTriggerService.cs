@@ -34,12 +34,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<EvolutionTriggerEntry> Get(EntryRef<EvolutionTriggerEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<EvolutionTriggerEntry[]> Get(IEnumerable<NamedApiResource<EvolutionTrigger>> resources)
         {
             var entries = new List<EvolutionTriggerEntry>();

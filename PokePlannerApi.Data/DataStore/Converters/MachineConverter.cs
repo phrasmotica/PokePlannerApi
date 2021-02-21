@@ -23,7 +23,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             {
                 MachineId = resource.Id,
                 Name = resource.Id.ToString(),
-                Item = item.ToRef(),
+                Item = item,
             };
         }
     }

@@ -45,22 +45,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<MachineEntry> Get(EntryRef<MachineEntry> entryRef)
-        {
-            var (hasEntry, entry) = await _dataSource.HasOne(e => e.MachineId == entryRef.Key);
-            if (hasEntry)
-            {
-                return entry;
-            }
-
-            var machine = await _pokeApi.Get<Machine>(entryRef.Key);
-            var newEntry = await _converter.Convert(machine);
-            await _dataSource.Create(newEntry);
-
-            return newEntry;
-        }
-
-        /// <inheritdoc />
         public async Task<MachineEntry[]> Get(IEnumerable<ApiResource<Machine>> resources)
         {
             var entries = new List<MachineEntry>();

@@ -37,9 +37,9 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 Name = resource.Name,
                 Order = resource.Order,
                 DisplayNames = displayNames.ToList(),
-                Generation = generation.ToRef(),
-                Versions = versions.Select(v => v.ToRef()).ToList(),
-                Pokedexes = pokedexes.Select(p => p.ToRef()).ToList(),
+                Generation = generation,
+                Versions = versions.ToList(),
+                Pokedexes = pokedexes.ToList(),
             };
         }
 

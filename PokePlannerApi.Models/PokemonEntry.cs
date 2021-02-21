@@ -34,17 +34,17 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon's forms.
         /// </summary>
-        public List<EntryRef<PokemonFormEntry>> Forms { get; set; }
+        public List<PokemonFormEntry> Forms { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's types, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EntryRef<TypeEntry>>>> Types { get; set; }
+        public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's abilities.
         /// </summary>
-        public List<EntryRef<AbilityEntry>> Abilities { get; set; }
+        public List<AbilityEntry> Abilities { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's base stats indexed by version group ID.
@@ -54,23 +54,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon's moves indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EntryRef<MoveEntry>>>> Moves { get; set; }
+        public List<WithId<List<MoveEntry>>> Moves { get; set; }
 
         /// <summary>
         /// Gets or sets the held items this Pokemon may bear in a wild encounter, indexed by version ID.
         /// </summary>
         public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; }
-
-        /// <summary>
-        /// Returns a reference to the Pokemon entry.
-        /// </summary>
-        public EntryRef<PokemonEntry> ToRef()
-        {
-            return new EntryRef<PokemonEntry>
-            {
-                Key = PokemonId,
-                Name = Name,
-            };
-        }
     }
 }

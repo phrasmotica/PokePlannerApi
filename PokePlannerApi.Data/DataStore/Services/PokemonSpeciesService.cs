@@ -39,12 +39,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<PokemonSpeciesEntry> Get(EntryRef<PokemonSpeciesEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<PokemonSpeciesEntry[]> Get(IEnumerable<NamedApiResource<PokemonSpecies>> resources)
         {
             var entries = new List<PokemonSpeciesEntry>();
@@ -122,7 +116,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public async Task<PokemonEntry[]> GetPokemonSpeciesVarieties(int speciesId, int versionGroupId)
         {
             var entry = await Get(speciesId);
-            return await _pokemonService.Get(entry.Varieties);
+            return entry.Varieties.ToArray();
         }
 
         /// <summary>
@@ -137,8 +131,8 @@ namespace PokePlannerApi.Data.DataStore.Services
 
             foreach (var varietyEntry in speciesEntry.Varieties)
             {
-                var formsList = await _pokemonService.GetPokemonForms(varietyEntry.Key, versionGroupId);
-                formsListList.Add(new WithId<List<PokemonFormEntry>>(varietyEntry.Key, formsList));
+                var formsList = await _pokemonService.GetPokemonForms(varietyEntry.PokemonId, versionGroupId);
+                formsListList.Add(new WithId<List<PokemonFormEntry>>(varietyEntry.PokemonId, formsList));
             }
 
             return formsListList;

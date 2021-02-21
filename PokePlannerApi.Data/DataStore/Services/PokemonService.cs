@@ -59,12 +59,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <inheritdoc />
-        public async Task<PokemonEntry> Get(EntryRef<PokemonEntry> entryRef)
-        {
-            return entryRef is null ? null : await Get(entryRef.Name);
-        }
-
-        /// <inheritdoc />
         public async Task<PokemonEntry[]> Get(IEnumerable<NamedApiResource<Pokemon>> resources)
         {
             var entries = new List<PokemonEntry>();
@@ -97,22 +91,6 @@ namespace PokePlannerApi.Data.DataStore.Services
         }
 
         /// <summary>
-        /// Returns the Pokemon in the given reference objects.
-        /// </summary>
-        /// <param name="entryRefs">The reference objects.</param>
-        public async Task<PokemonEntry[]> Get(IEnumerable<EntryRef<PokemonEntry>> entryRefs)
-        {
-            var varietiesList = new List<PokemonEntry>();
-
-            foreach (var er in entryRefs)
-            {
-                varietiesList.Add(await Get(er));
-            }
-
-            return varietiesList.ToArray();
-        }
-
-        /// <summary>
         /// Returns the abilities of the Pokemon with the given ID.
         /// </summary>
         public async Task<PokemonAbilityContext[]> GetPokemonAbilities(int pokemonId)
@@ -134,8 +112,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public async Task<List<PokemonFormEntry>> GetPokemonForms(int pokemonId, int versionGroupId)
         {
             var entry = await Get(pokemonId);
-            var formEntries = await _pokemonFormService.Get(entry.Forms);
-            return formEntries.OrderBy(f => f.PokemonFormId).ToList();
+            return entry.Forms.OrderBy(f => f.PokemonFormId).ToList();
         }
 
         public async Task<PokemonMoveContext[]> GetPokemonMoves(int pokemonId, int versionGroupId)
@@ -173,18 +150,10 @@ namespace PokePlannerApi.Data.DataStore.Services
 
                     if (method.Name == "machine")
                     {
-                        var machineRefs = moveEntry.Machines.SingleOrDefault(m => m.Id == versionGroupId)?.Data;
-                        if (machineRefs.Any())
+                        var machines = moveEntry.Machines.SingleOrDefault(m => m.Id == versionGroupId)?.Data;
+                        if (machines.Any())
                         {
-                            var machineItems = new List<ItemEntry>();
-
-                            foreach (var mr in machineRefs)
-                            {
-                                var machineEntry = await _machineService.Get(mr);
-                                var machineItem = await _itemService.Get(machineEntry.Item);
-                                machineItems.Add(machineItem);
-                            }
-
+                            var machineItems = machines.Select(mr => mr.Item).ToList();
                             context.LearnMachines = machineItems;
                         }
                     }
