@@ -58,7 +58,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
             // enumerate version groups spanned by this Pokemon's encounters
             var encounters = await _pokeApi.GetEncounters(pokemon);
             var versions = await _versionService.Get(encounters.GetDistinctVersions());
-            var versionGroups = await _versionGroupService.UpsertManyByVersionIds(versions.Select(v => v.VersionId));
+            var versionGroups = await _versionGroupService.GetByVersionIds(versions.Select(v => v.VersionId));
 
             foreach (var vg in versionGroups)
             {

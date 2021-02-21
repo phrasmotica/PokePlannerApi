@@ -115,7 +115,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <summary>
         /// Returns the version groups spanned by the set of version IDs.
         /// </summary>
-        public async Task<VersionGroupEntry[]> UpsertManyByVersionIds(IEnumerable<int> versionIds)
+        public async Task<VersionGroupEntry[]> GetByVersionIds(IEnumerable<int> versionIds)
         {
             var allVersionGroups = await GetAll();
             var relevantVersionGroups = allVersionGroups.Where(vg =>
