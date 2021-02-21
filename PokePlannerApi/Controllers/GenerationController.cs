@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Models;
@@ -22,6 +23,7 @@ namespace PokePlannerApi.Controllers
         /// <summary>
         /// Returns all generations.
         /// </summary>
+        [HttpGet]
         public async Task<GenerationEntry[]> GetGenerations()
         {
             _logger.LogInformation("Getting generations...");

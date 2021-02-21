@@ -24,6 +24,7 @@ namespace PokePlannerApi.Controllers
         /// <summary>
         /// Returns all Pokemon species, optionally up to the given limit from the given offset.
         /// </summary>
+        [HttpGet]
         public async Task<PokemonSpeciesEntry[]> GetPokemonSpecies(int? limit = null, int? offset = null)
         {
             if (limit.HasValue)

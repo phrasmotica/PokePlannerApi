@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Models;
@@ -22,6 +23,7 @@ namespace PokePlannerApi.Controllers
         /// <summary>
         /// Returns all concrete types.
         /// </summary>
+        [HttpGet]
         public async Task<TypeEntry[]> GetConcreteTypes()
         {
             _logger.LogInformation($"Getting concrete types...");
