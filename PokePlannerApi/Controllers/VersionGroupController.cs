@@ -23,10 +23,9 @@ namespace PokePlannerApi.Controllers
         /// <summary>
         /// Returns all version groups.
         /// </summary>
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<VersionGroupEntry[]> GetVersionGroups()
         {
-            _logger.LogInformation("VersionGroupController: getting version groups...");
             return await _versionGroupService.GetAll();
         }
     }
