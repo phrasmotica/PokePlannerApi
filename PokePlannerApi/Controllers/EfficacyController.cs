@@ -36,19 +36,7 @@ namespace PokePlannerApi.Controllers
         [HttpGet("{versionGroupId:int}/{type1Id:int}/{type2Id:int}")]
         public async Task<EfficacySet> GetEfficacySet(int versionGroupId, int type1Id, int type2Id)
         {
-            _logger.LogInformation($"Getting efficacy for types {type1Id}/{type2Id} in version group {versionGroupId}...");
             return await _efficacyService.GetEfficacySet(new[] { type1Id, type2Id }, versionGroupId);
-        }
-
-        /// <summary>
-        /// Returns the efficacy of the Pokemon with the given ID in the version
-        /// group with the given ID.
-        /// </summary>
-        [HttpGet("{pokemonId:int}/{versionGroupId:int}")]
-        public async Task<EfficacySet> GetEfficacySetByPokemonId(int pokemonId, int versionGroupId)
-        {
-            _logger.LogInformation($"Getting efficacy for Pokemon {pokemonId} in version group {versionGroupId}...");
-            return await _efficacyService.GetEfficacySetByPokemonId(pokemonId, versionGroupId);
         }
     }
 }

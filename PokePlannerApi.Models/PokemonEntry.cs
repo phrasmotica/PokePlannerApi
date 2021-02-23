@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace PokePlannerApi.Models
 {
@@ -60,5 +61,16 @@ namespace PokePlannerApi.Models
         /// Gets or sets the held items this Pokemon may bear in a wild encounter, indexed by version ID.
         /// </summary>
         public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; }
+
+        /// <summary>
+        /// Returns the Pokemon's types in the version group with the given ID.
+        /// </summary>
+        public List<TypeEntry> GetTypes(int versionGroupId)
+        {
+            return Types.OrderBy(e => e.Id)
+                        .Where(e => e.Id >= versionGroupId)
+                        .First()
+                        .Data;
+        }
     }
 }

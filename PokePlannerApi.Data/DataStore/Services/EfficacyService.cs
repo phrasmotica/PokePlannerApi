@@ -70,7 +70,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         public async Task<EfficacySet> GetEfficacySetByPokemonId(int pokemonId, int versionGroupId)
         {
             var pokemon = await _pokemonService.Get(pokemonId);
-            var types = pokemon.Types.SingleOrDefault(e => e.Id == versionGroupId)?.Data;
+            var types = pokemon.GetTypes(versionGroupId);
             return await GetEfficacySet(types.Select(t => t.TypeId), versionGroupId);
         }
 

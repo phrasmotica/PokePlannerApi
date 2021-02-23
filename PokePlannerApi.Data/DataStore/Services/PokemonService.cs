@@ -21,11 +21,8 @@ namespace PokePlannerApi.Data.DataStore.Services
         private readonly IResourceConverter<Pokemon, PokemonEntry> _converter;
         private readonly IDataStoreSource<PokemonEntry> _dataSource;
         private readonly AbilityService _abilityService;
-        private readonly ItemService _itemService;
-        private readonly MachineService _machineService;
         private readonly MoveLearnMethodService _moveLearnMethodService;
         private readonly MoveService _moveService;
-        private readonly PokemonFormService _pokemonFormService;
         private readonly VersionGroupService _versionGroupService;
 
         public PokemonService(
@@ -33,22 +30,16 @@ namespace PokePlannerApi.Data.DataStore.Services
             IResourceConverter<Pokemon, PokemonEntry> converter,
             IDataStoreSource<PokemonEntry> dataSource,
             AbilityService abilityService,
-            ItemService itemService,
-            MachineService machineService,
             MoveLearnMethodService moveLearnMethodService,
             MoveService moveService,
-            PokemonFormService pokemonFormService,
             VersionGroupService versionGroupService)
         {
             _pokeApi = pokeApi;
             _converter = converter;
             _dataSource = dataSource;
             _abilityService = abilityService;
-            _itemService = itemService;
-            _machineService = machineService;
             _moveLearnMethodService = moveLearnMethodService;
             _moveService = moveService;
-            _pokemonFormService = pokemonFormService;
             _versionGroupService = versionGroupService;
         }
 
