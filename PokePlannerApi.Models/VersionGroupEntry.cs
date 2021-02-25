@@ -24,21 +24,21 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the version group.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the generation the version group belongs to.
         /// </summary>
-        public GenerationEntry Generation { get; set; }
+        public GenerationEntry Generation { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the versions belonging to the version group.
         /// </summary>
-        public List<VersionEntry> Versions { get; set; }
+        public List<VersionEntry> Versions { get; set; } = new List<VersionEntry>();
 
         /// <summary>
         /// Gets or sets the pokedexes present in the version group.
         /// </summary>
-        public List<PokedexEntry> Pokedexes { get; set; }
+        public List<PokedexEntry> Pokedexes { get; set; } = new List<PokedexEntry>();
     }
 }

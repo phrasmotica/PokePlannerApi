@@ -19,22 +19,22 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the move.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the flavour text entries of the move, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; } = new List<WithId<List<LocalString>>>();
 
         /// <summary>
         /// Gets or sets the type of the move.
         /// </summary>
-        public TypeEntry Type { get; set; }
+        public TypeEntry Type { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the category of the move.
         /// </summary>
-        public MoveCategoryEntry Category { get; set; }
+        public MoveCategoryEntry Category { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the move's base power.
@@ -44,7 +44,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the damage class of the move.
         /// </summary>
-        public MoveDamageClassEntry DamageClass { get; set; }
+        public MoveDamageClassEntry DamageClass { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the move's accuracy.
@@ -64,12 +64,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's target.
         /// </summary>
-        public MoveTargetEntry Target { get; set; }
+        public MoveTargetEntry Target { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the machines that teach the move, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<MachineEntry>>> Machines { get; set; }
+        public List<WithId<List<MachineEntry>>> Machines { get; set; } = new List<WithId<List<MachineEntry>>>();
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
@@ -98,12 +98,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the machines that teach the move, if applicable.
         /// </summary>
-        public List<ItemEntry> LearnMachines { get; set; }
+        public List<ItemEntry> LearnMachines { get; set; } = new List<ItemEntry>();
 
         /// <summary>
         /// Gets or sets the methods by which the move is learnt.
         /// </summary>
-        public List<MoveLearnMethodEntry> Methods { get; set; }
+        public List<MoveLearnMethodEntry> Methods { get; set; } = new List<MoveLearnMethodEntry>();
 
         /// <summary>
         /// Converts an move entry into an move context instance.

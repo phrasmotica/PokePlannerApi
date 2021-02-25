@@ -17,6 +17,6 @@
         /// <summary>
         /// Gets or sets the item this machine represents.
         /// </summary>
-        public ItemEntry Item { get; set; }
+        public ItemEntry Item { get; set; } = default!;
     }
 }

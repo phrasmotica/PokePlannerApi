@@ -15,7 +15,7 @@ namespace PokePlannerApi.Models
         /// </summary>
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the key of the entry.
@@ -25,7 +25,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the name of the entry.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// Gets the time that the entry was created.

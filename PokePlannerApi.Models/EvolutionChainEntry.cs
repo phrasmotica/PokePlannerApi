@@ -19,7 +19,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the evolution chain link.
         /// </summary>
-        public ChainLinkEntry Chain { get; set; }
+        public ChainLinkEntry Chain { get; set; } = default!;
     }
 
     /// <summary>
@@ -35,17 +35,17 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// The Pokemon species at this stage of the evolution chain.
         /// </summary>
-        public PokemonSpeciesEntry Species { get; set; }
+        public PokemonSpeciesEntry Species { get; set; } = default!;
 
         /// <summary>
         /// All details regarding the specific details of the referenced species evolution.
         /// </summary>
-        public List<EvolutionDetailEntry> EvolutionDetails { get; set; }
+        public List<EvolutionDetailEntry> EvolutionDetails { get; set; } = new List<EvolutionDetailEntry>();
 
         /// <summary>
         /// A list of chain objects.
         /// </summary>
-        public List<ChainLinkEntry> EvolvesTo { get; set; }
+        public List<ChainLinkEntry> EvolvesTo { get; set; } = new List<ChainLinkEntry>();
     }
 
     /// <summary>
@@ -56,12 +56,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the item required to cause evolution into this species.
         /// </summary>
-        public ItemEntry Item { get; set; }
+        public ItemEntry Item { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the type of event that triggers evolution into this species.
         /// </summary>
-        public EvolutionTriggerEntry Trigger { get; set; }
+        public EvolutionTriggerEntry Trigger { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the ID of the gender of the evolving Pokémon species must be in order to
@@ -73,24 +73,24 @@ namespace PokePlannerApi.Models
         /// Gets or sets the item the evolving species must be holding during the evolution trigger
         /// event to evolve into this species.
         /// </summary>
-        public ItemEntry HeldItem { get; set; }
+        public ItemEntry HeldItem { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the move that must be known by the evolving species during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public MoveEntry KnownMove { get; set; }
+        public MoveEntry KnownMove { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the evolving species must know a move with this type during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public TypeEntry KnownMoveType { get; set; }
+        public TypeEntry KnownMoveType { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the location the evolution must be triggered at.
         /// </summary>
-        public LocationEntry Location { get; set; }
+        public LocationEntry Location { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the minimum required level of the evolving Pokémon species to evolve into
@@ -126,13 +126,13 @@ namespace PokePlannerApi.Models
         /// Gets or sets the species that must be in the players party in order for the evolving
         /// species to evolve into this species.
         /// </summary>
-        public PokemonSpeciesEntry PartySpecies { get; set; }
+        public PokemonSpeciesEntry PartySpecies { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the type of Pokemon the player must have in their party during the
         /// evolution trigger event in order for the evolving species to evolve into this species.
         /// </summary>
-        public TypeEntry PartyType { get; set; }
+        public TypeEntry PartyType { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the required relation between the Pokémon's Attack and Defense stats:
@@ -145,12 +145,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the required time of day: day or night.
         /// </summary>
-        public string TimeOfDay { get; set; }
+        public string TimeOfDay { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the species for which this one must be traded.
         /// </summary>
-        public PokemonSpeciesEntry TradeSpecies { get; set; }
+        public PokemonSpeciesEntry TradeSpecies { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets whether or not the 3DS needs to be turned upside-down as this Pokemon

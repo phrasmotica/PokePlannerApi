@@ -19,7 +19,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the encounters indexed by version group ID.
         /// </summary>
-        public List<WithId<List<EncounterEntry>>> Encounters { get; set; }
+        public List<WithId<List<EncounterEntry>>> Encounters { get; set; } = new List<WithId<List<EncounterEntry>>>();
     }
 
     /// <summary>
@@ -35,12 +35,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the encounter.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the details of the encounter indexed by version ID.
         /// </summary>
-        public List<WithId<List<EncounterMethodDetails>>> Details { get; set; }
+        public List<WithId<List<EncounterMethodDetails>>> Details { get; set; } = new List<WithId<List<EncounterMethodDetails>>>();
     }
 
     /// <summary>
@@ -51,12 +51,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the encounter method.
         /// </summary>
-        public EncounterMethodEntry Method { get; set; }
+        public EncounterMethodEntry Method { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the condition values details.
         /// </summary>
-        public List<ConditionValuesDetail> ConditionValuesDetails { get; set; }
+        public List<ConditionValuesDetail> ConditionValuesDetails { get; set; } = new List<ConditionValuesDetail>();
     }
 
     /// <summary>
@@ -67,12 +67,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the condition values required for the encounters to occur.
         /// </summary>
-        public List<EncounterConditionValueEntry> ConditionValues { get; set; }
+        public List<EncounterConditionValueEntry> ConditionValues { get; set; } = new List<EncounterConditionValueEntry>();
 
         /// <summary>
         /// Gets or sets the encounter details.
         /// </summary>
-        public List<EncounterDetailEntry> EncounterDetails { get; set; }
+        public List<EncounterDetailEntry> EncounterDetails { get; set; } = new List<EncounterDetailEntry>();
     }
 
     /// <summary>

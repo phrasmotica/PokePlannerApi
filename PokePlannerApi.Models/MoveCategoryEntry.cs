@@ -19,6 +19,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the descriptions of the move category.
         /// </summary>
-        public List<LocalString> Descriptions { get; set; }
+        public List<LocalString> Descriptions { get; set; } = new List<LocalString>();
     }
 }

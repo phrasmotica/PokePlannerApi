@@ -19,12 +19,12 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the ability.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the flavour text entries of the ability, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; } = new List<WithId<List<LocalString>>>();
     }
 
     /// <summary>

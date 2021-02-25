@@ -19,11 +19,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the move learn method.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the descriptions of the move learn method.
         /// </summary>
-        public List<LocalString> Descriptions { get; set; }
+        public List<LocalString> Descriptions { get; set; } = new List<LocalString>();
     }
 }

@@ -24,6 +24,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the encounter method.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
     }
 }

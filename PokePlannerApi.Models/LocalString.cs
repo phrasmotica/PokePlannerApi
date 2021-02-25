@@ -8,11 +8,11 @@
         /// <summary>
         /// The language of the string.
         /// </summary>
-        public string Language { get; set; }
+        public string Language { get; set; } = default!;
 
         /// <summary>
         /// The string to display.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = default!;
     }
 }

@@ -19,7 +19,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the item.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.

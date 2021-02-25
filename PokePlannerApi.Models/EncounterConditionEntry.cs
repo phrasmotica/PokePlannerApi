@@ -19,11 +19,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the encounter condition.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets the possible values of the encounter condition.
         /// </summary>
-        public List<EncounterConditionValueEntry> Values { get; set; }
+        public List<EncounterConditionValueEntry> Values { get; set; } = new List<EncounterConditionValueEntry>();
     }
 }

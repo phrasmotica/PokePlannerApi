@@ -20,7 +20,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this type's efficacy indexed by version group ID and then type ID.
         /// </summary>
-        public List<WithId<EfficacySet>> EfficacySets { get; set; }
+        public List<WithId<EfficacySet>> EfficacySets { get; set; } = new List<WithId<EfficacySet>>();
 
         /// <summary>
         /// Constructor.
@@ -58,7 +58,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the efficacy multipliers.
         /// </summary>
-        public List<WithId<double>> EfficacyMultipliers { get; set; }
+        public List<WithId<double>> EfficacyMultipliers { get; set; } = new List<WithId<double>>();
 
         /// <summary>
         /// Constructor.

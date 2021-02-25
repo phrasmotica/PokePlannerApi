@@ -19,7 +19,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the type's display names.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; }
+        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
 
         /// <summary>
         /// Gets or sets whether the type is concrete.
@@ -29,7 +29,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the generation in which the type was introduced.
         /// </summary>
-        public GenerationEntry Generation { get; set; }
+        public GenerationEntry Generation { get; set; } = default!;
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.
