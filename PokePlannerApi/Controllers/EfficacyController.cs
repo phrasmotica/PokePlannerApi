@@ -33,10 +33,12 @@ namespace PokePlannerApi.Controllers
         /// Returns the efficacy of the types with the given IDs in the version
         /// group with the given ID.
         /// </summary>
-        [HttpGet("{versionGroupId:int}/{type1Id:int}/{type2Id:int}")]
-        public async Task<EfficacySet> GetEfficacySet(int versionGroupId, int type1Id, int type2Id)
+        [HttpGet]
+        public async Task<EfficacySet> GetEfficacySet(
+            [FromQuery(Name = "versionGroup")] int versionGroupId,
+            [FromQuery(Name = "type")] int[] types)
         {
-            return await _efficacyService.GetEfficacySet(new[] { type1Id, type2Id }, versionGroupId);
+            return await _efficacyService.GetEfficacySet(types, versionGroupId);
         }
     }
 }
