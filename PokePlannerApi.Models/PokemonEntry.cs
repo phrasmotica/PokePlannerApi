@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace PokePlannerApi.Models
@@ -11,6 +12,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon.
         /// </summary>
+        [Required]
         public int PokemonId
         {
             get => Key;
@@ -20,47 +22,56 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon's front default sprite URL.
         /// </summary>
-        public string SpriteUrl { get; set; } = default!;
+        [Required]
+        public string SpriteUrl { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's front shiny sprite URL.
         /// </summary>
-        public string ShinySpriteUrl { get; set; } = default!;
+        [Required]
+        public string ShinySpriteUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the display names of this Pokemon's primary form.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's forms.
         /// </summary>
-        public List<PokemonFormEntry> Forms { get; set; } = new List<PokemonFormEntry>();
+        [Required]
+        public List<PokemonFormEntry> Forms { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's types, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<TypeEntry>>> Types { get; set; } = new List<WithId<List<TypeEntry>>>();
+        [Required]
+        public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's abilities.
         /// </summary>
-        public List<AbilityEntry> Abilities { get; set; } = new List<AbilityEntry>();
+        [Required]
+        public List<AbilityEntry> Abilities { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's base stats indexed by version group ID.
         /// </summary>
-        public List<WithId<List<int>>> BaseStats { get; set; } = new List<WithId<List<int>>>();
+        [Required]
+        public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's moves indexed by version group ID.
         /// </summary>
-        public List<WithId<List<MoveEntry>>> Moves { get; set; } = new List<WithId<List<MoveEntry>>>();
+        [Required]
+        public List<WithId<List<MoveEntry>>> Moves { get; set; }
 
         /// <summary>
         /// Gets or sets the held items this Pokemon may bear in a wild encounter, indexed by version ID.
         /// </summary>
-        public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; } = new List<WithId<List<VersionHeldItemContext>>>();
+        [Required]
+        public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; }
 
         /// <summary>
         /// Returns the Pokemon's types in the version group with the given ID.

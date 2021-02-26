@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace PokePlannerApi.Models
@@ -11,6 +12,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the type whose efficacy this represents.
         /// </summary>
+        [Required]
         public int TypeId
         {
             get => Key;
@@ -20,7 +22,8 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this type's efficacy indexed by version group ID and then type ID.
         /// </summary>
-        public List<WithId<EfficacySet>> EfficacySets { get; set; } = new List<WithId<EfficacySet>>();
+        [Required]
+        public List<WithId<EfficacySet>> EfficacySets { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -58,7 +61,8 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the efficacy multipliers.
         /// </summary>
-        public List<WithId<double>> EfficacyMultipliers { get; set; } = new List<WithId<double>>();
+        [Required]
+        public List<WithId<double>> EfficacyMultipliers { get; set; }
 
         /// <summary>
         /// Constructor.

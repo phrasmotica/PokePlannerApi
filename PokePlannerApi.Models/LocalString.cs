@@ -1,4 +1,6 @@
-﻿namespace PokePlannerApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a localised string.
@@ -8,11 +10,13 @@
         /// <summary>
         /// The language of the string.
         /// </summary>
-        public string Language { get; set; } = default!;
+        [Required]
+        public string Language { get; set; }
 
         /// <summary>
         /// The string to display.
         /// </summary>
-        public string Value { get; set; } = default!;
+        [Required]
+        public string Value { get; set; }
     }
 }

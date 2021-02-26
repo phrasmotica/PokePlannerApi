@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using PokeApiNet;
 
 namespace PokePlannerApi.Models
@@ -11,6 +12,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon species.
         /// </summary>
+        [Required]
         public int PokemonSpeciesId
         {
             get => Key;
@@ -20,61 +22,73 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this species' front default sprite URL.
         /// </summary>
-        public string SpriteUrl { get; set; } = default!;
+        [Required]
+        public string SpriteUrl { get; set; }
 
         /// <summary>
         /// Gets or sets this species' front shiny sprite URL.
         /// </summary>
-        public string ShinySpriteUrl { get; set; } = default!;
+        [Required]
+        public string ShinySpriteUrl { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon species' display names.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon species' genera.
         /// </summary>
-        public List<LocalString> Genera { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> Genera { get; set; }
 
         /// <summary>
         /// Gets or sets the flavour text entries of the species, indexed by version ID.
         /// </summary>
-        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; } = new List<WithId<List<LocalString>>>();
+        [Required]
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
 
         /// <summary>
         /// Gets or sets the types of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<TypeEntry>>> Types { get; set; } = new List<WithId<List<TypeEntry>>>();
+        [Required]
+        public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the base stats of this species' primary variety, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<int>>> BaseStats { get; set; } = new List<WithId<List<int>>>();
+        [Required]
+        public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
         /// </summary>
-        public List<PokemonEntry> Varieties { get; set; } = new List<PokemonEntry>();
+        [Required]
+        public List<PokemonEntry> Varieties { get; set; }
 
         /// <summary>
         /// Gets or sets the generation in which this species was introduced.
         /// </summary>
-        public GenerationEntry Generation { get; set; } = default!;
+        [Required]
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the species' evolution chain.
         /// </summary>
-        public EvolutionChain EvolutionChain { get; set; } = default!;
+        [Required]
+        public EvolutionChain EvolutionChain { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon species is valid.
         /// </summary>
-        public List<int> Validity { get; set; } = new List<int>();
+        [Required]
+        public List<int> Validity { get; set; }
 
         /// <summary>
         /// Gets or sets the catch rate of the species.
         /// </summary>
+        [Required]
         public int CatchRate { get; set; }
 
         /// <summary>

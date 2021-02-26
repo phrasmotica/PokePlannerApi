@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the version group.
         /// </summary>
+        [Required]
         public int VersionGroupId
         {
             get => Key;
@@ -19,26 +21,31 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the order of the version group.
         /// </summary>
+        [Required]
         public int Order { get; set; }
 
         /// <summary>
         /// Gets or sets the display names of the version group.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the generation the version group belongs to.
         /// </summary>
-        public GenerationEntry Generation { get; set; } = default!;
+        [Required]
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Gets or sets the versions belonging to the version group.
         /// </summary>
-        public List<VersionEntry> Versions { get; set; } = new List<VersionEntry>();
+        [Required]
+        public List<VersionEntry> Versions { get; set; }
 
         /// <summary>
         /// Gets or sets the pokedexes present in the version group.
         /// </summary>
-        public List<PokedexEntry> Pokedexes { get; set; } = new List<PokedexEntry>();
+        [Required]
+        public List<PokedexEntry> Pokedexes { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PokePlannerApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents a machine in the data store.
@@ -8,6 +10,7 @@
         /// <summary>
         /// Gets the ID of the machine.
         /// </summary>
+        [Required]
         public int MachineId
         {
             get => Key;
@@ -17,6 +20,7 @@
         /// <summary>
         /// Gets or sets the item this machine represents.
         /// </summary>
-        public ItemEntry Item { get; set; } = default!;
+        [Required]
+        public ItemEntry Item { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the ability.
         /// </summary>
+        [Required]
         public int AbilityId
         {
             get => Key;
@@ -19,12 +21,14 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the ability.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the flavour text entries of the ability, indexed by version group ID.
         /// </summary>
-        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; } = new List<WithId<List<LocalString>>>();
+        [Required]
+        public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
     }
 
     /// <summary>
@@ -35,6 +39,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets whether the ability is hidden.
         /// </summary>
+        [Required]
         public bool IsHidden { get; set; }
 
         /// <summary>

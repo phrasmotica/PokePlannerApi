@@ -43,7 +43,6 @@ namespace PokePlannerApi
 
             services.AddSwaggerGen(c =>
             {
-                c.SupportNonNullableReferenceTypes();
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PokePlannerApi", Version = "v1" });
             });
 

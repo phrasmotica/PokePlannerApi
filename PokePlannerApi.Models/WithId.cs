@@ -1,4 +1,6 @@
-﻿namespace PokePlannerApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PokePlannerApi.Models
 {
     /// <summary>
     /// Represents some data associated with a numeric ID.
@@ -8,11 +10,13 @@
         /// <summary>
         /// Gets or set the ID.
         /// </summary>
+        [Required]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
+        [Required]
         public T Data { get; set; }
 
         /// <summary>

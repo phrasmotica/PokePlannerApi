@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the type.
         /// </summary>
+        [Required]
         public int TypeId
         {
             get => Key;
@@ -19,17 +21,20 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the type's display names.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets whether the type is concrete.
         /// </summary>
+        [Required]
         public bool IsConcrete { get; set; }
 
         /// <summary>
         /// Gets or sets the generation in which the type was introduced.
         /// </summary>
-        public GenerationEntry Generation { get; set; } = default!;
+        [Required]
+        public GenerationEntry Generation { get; set; }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.

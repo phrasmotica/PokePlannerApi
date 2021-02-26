@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the encounter condition.
         /// </summary>
+        [Required]
         public int EncounterConditionId
         {
             get => Key;
@@ -19,11 +21,13 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the encounter condition.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the possible values of the encounter condition.
         /// </summary>
-        public List<EncounterConditionValueEntry> Values { get; set; } = new List<EncounterConditionValueEntry>();
+        [Required]
+        public List<EncounterConditionValueEntry> Values { get; set; }
     }
 }

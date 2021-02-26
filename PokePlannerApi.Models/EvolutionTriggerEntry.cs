@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the evolution trigger.
         /// </summary>
+        [Required]
         public int EvolutionTriggerId
         {
             get => Key;
@@ -19,7 +21,8 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the evolution trigger.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Returns a subset of this entry for use in <see cref="EvolutionChainEntry"/>.

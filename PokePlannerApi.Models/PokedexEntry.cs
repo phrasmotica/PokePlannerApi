@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the pokedex.
         /// </summary>
+        [Required]
         public int PokedexId
         {
             get => Key;
@@ -19,6 +21,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the pokedex.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
     }
 }

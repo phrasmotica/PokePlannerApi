@@ -14,9 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokePlannerApi.Clients", "PokePlannerApi.Clients\PokePlannerApi.Clients.csproj", "{5C2BCDD5-ABB7-4535-9A2A-C8A7BEFFF356}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{16FCB616-8697-4D41-B9A0-86AECF240826}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

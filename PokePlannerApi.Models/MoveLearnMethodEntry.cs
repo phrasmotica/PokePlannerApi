@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the move learn method.
         /// </summary>
+        [Required]
         public int MoveLearnMethodId
         {
             get => Key;
@@ -19,11 +21,13 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the move learn method.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the descriptions of the move learn method.
         /// </summary>
-        public List<LocalString> Descriptions { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> Descriptions { get; set; }
     }
 }

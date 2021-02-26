@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the location area.
         /// </summary>
+        [Required]
         public int LocationAreaId
         {
             get => Key;
@@ -19,11 +21,13 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the location area.
         /// </summary>
-        public List<LocalString> DisplayNames { get; set; } = new List<LocalString>();
+        [Required]
+        public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the location area.
         /// </summary>
-        public LocationEntry Location { get; set; } = default!;
+        [Required]
+        public LocationEntry Location { get; set; }
     }
 }

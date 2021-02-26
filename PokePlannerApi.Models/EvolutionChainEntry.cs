@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -10,6 +11,7 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the evolution chain.
         /// </summary>
+        [Required]
         public int EvolutionChainId
         {
             get => Key;
@@ -19,7 +21,8 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the evolution chain link.
         /// </summary>
-        public ChainLinkEntry Chain { get; set; } = default!;
+        [Required]
+        public ChainLinkEntry Chain { get; set; }
     }
 
     /// <summary>
@@ -30,22 +33,26 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Whether this link is for a baby Pokemon. Only ever true on the base link.
         /// </summary>
+        [Required]
         public bool IsBaby { get; set; }
 
         /// <summary>
         /// The Pokemon species at this stage of the evolution chain.
         /// </summary>
-        public PokemonSpeciesEntry Species { get; set; } = default!;
+        [Required]
+        public PokemonSpeciesEntry Species { get; set; }
 
         /// <summary>
         /// All details regarding the specific details of the referenced species evolution.
         /// </summary>
-        public List<EvolutionDetailEntry> EvolutionDetails { get; set; } = new List<EvolutionDetailEntry>();
+        [Required]
+        public List<EvolutionDetailEntry> EvolutionDetails { get; set; }
 
         /// <summary>
         /// A list of chain objects.
         /// </summary>
-        public List<ChainLinkEntry> EvolvesTo { get; set; } = new List<ChainLinkEntry>();
+        [Required]
+        public List<ChainLinkEntry> EvolvesTo { get; set; }
     }
 
     /// <summary>
@@ -56,83 +63,97 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the item required to cause evolution into this species.
         /// </summary>
-        public ItemEntry Item { get; set; } = default!;
+        [Required]
+        public ItemEntry Item { get; set; }
 
         /// <summary>
         /// Gets or sets the type of event that triggers evolution into this species.
         /// </summary>
-        public EvolutionTriggerEntry Trigger { get; set; } = default!;
+        [Required]
+        public EvolutionTriggerEntry Trigger { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the gender of the evolving Pokémon species must be in order to
         /// evolve into this species.
         /// </summary>
+        [Required]
         public int? Gender { get; set; }
 
         /// <summary>
         /// Gets or sets the item the evolving species must be holding during the evolution trigger
         /// event to evolve into this species.
         /// </summary>
-        public ItemEntry HeldItem { get; set; } = default!;
+        [Required]
+        public ItemEntry HeldItem { get; set; }
 
         /// <summary>
         /// Gets or sets the move that must be known by the evolving species during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public MoveEntry KnownMove { get; set; } = default!;
+        [Required]
+        public MoveEntry KnownMove { get; set; }
 
         /// <summary>
         /// Gets or sets the evolving species must know a move with this type during the evolution
         /// trigger event in order to evolve into this species.
         /// </summary>
-        public TypeEntry KnownMoveType { get; set; } = default!;
+        [Required]
+        public TypeEntry KnownMoveType { get; set; }
 
         /// <summary>
         /// Gets or sets the location the evolution must be triggered at.
         /// </summary>
-        public LocationEntry Location { get; set; } = default!;
+        [Required]
+        public LocationEntry Location { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum required level of the evolving Pokémon species to evolve into
         /// this species.
         /// </summary>
+        [Required]
         public int? MinLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum required level of happiness the evolving species to evolve into
         /// this species.
         /// </summary>
+        [Required]
         public int? MinHappiness { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum required level of beauty the evolving species to evolve into
         /// this species.
         /// </summary>
+        [Required]
         public int? MinBeauty { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum required level of affection the evolving species to evolve into
         /// this species.
         /// </summary>
+        [Required]
         public int? MinAffection { get; set; }
 
         /// <summary>
         /// Gets or sets whether or not it must be raining in the overworld to cause
         /// evolution into this species.
         /// </summary>
+        [Required]
         public bool NeedsOverworldRain { get; set; }
 
         /// <summary>
         /// Gets or sets the species that must be in the players party in order for the evolving
         /// species to evolve into this species.
         /// </summary>
-        public PokemonSpeciesEntry PartySpecies { get; set; } = default!;
+        [Required]
+        public PokemonSpeciesEntry PartySpecies { get; set; }
 
         /// <summary>
         /// Gets or sets the type of Pokemon the player must have in their party during the
         /// evolution trigger event in order for the evolving species to evolve into this species.
         /// </summary>
-        public TypeEntry PartyType { get; set; } = default!;
+        [Required]
+        public TypeEntry PartyType { get; set; }
 
         /// <summary>
         /// Gets or sets the required relation between the Pokémon's Attack and Defense stats:
@@ -140,22 +161,26 @@ namespace PokePlannerApi.Models
         /// 0 means Attack = Defense
         /// -1 means Attack < Defense
         /// </summary>
+        [Required]
         public int? RelativePhysicalStats { get; set; }
 
         /// <summary>
         /// Gets or sets the required time of day: day or night.
         /// </summary>
-        public string TimeOfDay { get; set; } = default!;
+        [Required]
+        public string TimeOfDay { get; set; }
 
         /// <summary>
         /// Gets or sets the species for which this one must be traded.
         /// </summary>
-        public PokemonSpeciesEntry TradeSpecies { get; set; } = default!;
+        [Required]
+        public PokemonSpeciesEntry TradeSpecies { get; set; }
 
         /// <summary>
         /// Gets or sets whether or not the 3DS needs to be turned upside-down as this Pokemon
         /// levels up.
         /// </summary>
+        [Required]
         public bool TurnUpsideDown { get; set; }
     }
 }
