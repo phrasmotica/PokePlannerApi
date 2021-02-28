@@ -11,13 +11,16 @@ namespace PokePlannerApi.Data.DataStore.Converters
 {
     public class PokemonFormConverter : IResourceConverter<PokemonForm, PokemonFormEntry>
     {
+        private readonly TypeService _typeService;
         private readonly VersionGroupService _versionGroupService;
         private readonly ILogger<PokemonFormConverter> _logger;
 
         public PokemonFormConverter(
+            TypeService typeService,
             VersionGroupService versionGroupService,
             ILogger<PokemonFormConverter> logger)
         {
+            _typeService = typeService;
             _versionGroupService = versionGroupService;
             _logger = logger;
         }
@@ -26,6 +29,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
         public async Task<PokemonFormEntry> Convert(PokemonForm resource)
         {
             var versionGroup = await _versionGroupService.Get(resource.VersionGroup);
+            var types = await GetTypes(resource);
             var validity = await GetValidity(resource);
 
             return new PokemonFormEntry
@@ -38,7 +42,7 @@ namespace PokePlannerApi.Data.DataStore.Converters
                 DisplayNames = resource.Names.Localise().ToList(),
                 SpriteUrl = GetSpriteUrl(resource),
                 ShinySpriteUrl = GetShinySpriteUrl(resource),
-                Types = new List<WithId<List<TypeEntry>>>(),
+                Types = types.ToList(),
                 Validity = validity.ToList()
             };
         }
@@ -69,6 +73,26 @@ namespace PokePlannerApi.Data.DataStore.Converters
             }
 
             return frontShinyUrl;
+        }
+
+        /// <summary>
+        /// Returns the types of the given Pokemon form in past version groups, if any.
+        /// </summary>
+        private async Task<List<WithId<List<TypeEntry>>>> GetTypes(PokemonForm pokemonForm)
+        {
+            var typesList = new List<WithId<List<TypeEntry>>>();
+
+            var newestId = await _versionGroupService.GetNewestVersionGroupId();
+            var newestTypeEntries = await _typeService.Get(pokemonForm.Types.Select(t => t.Type));
+
+            typesList.Add(
+                new WithId<List<TypeEntry>>(
+                    newestId,
+                    newestTypeEntries.ToList()
+                )
+            );
+
+            return typesList;
         }
 
         /// <summary>
