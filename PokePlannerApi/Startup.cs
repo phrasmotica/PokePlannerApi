@@ -13,6 +13,7 @@ using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Data.DataStore.Settings;
 using PokePlannerApi.Models;
+using PokePlannerApi.OpenAPI;
 using PokePlannerApi.Settings;
 using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
 using Type = PokeApiNet.Type;
@@ -43,6 +44,7 @@ namespace PokePlannerApi
 
             services.AddSwaggerGen(c =>
             {
+                c.SchemaFilter<RequiredAndNullableSchemaFilter>();
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PokePlannerApi", Version = "v1" });
             });
 
