@@ -11,7 +11,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon form.
         /// </summary>
-        [Required]
         public int PokemonFormId
         {
             get => Key;
@@ -27,7 +26,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets whether the Pokemon form is a mega evolution.
         /// </summary>
-        [Required]
         public bool IsMega { get; set; }
 
         /// <summary>
@@ -39,7 +37,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon form's display names.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
@@ -57,13 +54,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon form's types, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon form is valid.
         /// </summary>
-        [Required]
         public List<int> Validity { get; set; }
     }
 }

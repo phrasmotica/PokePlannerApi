@@ -12,7 +12,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon species.
         /// </summary>
-        [Required]
         public int PokemonSpeciesId
         {
             get => Key;
@@ -34,37 +33,31 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets this Pokemon species' display names.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon species' genera.
         /// </summary>
-        [Required]
         public List<LocalString> Genera { get; set; }
 
         /// <summary>
         /// Gets or sets the flavour text entries of the species, indexed by version ID.
         /// </summary>
-        [Required]
         public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
 
         /// <summary>
         /// Gets or sets the types of this species' primary variety, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets the base stats of this species' primary variety, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
         /// </summary>
-        [Required]
         public List<PokemonEntry> Varieties { get; set; }
 
         /// <summary>
@@ -82,13 +75,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the IDs of the version groups where this Pokemon species is valid.
         /// </summary>
-        [Required]
         public List<int> Validity { get; set; }
 
         /// <summary>
         /// Gets or sets the catch rate of the species.
         /// </summary>
-        [Required]
         public int CatchRate { get; set; }
 
         /// <summary>

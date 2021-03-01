@@ -11,7 +11,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the type.
         /// </summary>
-        [Required]
         public int TypeId
         {
             get => Key;
@@ -21,13 +20,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the type's display names.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets whether the type is concrete.
         /// </summary>
-        [Required]
         public bool IsConcrete { get; set; }
 
         /// <summary>

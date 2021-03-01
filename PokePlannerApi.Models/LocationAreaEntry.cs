@@ -11,7 +11,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the location area.
         /// </summary>
-        [Required]
         public int LocationAreaId
         {
             get => Key;
@@ -21,7 +20,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the location area.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>

@@ -11,7 +11,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the move.
         /// </summary>
-        [Required]
         public int MoveId
         {
             get => Key;
@@ -21,13 +20,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of the move.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the flavour text entries of the move, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<LocalString>>> FlavourTextEntries { get; set; }
 
         /// <summary>
@@ -45,7 +42,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's base power.
         /// </summary>
-        [Required]
         public int? Power { get; set; }
 
         /// <summary>
@@ -57,19 +53,16 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the move's accuracy.
         /// </summary>
-        [Required]
         public int? Accuracy { get; set; }
 
         /// <summary>
         /// Gets or sets the move's max number of power points.
         /// </summary>
-        [Required]
         public int? PP { get; set; }
 
         /// <summary>
         /// Gets or sets the move's priority.
         /// </summary>
-        [Required]
         public int Priority { get; set; }
 
         /// <summary>
@@ -81,7 +74,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the machines that teach the move, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<MachineEntry>>> Machines { get; set; }
 
         /// <summary>
@@ -106,19 +98,16 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the level at which the move is learnt, if applicable.
         /// </summary>
-        [Required]
         public int Level { get; set; }
 
         /// <summary>
         /// Gets or sets the machines that teach the move, if applicable.
         /// </summary>
-        [Required]
         public List<ItemEntry> LearnMachines { get; set; }
 
         /// <summary>
         /// Gets or sets the methods by which the move is learnt.
         /// </summary>
-        [Required]
         public List<MoveLearnMethodEntry> Methods { get; set; }
 
         /// <summary>

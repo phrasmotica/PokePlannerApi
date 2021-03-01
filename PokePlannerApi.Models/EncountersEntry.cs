@@ -11,7 +11,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon.
         /// </summary>
-        [Required]
         public int PokemonId
         {
             get => Key;
@@ -21,7 +20,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the encounters indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<EncounterEntry>>> Encounters { get; set; }
     }
 
@@ -33,19 +31,16 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the ID of the location area of the encounter.
         /// </summary>
-        [Required]
         public int LocationAreaId { get; set; }
 
         /// <summary>
         /// Gets or sets the display names of the encounter.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets the details of the encounter indexed by version ID.
         /// </summary>
-        [Required]
         public List<WithId<List<EncounterMethodDetails>>> Details { get; set; }
     }
 
@@ -63,7 +58,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the condition values details.
         /// </summary>
-        [Required]
         public List<ConditionValuesDetail> ConditionValuesDetails { get; set; }
     }
 
@@ -75,13 +69,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the condition values required for the encounters to occur.
         /// </summary>
-        [Required]
         public List<EncounterConditionValueEntry> ConditionValues { get; set; }
 
         /// <summary>
         /// Gets or sets the encounter details.
         /// </summary>
-        [Required]
         public List<EncounterDetailEntry> EncounterDetails { get; set; }
     }
 
@@ -93,19 +85,16 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// The lowest level of the encounter detail.
         /// </summary>
-        [Required]
         public int MinLevel { get; set; }
 
         /// <summary>
         /// The highest level of the encounter detail.
         /// </summary>
-        [Required]
         public int MaxLevel { get; set; }
 
         /// <summary>
         /// The percent chance that this encounter will occur.
         /// </summary>
-        [Required]
         public int Chance { get; set; }
     }
 }

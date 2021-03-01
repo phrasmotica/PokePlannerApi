@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the move category.
         /// </summary>
-        [Required]
         public int MoveCategoryId
         {
             get => Key;
@@ -21,7 +19,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the descriptions of the move category.
         /// </summary>
-        [Required]
         public List<LocalString> Descriptions { get; set; }
     }
 }

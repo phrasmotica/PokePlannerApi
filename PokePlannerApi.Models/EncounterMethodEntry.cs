@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PokePlannerApi.Models
 {
@@ -11,7 +10,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the encounter method.
         /// </summary>
-        [Required]
         public int EncounterMethodId
         {
             get => Key;
@@ -21,13 +19,11 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the order of the encounter method.
         /// </summary>
-        [Required]
         public int Order { get; set; }
 
         /// <summary>
         /// Gets or sets the display names of the encounter method.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
     }
 }

@@ -22,7 +22,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the key of the entry.
         /// </summary>
-        [Required]
         protected int Key { get; set; }
 
         /// <summary>

@@ -10,7 +10,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or set the ID.
         /// </summary>
-        [Required]
         public int Id { get; set; }
 
         /// <summary>

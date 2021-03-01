@@ -12,7 +12,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the Pokemon.
         /// </summary>
-        [Required]
         public int PokemonId
         {
             get => Key;
@@ -34,43 +33,36 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets or sets the display names of this Pokemon's primary form.
         /// </summary>
-        [Required]
         public List<LocalString> DisplayNames { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's forms.
         /// </summary>
-        [Required]
         public List<PokemonFormEntry> Forms { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's types, indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<TypeEntry>>> Types { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's abilities.
         /// </summary>
-        [Required]
         public List<AbilityEntry> Abilities { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's base stats indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<int>>> BaseStats { get; set; }
 
         /// <summary>
         /// Gets or sets this Pokemon's moves indexed by version group ID.
         /// </summary>
-        [Required]
         public List<WithId<List<MoveEntry>>> Moves { get; set; }
 
         /// <summary>
         /// Gets or sets the held items this Pokemon may bear in a wild encounter, indexed by version ID.
         /// </summary>
-        [Required]
         public List<WithId<List<VersionHeldItemContext>>> HeldItems { get; set; }
 
         /// <summary>

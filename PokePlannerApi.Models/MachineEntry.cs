@@ -10,7 +10,6 @@ namespace PokePlannerApi.Models
         /// <summary>
         /// Gets the ID of the machine.
         /// </summary>
-        [Required]
         public int MachineId
         {
             get => Key;
