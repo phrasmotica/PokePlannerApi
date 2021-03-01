@@ -57,6 +57,7 @@ namespace PokePlannerApi.Models
 
         /// <summary>
         /// Gets or sets the Pokemon this species represents.
+        /// TODO: convert to list of int IDs
         /// </summary>
         public List<PokemonEntry> Varieties { get; set; }
 

@@ -37,6 +37,7 @@ namespace PokePlannerApi.Models
 
         /// <summary>
         /// Gets or sets this Pokemon's forms.
+        /// TODO: convert to list of int IDs
         /// </summary>
         public List<PokemonFormEntry> Forms { get; set; }
 
@@ -47,6 +48,7 @@ namespace PokePlannerApi.Models
 
         /// <summary>
         /// Gets or sets this Pokemon's abilities.
+        /// TODO: convert to list of int IDs
         /// </summary>
         public List<AbilityEntry> Abilities { get; set; }
 
@@ -57,6 +59,7 @@ namespace PokePlannerApi.Models
 
         /// <summary>
         /// Gets or sets this Pokemon's moves indexed by version group ID.
+        /// TODO: convert to list of int IDs
         /// </summary>
         public List<WithId<List<MoveEntry>>> Moves { get; set; }
 

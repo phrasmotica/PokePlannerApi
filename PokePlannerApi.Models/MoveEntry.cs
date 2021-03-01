@@ -35,6 +35,7 @@ namespace PokePlannerApi.Models
 
         /// <summary>
         /// Gets or sets the category of the move.
+        /// TODO: replace with entire move metadata
         /// </summary>
         [Required]
         public MoveCategoryEntry Category { get; set; }
