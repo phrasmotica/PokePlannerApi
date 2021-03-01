@@ -212,7 +212,7 @@ namespace PokePlannerApi
                 services,
                 dataStoreSourceFactory,
                 dataStoreSettings,
-                collectionSettings.MoveCategoryCollectionName);
+                collectionSettings.PokemonSpeciesCollectionName);
 
             AddNamedService<Stat, StatEntry, StatConverter, StatService>(
                 services,
