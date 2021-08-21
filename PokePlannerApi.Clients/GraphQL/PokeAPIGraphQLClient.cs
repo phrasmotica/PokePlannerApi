@@ -30,6 +30,17 @@ namespace PokePlannerApi.Clients.GraphQL
                         name
                         species: pokemon_v2_pokemonspecy {
                             order
+                            generation_id
+                            varieties: pokemon_v2_pokemons {
+                                is_default
+                                pokemon_v2_pokemontypes {
+                  	                type_id
+                                }
+                                pokemon_v2_pokemonstats {
+                                    stat_id
+                                    base_value: base_stat
+                                }
+                            }
                         }
                     }
                 }
@@ -43,6 +54,8 @@ namespace PokePlannerApi.Clients.GraphQL
             };
 
             var data = await GetResponse<PokemonSpeciesInfoResponse>(request);
+
+            // TODO: include species validity in info entry
 
             var id = $"speciesInfoGeneration{generationId}Language{languageId}";
 
