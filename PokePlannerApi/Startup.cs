@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using PokeApiNet;
 using PokePlannerApi.Clients;
+using PokePlannerApi.Clients.GraphQL;
 using PokePlannerApi.Data.DataStore.Abstractions;
 using PokePlannerApi.Data.DataStore.Converters;
 using PokePlannerApi.Data.DataStore.Services;
@@ -66,6 +67,8 @@ namespace PokePlannerApi
 
             services.AddSingleton(sp => new PokeApiClient(new Uri(pokeApiSettings.BaseUri)));
             services.AddSingleton<IPokeApi, PokeAPI>();
+
+            services.AddSingleton(sp => new PokeAPIGraphQLClient(new Uri(pokeApiSettings.GraphQlUri)));
         }
 
         /// <summary>

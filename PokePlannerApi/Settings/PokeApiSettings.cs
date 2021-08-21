@@ -6,5 +6,6 @@
     public class PokeApiSettings
     {
         public string BaseUri { get; set; }
+        public string GraphQlUri { get; set; }
     }
 }

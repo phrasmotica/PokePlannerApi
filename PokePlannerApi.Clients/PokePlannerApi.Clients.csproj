@@ -5,14 +5,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GraphQL.Client" Version="3.2.4" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="3.2.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PokePlannerApi.Models\PokePlannerApi.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="PokeApiNet">
       <HintPath>..\..\PokeApiNet\PokeApiNet\bin\Debug\netstandard2.1\PokeApiNet.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GraphQL\" />
   </ItemGroup>
     
 </Project>
