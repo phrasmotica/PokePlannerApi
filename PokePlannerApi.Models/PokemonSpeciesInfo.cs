@@ -23,8 +23,14 @@ namespace PokePlannerApi.Models
         [JsonProperty("generation_id")]
         public int GenerationId { get; set; }
 
+        [JsonProperty("pokemon_v2_pokemondexnumbers")]
+        public List<PokedexInfo> Pokedexes { get; set; }
+
         [JsonProperty("varieties")]
         public List<VarietyInfo> Varieties { get; set; }
+
+        [JsonProperty("validity")]
+        public List<int> Validity { get; set; }
     }
 
     public class VarietyInfo

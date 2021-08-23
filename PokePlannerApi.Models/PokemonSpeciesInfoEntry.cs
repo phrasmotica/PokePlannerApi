@@ -3,15 +3,18 @@ using Newtonsoft.Json;
 
 namespace PokePlannerApi.Models
 {
-    public class PokemonSpeciesInfoEntry : EntryBase
+    public class VersionGroupInfoEntry : EntryBase
     {
-        [JsonProperty("languageId")]
-        public int LanguageId { get; set; }
+        [JsonProperty("version_group_info")]
+        public List<VersionGroupInfo> VersionGroupInfo { get; set; }
+    }
 
-        [JsonProperty("generationId")]
-        public int GenerationId { get; set; }
+    public class VersionGroupInfo
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
 
-        [JsonProperty("species")]
-        public List<PokemonSpeciesInfo> Species { get;set;}
+        [JsonProperty("pokedexes")]
+        public List<PokedexInfo> Pokedexes { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -31,6 +33,9 @@ namespace PokePlannerApi.Clients.GraphQL
                         species: pokemon_v2_pokemonspecy {
                             order
                             generation_id
+                            pokemon_v2_pokemondexnumbers {
+                                pokedex_id
+                            }
                             varieties: pokemon_v2_pokemons {
                                 is_default
                                 pokemon_v2_pokemontypes {
@@ -55,7 +60,12 @@ namespace PokePlannerApi.Clients.GraphQL
 
             var data = await GetResponse<PokemonSpeciesInfoResponse>(request);
 
-            // TODO: include species validity in info entry
+            var versionGroupInfo = await GetVersionGroupInfo();
+
+            foreach (var species in data.SpeciesInfo.Select(s => s.Species))
+            {
+                species.Validity = GetValidity(species, versionGroupInfo.VersionGroupInfo);
+            }
 
             var id = $"speciesInfoGeneration{generationId}Language{languageId}";
 
@@ -69,6 +79,57 @@ namespace PokePlannerApi.Clients.GraphQL
                 LanguageId = languageId,
                 Species = data.SpeciesInfo,
             };
+        }
+
+        public async Task<VersionGroupInfoEntry> GetVersionGroupInfo()
+        {
+            var request = new GraphQLRequest
+            {
+                Query = @"
+                query versionGroupInfo {
+                    version_group_info: pokemon_v2_versiongroup {
+                        id
+                        pokedexes: pokemon_v2_pokedexversiongroups {
+                            pokedex_id
+                        }
+                    }
+                }
+                ",
+                OperationName = "versionGroupInfo",
+            };
+
+            var data = await GetResponse<VersionGroupInfoResponse>(request);
+
+            var id = "versionGroupInfo";
+
+            // TODO: cache this entry
+            return new VersionGroupInfoEntry
+            {
+                Id = id,
+                Name = id,
+                CreationTime = DateTime.UtcNow,
+                VersionGroupInfo = data.VersionGroupInfo,
+            };
+        }
+
+        private static List<int> GetValidity(SpeciesInfo species, List<VersionGroupInfo> versionGroupInfo)
+        {
+            if (!species.Pokedexes.Any())
+            {
+                return versionGroupInfo.Select(vg => vg.Id).ToList();
+            }
+
+            return versionGroupInfo.Where(vg =>
+            {
+                if (!vg.Pokedexes.Any())
+                {
+                    return true;
+                }
+
+                var versionGroupPokedexes = vg.Pokedexes.Select(p => p.PokedexId);
+                var speciesPokedexes = species.Pokedexes.Select(p => p.PokedexId);
+                return versionGroupPokedexes.Intersect(speciesPokedexes).Any();
+            }).Select(vg => vg.Id).ToList();
         }
 
         private async Task<T> GetResponse<T>(GraphQLRequest request)
