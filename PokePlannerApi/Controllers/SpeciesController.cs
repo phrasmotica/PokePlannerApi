@@ -25,22 +25,32 @@ namespace PokePlannerApi.Controllers
         /// Returns all Pokemon species, optionally up to the given limit from the given offset.
         /// </summary>
         [HttpGet]
-        public async Task<PokemonSpeciesEntry[]> GetPokemonSpecies(int? limit = null, int? offset = null)
+        public async Task<PokemonSpeciesEntry[]> GetManyPokemonSpecies(int? limit = null, int? offset = null)
         {
             if (limit.HasValue)
             {
                 if (offset.HasValue)
                 {
                     _logger.LogInformation($"Getting first {limit.Value} Pokemon species starting at {offset.Value}...");
-                    return await _pokemonSpeciesService.GetPokemonSpecies(limit.Value, offset.Value);
+                    return await _pokemonSpeciesService.GetManyPokemonSpecies(limit.Value, offset.Value);
                 }
 
                 _logger.LogInformation($"Getting first {limit.Value} Pokemon species...");
-                return await _pokemonSpeciesService.GetPokemonSpecies(limit.Value, 0);
+                return await _pokemonSpeciesService.GetManyPokemonSpecies(limit.Value, 0);
             }
 
             _logger.LogInformation("Getting all Pokemon species...");
-            return await _pokemonSpeciesService.GetPokemonSpecies();
+            return await _pokemonSpeciesService.GetManyPokemonSpecies();
+        }
+
+        /// <summary>
+        /// Returns the Pokemon species with the given ID.
+        /// </summary>
+        [HttpGet("{speciesId:int}")]
+        public async Task<PokemonSpeciesEntry> GetPokemonSpecies(int speciesId)
+        {
+            _logger.LogInformation($"Getting Pokemon species {speciesId}...");
+            return await _pokemonSpeciesService.Get(speciesId);
         }
 
         /// <summary>

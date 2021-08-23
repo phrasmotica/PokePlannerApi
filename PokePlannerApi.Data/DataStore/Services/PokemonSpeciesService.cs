@@ -92,7 +92,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <summary>
         /// Returns all Pokemon species.
         /// </summary>
-        public async Task<PokemonSpeciesEntry[]> GetPokemonSpecies()
+        public async Task<PokemonSpeciesEntry[]> GetManyPokemonSpecies()
         {
             var resources = await _pokeApi.GetNamedFullPage<PokemonSpecies>();
             var allSpecies = await Get(resources.Results);
@@ -102,7 +102,7 @@ namespace PokePlannerApi.Data.DataStore.Services
         /// <summary>
         /// Returns all Pokemon species up to a limit from an offset.
         /// </summary>
-        public async Task<PokemonSpeciesEntry[]> GetPokemonSpecies(int limit, int offset)
+        public async Task<PokemonSpeciesEntry[]> GetManyPokemonSpecies(int limit, int offset)
         {
             var resources = await _pokeApi.GetNamedPage<PokemonSpecies>(limit, offset);
             var species = await Get(resources.Results);
