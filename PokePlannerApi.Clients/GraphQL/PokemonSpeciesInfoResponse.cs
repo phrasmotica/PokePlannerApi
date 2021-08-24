@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
-using PokePlannerApi.Models;
+using PokePlannerApi.Models.GraphQL;
 
 namespace PokePlannerApi.Clients.GraphQL
 {

@@ -1,14 +1,8 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace PokePlannerApi.Models
+namespace PokePlannerApi.Models.GraphQL
 {
-    public class VersionGroupInfoEntry : EntryBase
-    {
-        [JsonProperty("version_group_info")]
-        public List<VersionGroupInfo> VersionGroupInfo { get; set; }
-    }
-
     public class VersionGroupInfo
     {
         [JsonProperty("id")]

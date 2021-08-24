@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
-using PokePlannerApi.Models;
+using PokePlannerApi.Models.GraphQL;
 using Polly;
 
 namespace PokePlannerApi.Clients.GraphQL
@@ -24,7 +24,7 @@ namespace PokePlannerApi.Clients.GraphQL
             _resiliencePolicy = resiliencePolicy;
         }
 
-        public async Task<PokemonSpeciesInfoEntry> GetSpeciesInfo(int languageId, int generationId)
+        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfo(int languageId, int generationId)
         {
             var key = $"speciesInfoGeneration{generationId}Language{languageId}";
 
@@ -74,22 +74,14 @@ namespace PokePlannerApi.Clients.GraphQL
 
                 foreach (var species in data.SpeciesInfo.Select(s => s.Species))
                 {
-                    species.Validity = GetValidity(species, versionGroupInfo.VersionGroupInfo);
+                    species.Validity = GetValidity(species, versionGroupInfo);
                 }
 
-                return new PokemonSpeciesInfoEntry
-                {
-                    Id = key,
-                    Name = key,
-                    CreationTime = DateTime.UtcNow,
-                    GenerationId = generationId,
-                    LanguageId = languageId,
-                    Species = data.SpeciesInfo,
-                };
+                return data.SpeciesInfo;
             }, context);
         }
 
-        public async Task<VersionGroupInfoEntry> GetVersionGroupInfo()
+        public async Task<List<VersionGroupInfo>> GetVersionGroupInfo()
         {
             var key = "versionGroupInfo";
 
@@ -109,19 +101,13 @@ namespace PokePlannerApi.Clients.GraphQL
                         }
                     }
                     ",
-                    OperationName = "versionGroupInfo",
+                    OperationName = key,
                 };
 
                 var response = await _client.SendQueryAsync<VersionGroupInfoResponse>(request);
                 var data = response.Data;
 
-                return new VersionGroupInfoEntry
-                {
-                    Id = key,
-                    Name = key,
-                    CreationTime = DateTime.UtcNow,
-                    VersionGroupInfo = data.VersionGroupInfo,
-                };
+                return data.VersionGroupInfo;
             }, context);
         }
 

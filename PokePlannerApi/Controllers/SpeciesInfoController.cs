@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PokePlannerApi.Clients.GraphQL;
-using PokePlannerApi.Models;
+using PokePlannerApi.Models.GraphQL;
 
 namespace PokePlannerApi.Controllers
 {
@@ -25,7 +26,7 @@ namespace PokePlannerApi.Controllers
         /// given ID in the language with the given ID.
         /// </summary>
         [HttpGet("{generationId:int}/{languageId:int}")]
-        public async Task<PokemonSpeciesInfoEntry> GetSpeciesInfo(int generationId, int languageId)
+        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfo(int generationId, int languageId)
         {
             _logger.LogInformation($"Getting info for Pokemon species in generation {languageId} in language {languageId}...");
             return await _graphQlClient.GetSpeciesInfo(languageId, generationId);
