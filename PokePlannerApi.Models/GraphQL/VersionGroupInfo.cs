@@ -8,6 +8,9 @@ namespace PokePlannerApi.Models.GraphQL
         [JsonProperty("id")]
         public int VersionGroupId { get; set; }
 
+        [JsonProperty("generation_id")]
+        public int GenerationId { get; set; }
+
         [JsonProperty("versions")]
         public List<VersionInfo> VersionInfo { get; set; }
 
@@ -17,6 +20,9 @@ namespace PokePlannerApi.Models.GraphQL
 
     public class VersionInfo
     {
+        [JsonProperty("id")]
+        public int VersionId { get; set; }
+
         [JsonProperty("pokemon_v2_versionnames")]
         public List<VersionNamesInfo> VersionNamesInfo { get; set; }
     }

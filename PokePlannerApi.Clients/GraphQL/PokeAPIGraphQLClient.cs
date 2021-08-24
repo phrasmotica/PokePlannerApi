@@ -95,7 +95,9 @@ namespace PokePlannerApi.Clients.GraphQL
                     query versionGroupInfo($languageId: Int) {
                         version_group_info: pokemon_v2_versiongroup {
                             id
+                            generation_id
                             versions: pokemon_v2_versions {
+                                id
                                 pokemon_v2_versionnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
                                     name
                                 }
