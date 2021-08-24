@@ -7,6 +7,7 @@
     {
         public string BaseUri { get; set; }
         public string GraphQlUri { get; set; }
+        public int ResiliencePolicyRetryCount { get; set; }
         public int GraphQlClientCacheEntryLifetimeDays { get; set; }
     }
 }

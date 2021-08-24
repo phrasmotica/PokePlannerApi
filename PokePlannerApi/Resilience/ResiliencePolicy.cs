@@ -36,7 +36,16 @@ namespace PokePlannerApi.Resilience
                 }
             );
 
-            return cachePolicy;
+            var waitAndRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(
+                pokeApiSettings.ResiliencePolicyRetryCount,
+                sleepDurationProvider: count => TimeSpan.FromSeconds(Math.Pow(count, 2)),
+                onRetry: (ex, ts, count, ctx) =>
+                {
+                    logger.LogInformation($"Wait-and-retry caught exception for operation {ctx.OperationKey}: {ex.Message}. Waiting {ts.TotalSeconds} seconds before retry {count}");
+                }
+            );
+
+            return Policy.WrapAsync(cachePolicy, waitAndRetryPolicy);
         }
     }
 }
