@@ -2,9 +2,11 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OpenApi.Models;
 using PokeApiNet;
 using PokePlannerApi.Clients;
@@ -15,6 +17,7 @@ using PokePlannerApi.Data.DataStore.Services;
 using PokePlannerApi.Data.DataStore.Settings;
 using PokePlannerApi.Models;
 using PokePlannerApi.OpenAPI;
+using PokePlannerApi.Resilience;
 using PokePlannerApi.Settings;
 using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
 using Type = PokeApiNet.Type;
@@ -68,7 +71,9 @@ namespace PokePlannerApi
             services.AddSingleton(sp => new PokeApiClient(new Uri(pokeApiSettings.BaseUri)));
             services.AddSingleton<IPokeApi, PokeAPI>();
 
-            services.AddSingleton(sp => new PokeAPIGraphQLClient(new Uri(pokeApiSettings.GraphQlUri)));
+            var resiliencePolicy = ResiliencePolicy.CreateResiliencePolicy(pokeApiSettings, NullLogger.Instance);
+
+            services.AddSingleton(sp => new PokeAPIGraphQLClient(new Uri(pokeApiSettings.GraphQlUri), resiliencePolicy));
         }
 
         /// <summary>
