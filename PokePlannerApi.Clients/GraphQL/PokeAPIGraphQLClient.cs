@@ -70,7 +70,7 @@ namespace PokePlannerApi.Clients.GraphQL
                 var response = await _client.SendQueryAsync<PokemonSpeciesInfoResponse>(request);
                 var data = response.Data;
 
-                var versionGroupInfo = await GetVersionGroupInfo();
+                var versionGroupInfo = await GetVersionGroupInfo(languageId);
 
                 foreach (var species in data.SpeciesInfo.Select(s => s.Species))
                 {
@@ -81,9 +81,9 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
-        public async Task<List<VersionGroupInfo>> GetVersionGroupInfo()
+        public async Task<List<VersionGroupInfo>> GetVersionGroupInfo(int languageId)
         {
-            var key = "versionGroupInfo";
+            var key = $"versionGroupInfoLanguage{languageId}";
 
             var context = new Context(key);
 
@@ -92,16 +92,25 @@ namespace PokePlannerApi.Clients.GraphQL
                 var request = new GraphQLRequest
                 {
                     Query = @"
-                    query versionGroupInfo {
+                    query versionGroupInfo($languageId: Int) {
                         version_group_info: pokemon_v2_versiongroup {
                             id
+                            versions: pokemon_v2_versions {
+                                pokemon_v2_versionnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                    name
+                                }
+                            }
                             pokedexes: pokemon_v2_pokedexversiongroups {
                                 pokedex_id
                             }
                         }
                     }
                     ",
-                    OperationName = key,
+                    OperationName = "versionGroupInfo",
+                    Variables = new
+                    {
+                        languageId,
+                    }
                 };
 
                 var response = await _client.SendQueryAsync<VersionGroupInfoResponse>(request);
@@ -115,7 +124,7 @@ namespace PokePlannerApi.Clients.GraphQL
         {
             if (!species.Pokedexes.Any())
             {
-                return versionGroupInfo.Select(vg => vg.Id).ToList();
+                return versionGroupInfo.Select(vg => vg.VersionGroupId).ToList();
             }
 
             return versionGroupInfo.Where(vg =>
@@ -128,7 +137,7 @@ namespace PokePlannerApi.Clients.GraphQL
                 var versionGroupPokedexes = vg.Pokedexes.Select(p => p.PokedexId);
                 var speciesPokedexes = species.Pokedexes.Select(p => p.PokedexId);
                 return versionGroupPokedexes.Intersect(speciesPokedexes).Any();
-            }).Select(vg => vg.Id).ToList();
+            }).Select(vg => vg.VersionGroupId).ToList();
         }
     }
 }
