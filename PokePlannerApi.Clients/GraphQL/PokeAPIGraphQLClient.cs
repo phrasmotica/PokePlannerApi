@@ -24,6 +24,41 @@ namespace PokePlannerApi.Clients.GraphQL
             _resiliencePolicy = resiliencePolicy;
         }
 
+        public async Task<List<GenerationInfo>> GetGenerationInfo(int languageId)
+        {
+            var key = $"generationInfoLanguage{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query generationInfo($languageId: Int) {
+                        generation_info: pokemon_v2_generation {
+                            id
+                            name
+                            pokemon_v2_generationnames(where: {language_id: {_eq: $languageId}}) {
+                                name
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "generationInfo",
+                    Variables = new
+                    {
+                        languageId,
+                    }
+                };
+
+                var response = await _client.SendQueryAsync<GenerationInfoResponse>(request);
+                var data = response.Data;
+
+                return data.GenerationInfo;
+            }, context);
+        }
+
         public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfo(int languageId, int generationId)
         {
             var key = $"speciesInfoGeneration{generationId}Language{languageId}";
