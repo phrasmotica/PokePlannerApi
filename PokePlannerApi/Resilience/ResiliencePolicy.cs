@@ -13,7 +13,7 @@ namespace PokePlannerApi.Resilience
         {
             var cachePolicy = Policy.CacheAsync(
                 new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions())),
-                TimeSpan.FromDays(pokeApiSettings.GraphQlClientCacheEntryLifetimeDays),
+                TimeSpan.FromDays(pokeApiSettings.ResiliencePolicyCacheEntryLifetimeDays),
                 onCacheGet: (ctx, key) =>
                 {
                     logger.LogInformation($"Got cache entry for key {key}.");
