@@ -39,13 +39,13 @@ namespace PokePlannerApi.Models.GraphQL
         public bool IsDefault { get; set; }
 
         [JsonProperty("pokemon_v2_pokemontypes")]
-        public List<TypeInfo> Types { get; set; }
+        public List<VarietyTypeInfo> Types { get; set; }
 
         [JsonProperty("pokemon_v2_pokemonstats")]
         public List<BaseStatInfo> BaseStats { get; set; }
     }
 
-    public class TypeInfo
+    public class VarietyTypeInfo
     {
         [JsonProperty("type_id")]
         public int TypeId { get; set; }
