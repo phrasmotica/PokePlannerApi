@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace PokePlannerApi.Models
+namespace PokePlannerApi.Models.GraphQL
 {
     public class PokedexInfo
     {

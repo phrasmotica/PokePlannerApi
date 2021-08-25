@@ -71,24 +71,25 @@ namespace PokePlannerApi.Clients.GraphQL
                 {
                     Query = @"
                     query speciesInfo($languageId: Int, $generationId: Int) {
-                        species_info: pokemon_v2_pokemonspeciesname(where: {pokemon_v2_language: {id: {_eq: $languageId}}, pokemon_v2_pokemonspecy: {pokemon_v2_generation: {id: {_eq: $generationId}}}}, order_by: {id: asc}) {
-                            pokemon_species_id
+                        species_info: pokemon_v2_pokemonspecies(where: {pokemon_v2_generation: {id: {_eq: $generationId}}}, order_by: {id: asc}) {
+                            id
                             name
-                            species: pokemon_v2_pokemonspecy {
-                                order
-                                generation_id
-                                pokemon_v2_pokemondexnumbers {
-                                    pokedex_id
+                            order
+                            generation_id
+                            names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                name
+                            }
+                            pokedex_numbers: pokemon_v2_pokemondexnumbers {
+                                pokedex_id
+                            }
+                            varieties: pokemon_v2_pokemons {
+                                is_default
+                                types: pokemon_v2_pokemontypes {
+                                    type_id
                                 }
-                                varieties: pokemon_v2_pokemons {
-                                    is_default
-                                    pokemon_v2_pokemontypes {
-                                        type_id
-                                    }
-                                    pokemon_v2_pokemonstats {
-                                        stat_id
-                                        base_value: base_stat
-                                    }
+                                stats: pokemon_v2_pokemonstats {
+                                    stat_id
+                                    base_value: base_stat
                                 }
                             }
                         }
@@ -107,7 +108,7 @@ namespace PokePlannerApi.Clients.GraphQL
 
                 var versionGroupInfo = await GetVersionGroupInfo(languageId);
 
-                foreach (var species in data.SpeciesInfo.Select(s => s.Species))
+                foreach (var species in data.SpeciesInfo)
                 {
                     species.Validity = GetValidity(species, versionGroupInfo);
                 }
@@ -193,7 +194,7 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
-        private static List<int> GetValidity(SpeciesInfo species, List<VersionGroupInfo> versionGroupInfo)
+        private static List<int> GetValidity(PokemonSpeciesInfo species, List<VersionGroupInfo> versionGroupInfo)
         {
             if (!species.Pokedexes.Any())
             {
