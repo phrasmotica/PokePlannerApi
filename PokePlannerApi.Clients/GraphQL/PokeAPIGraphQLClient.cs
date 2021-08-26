@@ -177,6 +177,42 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
+        public async Task<List<StatInfo>> GetStatInfo(int languageId)
+        {
+            var key = $"statInfoLanguage{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query statInfo($languageId: Int) {
+                        stat_info: pokemon_v2_stat {
+                            id
+                            name
+                            is_battle_only
+                            pokemon_v2_statnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                name
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "statInfo",
+                    Variables = new
+                    {
+                        languageId,
+                    }
+                };
+
+                var response = await _client.SendQueryAsync<StatInfoResponse>(request);
+                var data = response.Data;
+
+                return data.StatInfo;
+            }, context);
+        }
+
         public async Task<List<TypeInfo>> GetTypeInfo(int languageId)
         {
             var key = $"typeInfoLanguage{languageId}";
