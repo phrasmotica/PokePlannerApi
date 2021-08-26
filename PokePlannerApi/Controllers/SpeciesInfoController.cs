@@ -31,5 +31,16 @@ namespace PokePlannerApi.Controllers
             _logger.LogInformation($"Getting info for Pokemon species in generation {languageId} in language {languageId}...");
             return await _graphQlClient.GetSpeciesInfo(languageId, generationId);
         }
+
+        /// <summary>
+        /// Returns info for the Pokemon species in the generation with the
+        /// given ID in the language with the given ID.
+        /// </summary>
+        [HttpGet("pokedex/{pokedexId:int}/language/{languageId:int}")]
+        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int pokedexId, int languageId)
+        {
+            _logger.LogInformation($"Getting info for Pokemon species in pokedex {languageId} in language {languageId}...");
+            return await _graphQlClient.GetSpeciesInfoByPokedex(languageId, pokedexId);
+        }
     }
 }

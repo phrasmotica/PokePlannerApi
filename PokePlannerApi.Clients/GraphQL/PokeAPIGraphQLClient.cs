@@ -118,6 +118,65 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
+        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int languageId, int pokedexId)
+        {
+            var key = $"speciesInfoPokedex{pokedexId}Language{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query speciesInfoByPokedex($languageId: Int, $pokedexId: Int) {
+                        species_info: pokemon_v2_pokemonspecies(where: {pokemon_v2_pokemondexnumbers: {pokedex_id: {_eq: $pokedexId}}}, order_by: {id: asc}) {
+                            id
+                            name
+                            order
+                            generation_id
+                            names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                name
+                            }
+                            pokedexes: pokemon_v2_pokemondexnumbers {
+                                pokedex_id
+                                pokedex_number
+                            }
+                            varieties: pokemon_v2_pokemons {
+                                is_default
+                                types: pokemon_v2_pokemontypes {
+                                    type_id
+                                }
+                                stats: pokemon_v2_pokemonstats {
+                                    stat_id
+                                    base_value: base_stat
+                                }
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "speciesInfoByPokedex",
+                    Variables = new
+                    {
+                        languageId,
+                        pokedexId,
+                    },
+                };
+
+                var response = await _client.SendQueryAsync<PokemonSpeciesInfoResponse>(request);
+                var data = response.Data;
+
+                var versionGroupInfo = await GetVersionGroupInfo(languageId);
+
+                foreach (var species in data.SpeciesInfo)
+                {
+                    species.Validity = new List<int>();
+                }
+
+                return data.SpeciesInfo;
+            }, context);
+        }
+
         public async Task<List<TypeInfo>> GetTypeInfo(int languageId)
         {
             var key = $"typeInfoLanguage{languageId}";
