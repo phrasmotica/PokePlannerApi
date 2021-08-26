@@ -14,8 +14,8 @@ namespace PokePlannerApi.Models.GraphQL
         [JsonProperty("versions")]
         public List<VersionInfo> VersionInfo { get; set; }
 
-        [JsonProperty("pokedexes")]
-        public List<PokedexInfo> Pokedexes { get; set; }
+        [JsonProperty("pokemon_v2_pokedexversiongroups")]
+        public List<VersionGroupPokedexInfo> VersionGroupPokedexes { get; set; }
     }
 
     public class VersionInfo
@@ -31,5 +31,11 @@ namespace PokePlannerApi.Models.GraphQL
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+    }
+
+    public class VersionGroupPokedexInfo
+    {
+        [JsonProperty("pokemon_v2_pokedex")]
+        public PokedexInfo Pokedex { get; set; }
     }
 }

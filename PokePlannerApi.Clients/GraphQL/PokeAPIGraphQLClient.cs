@@ -234,8 +234,13 @@ namespace PokePlannerApi.Clients.GraphQL
                                     name
                                 }
                             }
-                            pokedexes: pokemon_v2_pokedexversiongroups {
-                                pokedex_id
+                            pokemon_v2_pokedexversiongroups {
+                                pokemon_v2_pokedex {
+                                    id
+                                    pokemon_v2_pokedexnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                        name
+                                    }
+                                }
                             }
                         }
                     }
@@ -263,12 +268,12 @@ namespace PokePlannerApi.Clients.GraphQL
 
             return versionGroupInfo.Where(vg =>
             {
-                if (!vg.Pokedexes.Any())
+                if (!vg.VersionGroupPokedexes.Any())
                 {
                     return true;
                 }
 
-                var versionGroupPokedexes = vg.Pokedexes.Select(p => p.PokedexId);
+                var versionGroupPokedexes = vg.VersionGroupPokedexes.Select(p => p.Pokedex.PokedexId);
                 var speciesPokedexes = species.Pokedexes.Select(p => p.PokedexId);
                 return versionGroupPokedexes.Intersect(speciesPokedexes).Any();
             }).Select(vg => vg.VersionGroupId).ToList();
