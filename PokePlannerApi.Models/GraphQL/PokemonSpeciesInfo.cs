@@ -20,8 +20,8 @@ namespace PokePlannerApi.Models.GraphQL
         [JsonProperty("names")]
         public List<PokemonSpeciesNamesInfo> Names { get; set; }
 
-        [JsonProperty("pokedex_numbers")]
-        public List<PokedexInfo> Pokedexes { get; set; }
+        [JsonProperty("pokedexes")]
+        public List<PokemonSpeciesPokedexInfo> Pokedexes { get; set; }
 
         [JsonProperty("varieties")]
         public List<VarietyInfo> Varieties { get; set; }
@@ -34,6 +34,15 @@ namespace PokePlannerApi.Models.GraphQL
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+    }
+
+    public class PokemonSpeciesPokedexInfo
+    {
+        [JsonProperty("pokedex_id")]
+        public int PokedexId { get; set; }
+
+        [JsonProperty("pokedex_number")]
+        public int PokedexNumber { get; set; }
     }
 
     public class VarietyInfo

@@ -79,8 +79,9 @@ namespace PokePlannerApi.Clients.GraphQL
                             names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
                                 name
                             }
-                            pokedex_numbers: pokemon_v2_pokemondexnumbers {
+                            pokedexes: pokemon_v2_pokemondexnumbers {
                                 pokedex_id
+                                pokedex_number
                             }
                             varieties: pokemon_v2_pokemons {
                                 is_default
