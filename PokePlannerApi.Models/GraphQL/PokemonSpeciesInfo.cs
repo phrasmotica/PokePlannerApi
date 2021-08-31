@@ -25,9 +25,6 @@ namespace PokePlannerApi.Models.GraphQL
 
         [JsonProperty("varieties")]
         public List<VarietyInfo> Varieties { get; set; }
-
-        [JsonProperty("validity")]
-        public List<int> Validity { get; set; }
     }
 
     public class PokemonSpeciesNamesInfo

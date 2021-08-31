@@ -107,13 +107,6 @@ namespace PokePlannerApi.Clients.GraphQL
                 var response = await _client.SendQueryAsync<PokemonSpeciesInfoResponse>(request);
                 var data = response.Data;
 
-                var versionGroupInfo = await GetVersionGroupInfo(languageId);
-
-                foreach (var species in data.SpeciesInfo)
-                {
-                    species.Validity = new List<int>();
-                }
-
                 return data.SpeciesInfo;
             }, context);
         }
