@@ -59,65 +59,6 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
-        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfo(int languageId, int generationId)
-        {
-            var key = $"speciesInfoGeneration{generationId}Language{languageId}";
-
-            var context = new Context(key);
-
-            return await _resiliencePolicy.ExecuteAsync(async ctx =>
-            {
-                var request = new GraphQLRequest
-                {
-                    Query = @"
-                    query speciesInfo($languageId: Int, $generationId: Int) {
-                        species_info: pokemon_v2_pokemonspecies(where: {pokemon_v2_generation: {id: {_eq: $generationId}}}, order_by: {id: asc}) {
-                            id
-                            name
-                            order
-                            generation_id
-                            names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
-                                name
-                            }
-                            pokedexes: pokemon_v2_pokemondexnumbers {
-                                pokedex_id
-                                pokedex_number
-                            }
-                            varieties: pokemon_v2_pokemons {
-                                is_default
-                                types: pokemon_v2_pokemontypes {
-                                    type_id
-                                }
-                                stats: pokemon_v2_pokemonstats {
-                                    stat_id
-                                    base_value: base_stat
-                                }
-                            }
-                        }
-                    }
-                    ",
-                    OperationName = "speciesInfo",
-                    Variables = new
-                    {
-                        languageId,
-                        generationId,
-                    },
-                };
-
-                var response = await _client.SendQueryAsync<PokemonSpeciesInfoResponse>(request);
-                var data = response.Data;
-
-                var versionGroupInfo = await GetVersionGroupInfo(languageId);
-
-                foreach (var species in data.SpeciesInfo)
-                {
-                    species.Validity = GetValidity(species, versionGroupInfo);
-                }
-
-                return data.SpeciesInfo;
-            }, context);
-        }
-
         public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int languageId, int pokedexId)
         {
             var key = $"speciesInfoPokedex{pokedexId}Language{languageId}";
