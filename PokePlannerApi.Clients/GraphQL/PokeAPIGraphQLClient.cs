@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -59,9 +58,9 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
-        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int languageId, int pokedexId)
+        public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int languageId, int pokedexId, int versionGroupId)
         {
-            var key = $"speciesInfoPokedex{pokedexId}Language{languageId}";
+            var key = $"speciesInfoPokedex{pokedexId}VersionGroup{versionGroupId}Language{languageId}";
 
             var context = new Context(key);
 
@@ -70,7 +69,7 @@ namespace PokePlannerApi.Clients.GraphQL
                 var request = new GraphQLRequest
                 {
                     Query = @"
-                    query speciesInfoByPokedex($languageId: Int, $pokedexId: Int) {
+                    query speciesInfoByPokedex($languageId: Int, $pokedexId: Int, $versionGroupId: Int) {
                         species_info: pokemon_v2_pokemonspecies(where: {pokemon_v2_pokemondexnumbers: {pokedex_id: {_eq: $pokedexId}}}, order_by: {id: asc}) {
                             id
                             name
@@ -79,18 +78,50 @@ namespace PokePlannerApi.Clients.GraphQL
                             names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
                                 name
                             }
-                            pokedexes: pokemon_v2_pokemondexnumbers {
+                            pokedexes: pokemon_v2_pokemondexnumbers(where: {pokedex_id: {_eq: $pokedexId}}, order_by: {pokedex_id: asc}) {
                                 pokedex_id
                                 pokedex_number
                             }
-                            varieties: pokemon_v2_pokemons {
+                            varieties: pokemon_v2_pokemons(order_by: {order: asc}) {
+                                id
+                                name
                                 is_default
-                                types: pokemon_v2_pokemontypes {
+                                abilities: pokemon_v2_pokemonabilities(order_by: {slot: asc}) {
+                                    slot
+                                    is_hidden
+                                    ability: pokemon_v2_ability {
+                                        id
+                                        name
+                                        generation_id
+                                        names: pokemon_v2_abilitynames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                            name
+                                        }
+                                        flavor_texts: pokemon_v2_abilityflavortexts(where: {pokemon_v2_language: {id: {_eq: $languageId}}, version_group_id: {_eq: $versionGroupId}}) {
+                                            flavor_text
+                                        }
+                                    }
+                                }
+                                forms: pokemon_v2_pokemonforms(where: {version_group_id: {_lte: $versionGroupId}}, order_by: {form_order: asc}) {
+                                    id
+                                    form_name
+                                    is_mega
+                                    names: pokemon_v2_pokemonformnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                        name
+                                    }
+                                    types: pokemon_v2_pokemonformtypes(order_by: {slot: asc}) {
+                                        type_id
+                                    }
+                                }
+                                past_types: pokemon_v2_pokemontypepasts(order_by: {generation_id: asc, slot: asc}) {
+                                    generation_id
                                     type_id
                                 }
-                                stats: pokemon_v2_pokemonstats {
+                                stats: pokemon_v2_pokemonstats(order_by: {stat_id: asc}) {
                                     stat_id
                                     base_value: base_stat
+                                }
+                                types: pokemon_v2_pokemontypes(order_by: {slot: asc}) {
+                                    type_id
                                 }
                             }
                         }
@@ -101,6 +132,7 @@ namespace PokePlannerApi.Clients.GraphQL
                     {
                         languageId,
                         pokedexId,
+                        versionGroupId,
                     },
                 };
 
@@ -166,6 +198,11 @@ namespace PokePlannerApi.Clients.GraphQL
                             pokemon_v2_typenames(where: {language_id: {_eq: $languageId}}) {
                                 name
                             }
+                            pokemon_v2_pokemontypes_aggregate {
+                                aggregate {
+                                    count
+                                }
+                            }
                         }
                     }
                     ",
@@ -227,26 +264,6 @@ namespace PokePlannerApi.Clients.GraphQL
 
                 return data.VersionGroupInfo;
             }, context);
-        }
-
-        private static List<int> GetValidity(PokemonSpeciesInfo species, List<VersionGroupInfo> versionGroupInfo)
-        {
-            if (!species.Pokedexes.Any())
-            {
-                return versionGroupInfo.Select(vg => vg.VersionGroupId).ToList();
-            }
-
-            return versionGroupInfo.Where(vg =>
-            {
-                if (!vg.VersionGroupPokedexes.Any())
-                {
-                    return true;
-                }
-
-                var versionGroupPokedexes = vg.VersionGroupPokedexes.Select(p => p.Pokedex.PokedexId);
-                var speciesPokedexes = species.Pokedexes.Select(p => p.PokedexId);
-                return versionGroupPokedexes.Intersect(speciesPokedexes).Any();
-            }).Select(vg => vg.VersionGroupId).ToList();
         }
     }
 }
