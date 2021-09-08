@@ -17,11 +17,17 @@ namespace PokePlannerApi.Models.GraphQL
         [JsonProperty("generation_id")]
         public int GenerationId { get; set; }
 
+        [JsonProperty("capture_rate")]
+        public int CaptureRate { get; set; }
+
         [JsonProperty("names")]
         public List<PokemonSpeciesNamesInfo> Names { get; set; }
 
         [JsonProperty("pokedexes")]
         public List<PokemonSpeciesPokedexInfo> Pokedexes { get; set; }
+
+        [JsonProperty("flavor_texts")]
+        public List<FlavorTextInfo> FlavorTexts { get; set; }
 
         [JsonProperty("varieties")]
         public List<VarietyInfo> Varieties { get; set; }
@@ -31,6 +37,9 @@ namespace PokePlannerApi.Models.GraphQL
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("genus")]
+        public string Genus { get; set; }
     }
 
     public class PokemonSpeciesPokedexInfo

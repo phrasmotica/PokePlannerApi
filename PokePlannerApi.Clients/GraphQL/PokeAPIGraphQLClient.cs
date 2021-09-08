@@ -75,12 +75,17 @@ namespace PokePlannerApi.Clients.GraphQL
                             name
                             order
                             generation_id
+                            capture_rate
                             names: pokemon_v2_pokemonspeciesnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
                                 name
+                                genus
                             }
                             pokedexes: pokemon_v2_pokemondexnumbers(where: {pokedex_id: {_eq: $pokedexId}}, order_by: {pokedex_id: asc}) {
                                 pokedex_id
                                 pokedex_number
+                            }
+                            flavor_texts: pokemon_v2_pokemonspeciesflavortexts(where: {pokemon_v2_language: {id: {_eq: $languageId}}, pokemon_v2_version: {version_group_id: {_eq: $versionGroupId}}}) {
+                                flavor_text
                             }
                             varieties: pokemon_v2_pokemons(order_by: {order: asc}) {
                                 id
