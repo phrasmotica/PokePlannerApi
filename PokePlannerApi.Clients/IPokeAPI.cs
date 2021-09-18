@@ -25,6 +25,16 @@ namespace PokePlannerApi.Clients
         Task<IEnumerable<T>> Get<T>(IEnumerable<UrlNavigation<T>> nav) where T : ResourceBase;
 
         /// <summary>
+        /// Returns sprite data for the Pokemon with the given ID.
+        /// </summary>
+        Task<PokemonSprites> GetSpritesOfVariety(int varietyId);
+
+        /// <summary>
+        /// Returns sprite data for the Pokemon form with the given ID.
+        /// </summary>
+        Task<PokemonFormSprites> GetSpritesOfForm(int formId);
+
+        /// <summary>
         /// Returns the location area encounters for the Pokemon with the given ID.
         /// </summary>
         Task<IEnumerable<LocationAreaEncounter>> GetEncounters(Pokemon pokemon);

@@ -22,7 +22,7 @@ namespace PokePlannerApi.Clients
         /// <summary>
         /// The client for PokeAPI.
         /// </summary>
-        private readonly PokeApiClient PokeApiClient;
+        private readonly PokeApiClient _pokeApiClient;
 
         /// <summary>
         /// The base URI for PokeAPI.
@@ -34,7 +34,7 @@ namespace PokePlannerApi.Clients
         /// </summary>
         public PokeAPI(PokeApiClient pokeApiClient, ILogger<PokeAPI> logger)
         {
-            PokeApiClient = pokeApiClient;
+            _pokeApiClient = pokeApiClient;
             Logger = logger;
         }
 
@@ -51,7 +51,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                res = await PokeApiClient.GetResourceAsync<T>(id);
+                res = await _pokeApiClient.GetResourceAsync<T>(id);
 
                 Logger.LogInformation($"{call} finished.");
             }
@@ -76,7 +76,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                res = await PokeApiClient.GetResourceAsync(nav);
+                res = await _pokeApiClient.GetResourceAsync(nav);
 
                 Logger.LogInformation($"{call} finished.");
             }
@@ -101,7 +101,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                resList = await PokeApiClient.GetResourceAsync(nav);
+                resList = await _pokeApiClient.GetResourceAsync(nav);
 
                 Logger.LogInformation($"{call} finished.");
             }
@@ -112,6 +112,18 @@ namespace PokePlannerApi.Clients
             }
 
             return resList;
+        }
+
+        public async Task<PokemonSprites> GetSpritesOfVariety(int varietyId)
+        {
+            var pokemon = await Get<Pokemon>(varietyId);
+            return pokemon.Sprites;
+        }
+
+        public async Task<PokemonFormSprites> GetSpritesOfForm(int formId)
+        {
+            var form = await Get<PokemonForm>(formId);
+            return form.Sprites;
         }
 
         /// <summary>
@@ -185,7 +197,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                resList = await PokeApiClient.GetApiResourcePageAsync<T>(limit, offset);
+                resList = await _pokeApiClient.GetApiResourcePageAsync<T>(limit, offset);
 
                 Logger.LogInformation($"{call} finished.");
             }
@@ -270,7 +282,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                res = await PokeApiClient.GetResourceAsync<T>(name);
+                res = await _pokeApiClient.GetResourceAsync<T>(name);
 
                 Logger.LogInformation($"{call} finished.");
             }
@@ -327,7 +339,7 @@ namespace PokePlannerApi.Clients
             {
                 Logger.LogInformation($"{call} started...");
 
-                resList = await PokeApiClient.GetNamedResourcePageAsync<T>(limit, offset);
+                resList = await _pokeApiClient.GetNamedResourcePageAsync<T>(limit, offset);
 
                 Logger.LogInformation($"{call} finished.");
             }
