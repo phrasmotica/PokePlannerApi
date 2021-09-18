@@ -58,6 +58,77 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
+        public async Task<List<PokemonMoveInfo>> GetPokemonMovesInfoByVersionGroup(int languageId, int pokemonId, int versionGroupId)
+        {
+            var key = $"movesInfoPokemon{pokemonId}VersionGroup{versionGroupId}Language{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query pokemonMovesByVersionGroup($languageId: Int, $pokemonId: Int, $versionGroupId: Int) {
+                        moves_info: pokemon_v2_pokemonmove(where: {pokemon_id: {_eq: $pokemonId}, version_group_id: {_eq: $versionGroupId}}, order_by: {id: asc}) {
+                            id
+                            level
+                            learn_method: pokemon_v2_movelearnmethod {
+                                name
+                                names: pokemon_v2_movelearnmethodnames(where: {language_id: {_eq: $languageId}}, order_by: {id: asc}) {
+                                    name
+                                }
+                            }
+                            move: pokemon_v2_move {
+                                id
+                                name
+                                power
+                                accuracy
+                                pp
+                                priority
+                                damage_class: pokemon_v2_movedamageclass {
+                                    id
+                                    name
+                                }
+                                flavor_texts: pokemon_v2_moveflavortexts(where: {pokemon_v2_language: {id: {_eq: $languageId}}, version_group_id: {_eq: $versionGroupId}}) {
+                                    flavor_text
+                                }
+                                meta: pokemon_v2_movemeta {
+                                    category: pokemon_v2_movemetacategory {
+                                        id
+                                        name
+                                    }
+                                }
+                                names: pokemon_v2_movenames(where: {language_id: {_eq: $languageId}}, order_by: {id: asc}) {
+                                    name
+                                }
+                                target: pokemon_v2_movetarget {
+                                    id
+                                    name
+                                }
+                                type: pokemon_v2_type {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "pokemonMovesByVersionGroup",
+                    Variables = new
+                    {
+                        languageId,
+                        pokemonId,
+                        versionGroupId
+                    }
+                };
+
+                var response = await _client.SendQueryAsync<PokemonMovesInfoResponse>(request);
+                var data = response.Data;
+
+                return data.MovesInfo;
+            }, context);
+        }
+
         public async Task<List<PokemonSpeciesInfo>> GetSpeciesInfoByPokedex(int languageId, int pokedexId, int versionGroupId)
         {
             var key = $"speciesInfoPokedex{pokedexId}VersionGroup{versionGroupId}Language{languageId}";
