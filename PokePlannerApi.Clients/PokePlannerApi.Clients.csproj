@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Client" Version="3.2.4" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="3.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Polly" Version="7.2.2" />
+    <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PokePlannerApi.Models\PokePlannerApi.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PokeApiNet">
+      <HintPath>..\..\PokeApiNet\PokeApiNet\bin\Debug\netstandard2.1\PokeApiNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+    
+</Project>
