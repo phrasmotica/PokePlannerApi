@@ -386,6 +386,15 @@ namespace PokePlannerApi.Clients.GraphQL
                                     }
                                 }
                             }
+                            regions: pokemon_v2_versiongroupregions {
+                                pokemon_v2_region {
+                                    id
+                                    name
+                                    names: pokemon_v2_regionnames(where: {pokemon_v2_language: {id: {_eq: $languageId}}}) {
+                                        name
+                                    }
+                                }
+                            }
                         }
                     }
                     ",
