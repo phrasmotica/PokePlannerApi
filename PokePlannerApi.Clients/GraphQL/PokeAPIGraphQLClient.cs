@@ -58,6 +58,67 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
+        public async Task<List<EncountersInfo>> GetLocationAreaEncountersByVersion(int languageId, int locationAreaId, int versionId)
+        {
+            var key = $"encounters{locationAreaId}Version{versionId}Language{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query locationAreaEncountersByVersion($locationAreaId: Int, $versionId: Int, $languageId: Int) {
+                        encounters_info: pokemon_v2_encounter(
+                            where: {
+                                location_area_id: { _eq: $locationAreaId }
+                                _and: { version_id: { _eq: $versionId } }
+                            }
+                        ) {
+                            location_area_id
+                            pokemon_id
+                            min_level
+                            max_level
+                            version_id
+                            conditions: pokemon_v2_encounterconditionvaluemaps {
+                                pokemon_v2_encounterconditionvalue {
+                                    id
+                                    name
+                                }
+                            }
+                            encounter_slot: pokemon_v2_encounterslot {
+                                method: pokemon_v2_encountermethod {
+                                    id
+                                    name
+                                    names: pokemon_v2_encountermethodnames(
+                                        where: { language_id: { _eq: $languageId } }
+                                    ) {
+                                        name
+                                    }
+                                }
+                                rarity
+                                slot
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "locationAreaEncountersByVersion",
+                    Variables = new
+                    {
+                        languageId,
+                        locationAreaId,
+                        versionId
+                    }
+                };
+
+                var response = await _client.SendQueryAsync<LocationAreaEncountersInfoResponse>(request);
+                var data = response.Data;
+
+                return data.EncountersInfo;
+            }, context);
+        }
+
         public async Task<List<PokemonMoveInfo>> GetPokemonMovesInfoByVersionGroup(int languageId, int pokemonId, int versionGroupId)
         {
             var key = $"movesInfoPokemon{pokemonId}VersionGroup{versionGroupId}Language{languageId}";
