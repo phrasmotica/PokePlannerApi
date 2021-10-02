@@ -119,6 +119,55 @@ namespace PokePlannerApi.Clients.GraphQL
             }, context);
         }
 
+        public async Task<List<LocationInfo>> GetLocationsByRegion(int languageId, int regionId)
+        {
+            var key = $"locationsRegion{regionId}Language{languageId}";
+
+            var context = new Context(key);
+
+            return await _resiliencePolicy.ExecuteAsync(async ctx =>
+            {
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                    query locationsByRegion($regionId: Int, $languageId: Int) {
+                        location_info: pokemon_v2_location(
+                            where: { region_id: { _eq: $regionId } }
+                        ) {
+                            id
+                            name
+                            names: pokemon_v2_locationnames(
+                                where: { language_id: { _eq: $languageId } }
+                            ) {
+                                name
+                            }
+                            location_areas: pokemon_v2_locationareas {
+                                id
+                                name
+                                names: pokemon_v2_locationareanames(
+                                    where: { language_id: { _eq: $languageId } }
+                                ) {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                    ",
+                    OperationName = "locationsByRegion",
+                    Variables = new
+                    {
+                        languageId,
+                        regionId
+                    }
+                };
+
+                var response = await _client.SendQueryAsync<LocationInfoResponse>(request);
+                var data = response.Data;
+
+                return data.LocationInfo;
+            }, context);
+        }
+
         public async Task<List<PokemonMoveInfo>> GetPokemonMovesInfoByVersionGroup(int languageId, int pokemonId, int versionGroupId)
         {
             var key = $"movesInfoPokemon{pokemonId}VersionGroup{versionGroupId}Language{languageId}";
