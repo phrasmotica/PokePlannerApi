@@ -23,10 +23,10 @@ namespace PokePlannerApi.Controllers
 
         /// <summary>
         /// Returns info for encounters in the location area with the given ID
-        /// in the language with the given ID.
+        /// in the version with the given ID in the language with the given ID.
         /// </summary>
-        [HttpGet("locationArea/{locationAreaId:int}/versionGroup/{versionGroupId:int}/language/{languageId:int}")]
-        public async Task<List<EncountersInfo>> GetEncountersInfoByPokedex(int locationAreaId, int versionId, int languageId)
+        [HttpGet("locationArea/{locationAreaId:int}/version/{versionId:int}/language/{languageId:int}")]
+        public async Task<List<EncountersInfo>> GetLocationAreaEncountersByVersion(int locationAreaId, int versionId, int languageId)
         {
             _logger.LogInformation($"Getting info for encounters in location area {locationAreaId} and version {versionId} in language {languageId}...");
             return await _graphQlClient.GetLocationAreaEncountersByVersion(languageId, locationAreaId, versionId);
