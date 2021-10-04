@@ -30,7 +30,7 @@ namespace PokePlannerApi.Models.GraphQL
     public class EncounterSlot
     {
         [JsonProperty("method")]
-        public LearnMethod Method { get; set; }
+        public EncounterMethod Method { get; set; }
 
         [JsonProperty("rarity")]
         public int Rarity { get; set; }
@@ -39,7 +39,7 @@ namespace PokePlannerApi.Models.GraphQL
         public int? Slot { get; set; }
     }
 
-    public class LearnMethod
+    public class EncounterMethod
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -48,10 +48,10 @@ namespace PokePlannerApi.Models.GraphQL
         public string Name { get; set; }
 
         [JsonProperty("names")]
-        public List<LearnMethodName> Names { get; set; }
+        public List<EncounterMethodName> Names { get; set; }
     }
 
-    public class LearnMethodName
+    public class EncounterMethodName
     {
         [JsonProperty("name")]
         public string Name { get; set; }
