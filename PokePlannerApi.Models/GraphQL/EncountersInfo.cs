@@ -36,7 +36,7 @@ namespace PokePlannerApi.Models.GraphQL
         public int Rarity { get; set; }
 
         [JsonProperty("slot")]
-        public int Slot { get; set; }
+        public int? Slot { get; set; }
     }
 
     public class LearnMethod
