@@ -1,0 +1,15 @@
+version: '2.4'
+services:
+  app:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - POKEAPI_URL=https://pokeapi_web_1:443
+    volumes:
+      - ${APPDATA}\ASP.NET\Https:/root/.aspnet/https:ro
+      - ${APPDATA}\Microsoft\UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}\vsdbg\vs2017u5:/remote_debugger:rw
+
+networks:
+  default:
+    external: true
+    name: pokeapi_default

@@ -69,9 +69,13 @@ namespace PokePlannerApi
         {
             var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
 
+            var pokeApiUrl = Environment.GetEnvironmentVariable("POKEAPI_URL");
+
+            // TODO: the public version of PokeApiNet does not allow specifying a different base address.
+            // Implement your own client that can be configured, using the PokeApiNet code as a start...
             services.AddSingleton(sp => new PokeApiClient(new HttpClient
             {
-                BaseAddress = new Uri(pokeApiSettings.BaseUri),
+                BaseAddress = new Uri(pokeApiUrl),
             }));
 
             services.AddSingleton<IPokeApi, PokeAPI>();

@@ -14,10 +14,10 @@ COPY ["PokePlannerApi.Models/PokePlannerApi.Models.csproj", "PokePlannerApi.Mode
 RUN dotnet restore "PokePlannerApi/PokePlannerApi.csproj"
 COPY . .
 WORKDIR "/src/PokePlannerApi"
-RUN dotnet build "PokePlannerApi.csproj" -c Release -o /app/build
+RUN dotnet build "PokePlannerApi.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PokePlannerApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "PokePlannerApi.csproj" -c Debug -o /app/publish
 
 FROM base AS final
 WORKDIR /app
