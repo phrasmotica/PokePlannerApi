@@ -83,7 +83,8 @@ namespace PokePlannerApi.Data.DataStore.Converters
             var typesList = new List<WithId<List<TypeEntry>>>();
 
             var newestId = await _versionGroupService.GetNewestVersionGroupId();
-            var newestTypeEntries = await _typeService.Get(pokemonForm.Types.Select(t => t.Type));
+            //var newestTypeEntries = await _typeService.Get(pokemonForm.Types.Select(t => t.Type));
+            var newestTypeEntries = Enumerable.Empty<TypeEntry>();
 
             typesList.Add(
                 new WithId<List<TypeEntry>>(

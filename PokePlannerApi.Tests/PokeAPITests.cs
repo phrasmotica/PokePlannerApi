@@ -46,21 +46,6 @@ namespace PokePlannerApi.Tests
         }
 
         /// <summary>
-        /// Verifies that stat loading works correctly.
-        /// </summary>
-        [Test]
-        [Category("Integration")]
-        public async Task StatsLoadingTest()
-        {
-            // load stats
-            var statsService = serviceProvider.GetService<StatService>();
-            var stats = await statsService.GetAll();
-
-            // verify it's all loaded
-            Assert.AreEqual(8, stats.Length);
-        }
-
-        /// <summary>
         /// Verifies that loading the names of all Pokemon works correctly.
         /// </summary>
         [Test]

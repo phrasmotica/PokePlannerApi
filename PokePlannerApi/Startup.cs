@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -68,7 +69,11 @@ namespace PokePlannerApi
         {
             var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
 
-            services.AddSingleton(sp => new PokeApiClient(new Uri(pokeApiSettings.BaseUri)));
+            services.AddSingleton(sp => new PokeApiClient(new HttpClient
+            {
+                BaseAddress = new Uri(pokeApiSettings.BaseUri),
+            }));
+
             services.AddSingleton<IPokeApi, PokeAPI>();
 
             var resiliencePolicy = ResiliencePolicy.CreateResiliencePolicy(pokeApiSettings, NullLogger.Instance);
@@ -221,12 +226,6 @@ namespace PokePlannerApi
                 dataStoreSourceFactory,
                 dataStoreSettings,
                 collectionSettings.PokemonSpeciesCollectionName);
-
-            AddNamedService<Stat, StatEntry, StatConverter, StatService>(
-                services,
-                dataStoreSourceFactory,
-                dataStoreSettings,
-                collectionSettings.StatCollectionName);
 
             AddNamedService<Type, TypeEntry, TypeConverter, TypeService>(
                 services,
