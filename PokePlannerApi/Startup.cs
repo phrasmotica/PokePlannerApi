@@ -23,6 +23,7 @@ using PokePlannerApi.Settings;
 using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
 using Type = PokeApiNet.Type;
 using Version = PokeApiNet.Version;
+using PokeApiClient = PokePlannerApi.Clients.REST.PokeApiClient;
 
 namespace PokePlannerApi
 {
@@ -71,8 +72,6 @@ namespace PokePlannerApi
 
             var pokeApiUrl = Environment.GetEnvironmentVariable("POKEAPI_URL");
 
-            // TODO: the public version of PokeApiNet does not allow specifying a different base address.
-            // Implement your own client that can be configured, using the PokeApiNet code as a start...
             services.AddSingleton(sp => new PokeApiClient(new HttpClient
             {
                 BaseAddress = new Uri(pokeApiUrl),

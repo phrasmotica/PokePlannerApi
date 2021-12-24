@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using PokeApiNet;
+using PokeApiClient = PokePlannerApi.Clients.REST.PokeApiClient;
 
 namespace PokePlannerApi.Clients
 {
@@ -17,7 +16,7 @@ namespace PokePlannerApi.Clients
         /// <summary>
         /// The logger.
         /// </summary>
-        private readonly ILogger<PokeAPI> Logger;
+        private readonly ILogger<PokeAPI> _logger;
 
         /// <summary>
         /// The client for PokeAPI.
@@ -25,17 +24,12 @@ namespace PokePlannerApi.Clients
         private readonly PokeApiClient _pokeApiClient;
 
         /// <summary>
-        /// The base URI for PokeAPI.
-        /// </summary>
-        private readonly Uri BaseUri = new Uri("https://pokeapi.co/api/v2/");
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public PokeAPI(PokeApiClient pokeApiClient, ILogger<PokeAPI> logger)
         {
-            _pokeApiClient = pokeApiClient;
-            Logger = logger;
+            _pokeApiClient = pokeApiClient ?? throw new ArgumentNullException(nameof(pokeApiClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         #region Resource Get() methods
@@ -49,15 +43,15 @@ namespace PokePlannerApi.Clients
             T res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 res = await _pokeApiClient.GetResourceAsync<T>(id);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -74,15 +68,15 @@ namespace PokePlannerApi.Clients
             T res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 res = await _pokeApiClient.GetResourceAsync(nav);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} from UrlNavigation object failed.");
+                _logger.LogError(e, $"{call} from UrlNavigation object failed.");
                 throw;
             }
 
@@ -99,15 +93,15 @@ namespace PokePlannerApi.Clients
             List<T> resList;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 resList = await _pokeApiClient.GetResourceAsync(nav);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} from UrlNavigation objects failed.");
+                _logger.LogError(e, $"{call} from UrlNavigation objects failed.");
                 throw;
             }
 
@@ -135,21 +129,23 @@ namespace PokePlannerApi.Clients
             IEnumerable<LocationAreaEncounter> res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 var url = pokemon.LocationAreaEncounters;
-                res = await GetFromUrl<IEnumerable<LocationAreaEncounter>>(url);
+                res = await _pokeApiClient.GetFromUrl<IEnumerable<LocationAreaEncounter>>(url);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
             return res;
         }
+
+        #endregion
 
         #region API resources
 
@@ -162,16 +158,16 @@ namespace PokePlannerApi.Clients
             ApiResourceList<T> res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 var page = await GetPage<T>(1, 1);
                 res = await GetPage<T>(page.Count, 0);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -195,15 +191,15 @@ namespace PokePlannerApi.Clients
             ApiResourceList<T> resList;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 resList = await _pokeApiClient.GetApiResourcePageAsync<T>(limit, offset);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -219,16 +215,16 @@ namespace PokePlannerApi.Clients
             IEnumerable<T> res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 var page = await GetPage<T>(limit, offset);
                 res = await Get(page.Results);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -244,7 +240,7 @@ namespace PokePlannerApi.Clients
             T res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 // get a page to find the resource count
                 var page = await GetPage<T>();
@@ -256,11 +252,11 @@ namespace PokePlannerApi.Clients
 
                 res = await Get(page.Results.Last());
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -280,15 +276,15 @@ namespace PokePlannerApi.Clients
             T res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 res = await _pokeApiClient.GetResourceAsync<T>(name);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -304,16 +300,16 @@ namespace PokePlannerApi.Clients
             NamedApiResourceList<T> res;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 var page = await GetNamedPage<T>(1, 1);
                 res = await GetNamedPage<T>(page.Count, 0);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
@@ -337,58 +333,19 @@ namespace PokePlannerApi.Clients
             NamedApiResourceList<T> resList;
             try
             {
-                Logger.LogInformation($"{call} started...");
+                _logger.LogInformation($"{call} started...");
 
                 resList = await _pokeApiClient.GetNamedResourcePageAsync<T>(limit, offset);
 
-                Logger.LogInformation($"{call} finished.");
+                _logger.LogInformation($"{call} finished.");
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"{call} failed.");
+                _logger.LogError(e, $"{call} failed.");
                 throw;
             }
 
             return resList;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Returns objects of the given type from a PokeAPI URL.
-        /// </summary>
-        private async Task<T> GetFromUrl<T>(string url)
-        {
-            // lowercase as the API doesn't recognise uppercase and lowercase as the same
-            var sanitisedUrl = url.ToLowerInvariant();
-            if (!sanitisedUrl.EndsWith("/"))
-            {
-                // trailing slash is needed
-                sanitisedUrl += "/";
-            }
-
-            using var client = CreateHttpClient();
-
-            var response = await client.GetAsync(sanitisedUrl);
-            response.EnsureSuccessStatusCode();
-
-            var resp = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(resp);
-        }
-
-        #endregion
-
-        #region Helpers
-
-        /// <summary>
-        /// Returns a HttpClient for sending requests directly to PokeAPI.
-        /// </summary>
-        private HttpClient CreateHttpClient()
-        {
-            return new HttpClient
-            {
-                BaseAddress = BaseUri
-            };
         }
 
         #endregion
