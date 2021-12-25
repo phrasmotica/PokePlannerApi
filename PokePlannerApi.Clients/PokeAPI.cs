@@ -34,79 +34,11 @@ namespace PokePlannerApi.Clients
 
         #region Resource Get() methods
 
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetResourceAsync{T}(int)"/> with exception logging.
-        /// </summary>
-        public async Task<T> Get<T>(int id) where T : ResourceBase
-        {
-            var call = $"Get<{typeof(T)}>({id})";
-            T res;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
+        public Task<T> Get<T>(int id) where T : ResourceBase => _pokeApiClient.GetResourceAsync<T>(id);
 
-                res = await _pokeApiClient.GetResourceAsync<T>(id);
+        public Task<T> Get<T>(UrlNavigation<T> nav) where T : ResourceBase => _pokeApiClient.GetResourceAsync(nav);
 
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} failed.");
-                throw;
-            }
-
-            return res;
-        }
-
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetResourceAsync{T}(UrlNavigation{T})"/> with
-        /// exception logging.
-        /// </summary>
-        public async Task<T> Get<T>(UrlNavigation<T> nav) where T : ResourceBase
-        {
-            var call = $"Get<{typeof(T)}>(\"{nav.Url}\")";
-            T res;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                res = await _pokeApiClient.GetResourceAsync(nav);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} from UrlNavigation object failed.");
-                throw;
-            }
-
-            return res;
-        }
-
-        /// <summary>
-        /// Wrapper for <see
-        /// cref="PokeApiClient.GetResourceAsync{T}(IEnumerable{UrlNavigation{T}})"/> with exception logging.
-        /// </summary>
-        public async Task<IEnumerable<T>> Get<T>(IEnumerable<UrlNavigation<T>> nav) where T : ResourceBase
-        {
-            var call = $"Get<{typeof(T)}>(urlList)";
-            List<T> resList;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                resList = await _pokeApiClient.GetResourceAsync(nav);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} from UrlNavigation objects failed.");
-                throw;
-            }
-
-            return resList;
-        }
+        public Task<List<T>> Get<T>(IEnumerable<UrlNavigation<T>> nav) where T : ResourceBase => _pokeApiClient.GetResourceAsync(nav);
 
         public async Task<PokemonSprites> GetSpritesOfVariety(int varietyId)
         {
@@ -125,24 +57,8 @@ namespace PokePlannerApi.Clients
         /// </summary>
         public async Task<IEnumerable<LocationAreaEncounter>> GetEncounters(Pokemon pokemon)
         {
-            var call = $"GetLocationAreaEncounters({pokemon.Id})";
-            IEnumerable<LocationAreaEncounter> res;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                var url = pokemon.LocationAreaEncounters;
-                res = await _pokeApiClient.GetFromUrl<IEnumerable<LocationAreaEncounter>>(url);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} failed.");
-                throw;
-            }
-
-            return res;
+            var url = pokemon.LocationAreaEncounters;
+            return await _pokeApiClient.GetFromUrl<IEnumerable<LocationAreaEncounter>>(url);
         }
 
         #endregion
@@ -174,37 +90,9 @@ namespace PokePlannerApi.Clients
             return res;
         }
 
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetApiResourcePageAsync{T}"/> with exception logging.
-        /// </summary>
-        public async Task<ApiResourceList<T>> GetPage<T>() where T : ApiResource
-        {
-            return await GetPage<T>(20, 0);
-        }
+        public async Task<ApiResourceList<T>> GetPage<T>() where T : ApiResource => await GetPage<T>(20, 0);
 
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetApiResourcePageAsync{T}()"/> with exception logging.
-        /// </summary>
-        public async Task<ApiResourceList<T>> GetPage<T>(int limit, int offset) where T : ApiResource
-        {
-            var call = $"GetPage<{typeof(T)}>(limit={limit}, offset={offset})";
-            ApiResourceList<T> resList;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                resList = await _pokeApiClient.GetApiResourcePageAsync<T>(limit, offset);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} failed.");
-                throw;
-            }
-
-            return resList;
-        }
+        public Task<ApiResourceList<T>> GetPage<T>(int limit, int offset) where T : ApiResource => _pokeApiClient.GetApiResourcePageAsync<T>(limit, offset);
 
         /// <summary>
         /// Returns many named API resources of the given type.
@@ -267,29 +155,7 @@ namespace PokePlannerApi.Clients
 
         #region Named API resources
 
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetResourceAsync{T}(string)"/> with exception logging.
-        /// </summary>
-        public async Task<T> Get<T>(string name) where T : NamedApiResource
-        {
-            var call = $"Get<{typeof(T)}>(\"{name}\")";
-            T res;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                res = await _pokeApiClient.GetResourceAsync<T>(name);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} failed.");
-                throw;
-            }
-
-            return res;
-        }
+        public Task<T> Get<T>(string name) where T : NamedApiResource => _pokeApiClient.GetResourceAsync<T>(name);
 
         /// <summary>
         /// Returns a page with all resources of the given type.
@@ -316,37 +182,12 @@ namespace PokePlannerApi.Clients
             return res;
         }
 
-        /// <summary>
-        /// Wrapper for <see cref="PokeApiClient.GetNamedResourcePageAsync{T}"/> with exception logging.
-        /// </summary>
-        public async Task<NamedApiResourceList<T>> GetNamedPage<T>() where T : NamedApiResource
-        {
-            return await GetNamedPage<T>(20, 0);
-        }
+        public Task<NamedApiResourceList<T>> GetNamedPage<T>() where T : NamedApiResource => GetNamedPage<T>(20, 0);
 
         /// <summary>
         /// Wrapper for <see cref="PokeApiClient.GetNamedResourcePageAsync{T}()"/> with exception logging.
         /// </summary>
-        public async Task<NamedApiResourceList<T>> GetNamedPage<T>(int limit, int offset) where T : NamedApiResource
-        {
-            var call = $"GetPage<{typeof(T)}>(limit={limit}, offset={offset})";
-            NamedApiResourceList<T> resList;
-            try
-            {
-                _logger.LogInformation($"{call} started...");
-
-                resList = await _pokeApiClient.GetNamedResourcePageAsync<T>(limit, offset);
-
-                _logger.LogInformation($"{call} finished.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{call} failed.");
-                throw;
-            }
-
-            return resList;
-        }
+        public Task<NamedApiResourceList<T>> GetNamedPage<T>(int limit, int offset) where T : NamedApiResource => _pokeApiClient.GetNamedResourcePageAsync<T>(limit, offset);
 
         #endregion
     }

@@ -24,6 +24,8 @@ using PokemonEntry = PokePlannerApi.Models.PokemonEntry;
 using Type = PokeApiNet.Type;
 using Version = PokeApiNet.Version;
 using PokeApiClient = PokePlannerApi.Clients.REST.PokeApiClient;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 
 namespace PokePlannerApi
 {
@@ -40,6 +42,10 @@ namespace PokePlannerApi
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigurePokeApiClient(services);
+            ConfigureGraphQlClient(services);
+
+            services.AddSingleton<IPokeApi, PokeAPI>();
+
             ConfigureDataStore(services);
 
             services.AddControllers()
@@ -68,20 +74,34 @@ namespace PokePlannerApi
         /// </summary>
         private void ConfigurePokeApiClient(IServiceCollection services)
         {
-            var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
-
             var pokeApiUrl = Environment.GetEnvironmentVariable("POKEAPI_URL");
 
-            services.AddSingleton(sp => new PokeApiClient(new HttpClient
+            var httpClient = new HttpClient
             {
                 BaseAddress = new Uri(pokeApiUrl),
-            }));
+            };
 
-            services.AddSingleton<IPokeApi, PokeAPI>();
-
+            var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
             var resiliencePolicy = ResiliencePolicy.CreateResiliencePolicy(pokeApiSettings, NullLogger.Instance);
 
-            services.AddSingleton(sp => new PokeAPIGraphQLClient(new Uri(pokeApiSettings.GraphQlUri), resiliencePolicy));
+            services.AddSingleton(sp => new PokeApiClient(httpClient, resiliencePolicy));
+        }
+
+        private void ConfigureGraphQlClient(IServiceCollection services)
+        {
+            var graphQlUrl = Environment.GetEnvironmentVariable("POKEAPI_GRAPHQL_URL");
+
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(graphQlUrl),
+            };
+
+            var graphQlClient = new GraphQLHttpClient(new GraphQLHttpClientOptions(), new NewtonsoftJsonSerializer(), httpClient);
+
+            var pokeApiSettings = Configuration.GetSection(nameof(PokeApiSettings)).Get<PokeApiSettings>();
+            var resiliencePolicy = ResiliencePolicy.CreateResiliencePolicy(pokeApiSettings, NullLogger.Instance);
+
+            services.AddSingleton(sp => new PokeAPIGraphQLClient(graphQlClient, resiliencePolicy));
         }
 
         /// <summary>

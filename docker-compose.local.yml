@@ -3,7 +3,8 @@ services:
   app:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - POKEAPI_URL=https://pokeapi_web_1:443
+      - POKEAPI_URL=https://pokeapi.co/api/v2/
+      - POKEAPI_GRAPHQL_URL=https://beta.pokeapi.co/graphql/v1beta
     volumes:
       - ${APPDATA}\ASP.NET\Https:/root/.aspnet/https:ro
       - ${APPDATA}\Microsoft\UserSecrets:/root/.microsoft/usersecrets:ro

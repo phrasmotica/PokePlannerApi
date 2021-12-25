@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
+using GraphQL.Client.Abstractions;
 using PokePlannerApi.Models.GraphQL;
 using Polly;
 
@@ -14,13 +13,13 @@ namespace PokePlannerApi.Clients.GraphQL
     /// </summary>
     public class PokeAPIGraphQLClient
     {
-        private readonly GraphQLHttpClient _client;
+        private readonly IGraphQLClient _client;
         private readonly IAsyncPolicy _resiliencePolicy;
 
-        public PokeAPIGraphQLClient(Uri graphQlEndpoint, IAsyncPolicy resiliencePolicy)
+        public PokeAPIGraphQLClient(IGraphQLClient client, IAsyncPolicy resiliencePolicy)
         {
-            _client = new GraphQLHttpClient(graphQlEndpoint, new NewtonsoftJsonSerializer());
-            _resiliencePolicy = resiliencePolicy;
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _resiliencePolicy = resiliencePolicy ?? throw new ArgumentNullException(nameof(resiliencePolicy));
         }
 
         public async Task<List<GenerationInfo>> GetGenerationInfo(int languageId)

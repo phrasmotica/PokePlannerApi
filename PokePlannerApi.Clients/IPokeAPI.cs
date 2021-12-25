@@ -22,7 +22,7 @@ namespace PokePlannerApi.Clients
         /// <summary>
         /// Returns the resources of the given type from the given set of navigation properties.
         /// </summary>
-        Task<IEnumerable<T>> Get<T>(IEnumerable<UrlNavigation<T>> nav) where T : ResourceBase;
+        Task<List<T>> Get<T>(IEnumerable<UrlNavigation<T>> nav) where T : ResourceBase;
 
         /// <summary>
         /// Returns sprite data for the Pokemon with the given ID.
